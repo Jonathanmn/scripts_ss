@@ -1,3 +1,4 @@
+# https://minibatchai.com/2023/08/23/Windrose.html
 
 import os
 import pandas as pd
