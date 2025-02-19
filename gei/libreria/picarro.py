@@ -1,7 +1,46 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import os
+import glob
+from pathlib import Path
+''' estamos haciendo prubeas de git'''
 
+
+''' Lectura de archivos    '''
+
+
+def raw_gei_folder(folder_path):
+    """
+    Lee los archivos .dat del folder donde se encuentran los archivos raw con subcarpetas
+    retorna un solo data frame con los datos de toda la carpeta .
+    """
+    dataframes = []
+
+    for file_path in Path(folder_path).rglob('*.dat'):
+        df = pd.read_csv(file_path, delimiter=r',')
+        dataframes.append(df)
+
+    gei = pd.concat(dataframes, ignore_index=True)
+    gei['timestamp'] = pd.to_datetime(gei['timestamp'])
+    gei = gei.sort_values(by='timestamp').reset_index(drop=True)
+
+
+    return gei
+
+
+
+
+
+
+
+
+
+
+
+
+
+''' Pruebas de de Flags   '''
 
 def umbrales_gei(df, CO2_umbral=None, CH4_umbral=None, CO_umbral=None):
   """
@@ -17,7 +56,7 @@ def umbrales_gei(df, CO2_umbral=None, CH4_umbral=None, CO_umbral=None):
   return df
 
 
-def flags_mvp(df,CO2,CH4,CO):
+def flags_mpv(df,CO2,CH4,CO):
   df['MPVPosition'] = df['MPVPosition'].fillna(0).astype(int)
 
   df['MPVPosition'] = df['MPVPosition'].round().astype(int)
@@ -29,11 +68,11 @@ def flags_mvp(df,CO2,CH4,CO):
       column_name = f'MVP_{value}'
 
       temp_df = df[df['MPVPosition'] == value][[CO2,CH4,CO]]
-      # Rename columns
+      
       temp_df = temp_df.rename(columns={
-          CO2: f'{column_name}_CO2_flag',
-          CH4: f'{column_name}_CH4_flag',
-          CO: f'{column_name}_CO_flag'
+          CO2: f'{column_name}_CO2_mpv',
+          CH4: f'{column_name}_CH4_mpv',
+          CO: f'{column_name}_CO_mpv'
       })
       df = pd.merge(df, temp_df, left_index=True, right_index=True, how='left')
 
@@ -56,7 +95,7 @@ def flags_species_1min(df):
     size_CH4 = df.groupby(pd.Grouper(key='timestamp', freq='1min'))['CH4_dry'].transform('size')
     size_CO = df.groupby(pd.Grouper(key='timestamp', freq='1min'))['CO'].transform('size')
     
-    # Apply conditions to set values to None based on size
+    
     df.loc[(size_CO2 < 30), 'CO2_dry'] = None
     df.loc[(size_CH4 < 15), 'CH4_dry'] = None
     df.loc[(size_CO < 30), 'CO'] = None
@@ -99,3 +138,114 @@ def flags_species_1min(df):
 
 
 
+
+
+
+
+
+
+
+
+
+''' Ploteos    '''
+
+def plot_1min_avg_sd(df):
+    """
+    Ploteo de los valores promedio y desviacion estandar para gei.
+    """
+
+    fig, axes = plt.subplots(3, 1, figsize=(10, 12), sharex=True)
+
+    # CO2
+    ax1 = axes[0]
+    ax1.plot(df['Time'], df['CO2_Avg'], label='CO2_Avg', color='#123456')
+    ax1_twin = ax1.twinx()
+    ax1_twin.plot(df['Time'], df['CO2_SD'], label='CO2_SD', color='#F7883F', alpha=0.8)
+    ax1.set_ylabel('CO2_Avg')
+    ax1_twin.set_ylabel('CO2_SD')
+    ax1.legend(loc='upper left')
+    ax1_twin.legend(loc='upper right')
+    ax1.set_title('CO2 Concentration')
+
+    # CH4
+    ax2 = axes[1]
+    ax2.plot(df['Time'], df['CH4_Avg'], label='CH4_Avg', color='#123456')
+    ax2_twin = ax2.twinx()
+    ax2_twin.plot(df['Time'], df['CH4_SD'], label='CH4_SD', color='#F7883F',alpha=0.8)
+    ax2.set_ylabel('CH4_Avg')
+    ax2_twin.set_ylabel('CH4_SD')
+    ax2.legend(loc='upper left')
+    ax2_twin.legend(loc='upper right')
+    ax2.set_title('CH4 Concentration')
+
+    # CO
+    ax3 = axes[2]
+    ax3.plot(df['Time'], df['CO_Avg'], label='CO_Avg', color='#123456')
+    ax3_twin = ax3.twinx()
+    ax3_twin.plot(df['Time'], df['CO_SD'], label='CO_SD', color='#F7883F', alpha=0.8)
+    ax3.set_ylabel('CO_Avg')
+    ax3_twin.set_ylabel('CO_SD')
+    ax3.legend(loc='upper left')
+    ax3_twin.legend(loc='upper right')
+    ax3.set_title('CO Concentration')
+
+    plt.xlabel('Time')
+    plt.tight_layout()
+    plt.show()
+
+
+
+
+
+
+def plot_gei_avg_sd_monthly(df):
+    """
+    Plots average and standard deviation for CO2, CH4, and CO 
+    separately for each month in the DataFrame.
+    """
+    
+    # Ensure 'Time' column is datetime type
+    df['Time'] = pd.to_datetime(df['Time'])
+
+    # Group data by month
+    for month, group in df.groupby(df['Time'].dt.month):
+        # Create a figure and subplots for each month
+        fig, axes = plt.subplots(3, 1, figsize=(10, 12), sharex=True)
+        fig.suptitle(f'Month: {month}')  # Set title for the month
+
+        # Plot CO2 data for the month
+        ax1 = axes[0]
+        ax1.plot(group['Time'], group['CO2_Avg'], label='CO2_Avg', color='#123456')
+        ax1_twin = ax1.twinx()
+        ax1_twin.plot(group['Time'], group['CO2_SD'], label='CO2_SD', color='#F7883F', alpha=0.8)
+        ax1.set_ylabel('CO2_Avg')
+        ax1_twin.set_ylabel('CO2_SD')
+        ax1.legend(loc='upper left')
+        ax1_twin.legend(loc='upper right')
+        ax1.set_title('CO2 Concentration')
+
+        # Plot CH4 data for the month
+        ax2 = axes[1]
+        ax2.plot(group['Time'], group['CH4_Avg'], label='CH4_Avg', color='#123456')
+        ax2_twin = ax2.twinx()
+        ax2_twin.plot(group['Time'], group['CH4_SD'], label='CH4_SD', color='#F7883F', alpha=0.8)
+        ax2.set_ylabel('CH4_Avg')
+        ax2_twin.set_ylabel('CH4_SD')
+        ax2.legend(loc='upper left')
+        ax2_twin.legend(loc='upper right')
+        ax2.set_title('CH4 Concentration')
+
+        # Plot CO data for the month
+        ax3 = axes[2]
+        ax3.plot(group['Time'], group['CO_Avg'], label='CO_Avg', color='#123456')
+        ax3_twin = ax3.twinx()
+        ax3_twin.plot(group['Time'], group['CO_SD'], label='CO_SD', color='#F7883F', alpha=0.8)
+        ax3.set_ylabel('CO_Avg')
+        ax3_twin.set_ylabel('CO_SD')
+        ax3.legend(loc='upper left')
+        ax3_twin.legend(loc='upper right')
+        ax3.set_title('CO Concentration')
+
+        plt.xlabel('Time')
+        plt.tight_layout()
+        plt.show()

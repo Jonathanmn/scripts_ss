@@ -38,7 +38,8 @@ def download_roua_process(hostname, username, password, remote_path, local_path)
     except Exception as e:
         print(f"No se pudo descargar: {e}")
 
-# Example usage (same as before)
+# mete tus argumentos 
+
 hostname = "132.248.8.32"
 username = "gei"
 password = "ru04g31"
