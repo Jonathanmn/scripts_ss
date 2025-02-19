@@ -7,7 +7,7 @@ from pathlib import Path
 ''' estamos haciendo prubeas de git'''
 
 
-''' Lectura de archivos    '''
+''' Lectura de archivos y guardado de archivos   '''
 
 
 def raw_gei_folder(folder_path):
@@ -32,9 +32,49 @@ def raw_gei_folder(folder_path):
 
 
 
+''' Correcciones de hora y fecha   '''
 
 
+def correccion_utc(df, column_name):
+  """
+  se llama al data frame con el nombre de la columna con el timestamp ejemplo gei, 'Time'
+  Entrega el tiempo con la correccion UTC -6h - 170 s que tarda en llegar a la valvula.
+  """
+  df[column_name] = df[column_name] - timedelta(hours=6) - timedelta(seconds=170)
+  df[column_name] = df[column_name].dt.floor('min') 
+  return df
 
+
+def timestamp_l0(df, timestamp_column):
+  """
+  Completes a DataFrame's timestamp series by adding missing timestamps.
+
+  Args:
+    df: The Pandas DataFrame.
+    timestamp_column: The name of the timestamp column (default: 'timestamp').
+
+  Returns:
+    pandas.DataFrame: The DataFrame with a complete timestamp series.
+  """
+
+  # Get the start and end dates for the month
+  start_date = df[timestamp_column].min().floor('D').replace(day=1)  # Start of the month
+  end_date = df[timestamp_column].max().floor('D') + pd.offsets.MonthEnd(0)  # End of the month
+
+  # Generate the complete timestamp sequence
+  complete_timestamps = pd.date_range(
+      start=start_date, 
+      end=end_date + pd.Timedelta(days=1) - pd.Timedelta(seconds=1),  # Include 23:59:00 of the last day
+      freq='1min'
+  )
+
+  # Create a DataFrame with the complete timestamps
+  complete_df = pd.DataFrame({timestamp_column: complete_timestamps})
+
+  # Merge the original DataFrame with the complete DataFrame
+  df_complete = pd.merge(complete_df, df, on=timestamp_column, how='left')
+
+  return df_complete
 
 
 
