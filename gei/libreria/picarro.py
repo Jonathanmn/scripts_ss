@@ -12,7 +12,29 @@ def umbrales_gei(df, CO2_umbral=None, CH4_umbral=None, CO_umbral=None):
   return df
 
 
+def flags_mvp(df,CO2,CH4,CO):
+  df['MPVPosition'] = df['MPVPosition'].fillna(0).astype(int)
 
+  df['MPVPosition'] = df['MPVPosition'].round().astype(int)
+
+  MPVcount = df['MPVPosition'].value_counts(dropna=False)
+ 
+  for value, count in MPVcount.items():
+    if value != 0 and value != 1:
+      column_name = f'MVP_{value}'
+
+      temp_df = df[df['MPVPosition'] == value][[CO2,CH4,CO]]
+      # Rename columns
+      temp_df = temp_df.rename(columns={
+          CO2: f'{column_name}_CO2_flag',
+          CH4: f'{column_name}_CH4_flag',
+          CO: f'{column_name}_CO_flag'
+      })
+      df = pd.merge(df, temp_df, left_index=True, right_index=True, how='left')
+
+  df.loc[((df['MPVPosition'] != 0) & (df['MPVPosition'] != 1)), CO2] = None
+  df.loc[((df['MPVPosition'] != 0) & (df['MPVPosition'] != 1)), CH4] = None
+  return df
 
 def flags_species_1min(df):
     """
