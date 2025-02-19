@@ -46,32 +46,22 @@ def correccion_utc(df, column_name):
 
 
 def timestamp_l0(df, timestamp_column):
-  """
-  Completes a DataFrame's timestamp series by adding missing timestamps.
 
-  Args:
-    df: The Pandas DataFrame.
-    timestamp_column: The name of the timestamp column (default: 'timestamp').
 
-  Returns:
-    pandas.DataFrame: The DataFrame with a complete timestamp series.
-  """
+  start_date = df[timestamp_column].min().floor('D').replace(day=1)  
+  end_date = df[timestamp_column].max().floor('D') + pd.offsets.MonthEnd(0)  
 
-  # Get the start and end dates for the month
-  start_date = df[timestamp_column].min().floor('D').replace(day=1)  # Start of the month
-  end_date = df[timestamp_column].max().floor('D') + pd.offsets.MonthEnd(0)  # End of the month
 
-  # Generate the complete timestamp sequence
   complete_timestamps = pd.date_range(
       start=start_date, 
-      end=end_date + pd.Timedelta(days=1) - pd.Timedelta(seconds=1),  # Include 23:59:00 of the last day
+      end=end_date + pd.Timedelta(days=1) - pd.Timedelta(seconds=1),  
       freq='1min'
   )
 
-  # Create a DataFrame with the complete timestamps
+  
   complete_df = pd.DataFrame({timestamp_column: complete_timestamps})
 
-  # Merge the original DataFrame with the complete DataFrame
+  
   df_complete = pd.merge(complete_df, df, on=timestamp_column, how='left')
 
   return df_complete
@@ -105,14 +95,14 @@ def flags_mpv(df,CO2,CH4,CO):
  
   for value, count in MPVcount.items():
     if value != 0 and value != 1:
-      column_name = f'MVP_{value}'
+      column_name = f'MPV_{value}'
 
       temp_df = df[df['MPVPosition'] == value][[CO2,CH4,CO]]
       
       temp_df = temp_df.rename(columns={
-          CO2: f'{column_name}_CO2_mpv',
-          CH4: f'{column_name}_CH4_mpv',
-          CO: f'{column_name}_CO_mpv'
+          CO2: f'{column_name}_CO2',
+          CH4: f'{column_name}_CH4',
+          CO: f'{column_name}_CO'
       })
       df = pd.merge(df, temp_df, left_index=True, right_index=True, how='left')
 
