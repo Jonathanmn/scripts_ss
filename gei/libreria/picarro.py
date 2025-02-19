@@ -88,6 +88,7 @@ def flags_species_1min(df):
     resampled_df = resampled_df.reset_index().rename(columns={'timestamp': 'Time'})
 
     return resampled_df
-    resampled_df = resampled_df.reset_index().rename(columns={'timestamp': 'Time'})
 
-    return resampled_df
+
+
+
