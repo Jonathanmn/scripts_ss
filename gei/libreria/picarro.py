@@ -1,3 +1,8 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+
 def umbrales_gei(df, CO2_umbral=None, CH4_umbral=None, CO_umbral=None):
   """
  Aplica el umbral a las columnas 'CO2_dry', 'CH4_dry', y 'CO' del DataFrame.
@@ -88,6 +93,8 @@ def flags_species_1min(df):
     resampled_df = resampled_df.reset_index().rename(columns={'timestamp': 'Time'})
 
     return resampled_df
+
+
 
 
 
