@@ -5,6 +5,8 @@ from picarro import *
 
 #plot_raw
 folder_path= '/home/jmn/server_gei'
+output_folder= '/home/jmn/picarro_data'
+
 
 gei=raw_gei_folder(folder_path)
 gei=umbrales_gei(gei, CO2_umbral=300, CH4_umbral=1.6)
@@ -17,8 +19,11 @@ gei=flags_species_1min(gei)
 print('amonos a las flags')
 gei=flags_mpv(gei,'CO2_Avg','CH4_Avg','CO_Avg')
 
-plot_gei_avg_sd_monthly(gei)
+
+gei=correccion_utc(gei, 'Time')
+
+#plot_gei_avg_sd_monthly(gei)
 
 
 
-
+gei_l0(gei,output_folder)
