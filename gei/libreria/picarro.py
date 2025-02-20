@@ -102,7 +102,7 @@ def timestamp_l0(df, timestamp_column):
 
 
 
-''' Pruebas de de Flags   '''
+''' Pruebas umbrales  '''
 
 def umbrales_gei(df, CO2_umbral=None, CH4_umbral=None, CO_umbral=None):
   """
@@ -116,6 +116,35 @@ def umbrales_gei(df, CO2_umbral=None, CH4_umbral=None, CO_umbral=None):
   if CO_umbral is not None:
     df['CO'] = np.where(df['CO'] <= CO_umbral, np.nan, df['CO'])
   return df
+
+def filter_sd(df, num_sd=2):
+    """
+    Filters the DataFrame by removing outliers based on standard deviation.
+
+    Args:
+        df: The Pandas DataFrame containing the data.
+        num_stds: The number of standard deviations to use as the threshold
+                   for identifying outliers (default: 2).
+
+    Returns:
+        pandas.DataFrame: The DataFrame with outliers replaced by NaN.
+    """
+
+    # Get columns for CO2, CH4, and CO averages
+    avg_cols = ['CO2_Avg', 'CH4_Avg', 'CO_Avg']
+
+    # Iterate through average columns
+    for col in avg_cols:
+        # Calculate upper and lower bounds for outlier detection
+        upper_bound = df[col] + num_sd * df[f'{col[:-3]}SD']
+        lower_bound = df[col] - num_sd * df[f'{col[:-3]}SD']
+
+        # Replace outliers with NaN
+        df.loc[~df[col].between(lower_bound, upper_bound), col] = np.nan
+
+    return df
+''' Flags   '''
+
 
 
 def flags_mpv(df,CO2,CH4,CO):
@@ -192,7 +221,8 @@ def flags_species_1min(df):
     })
 
     resampled_df = resampled_df.reset_index().rename(columns={'timestamp': 'Time'})
-
+    resampled_df.loc[((resampled_df["MPVPosition"] != 0) & (resampled_df["MPVPosition"] != 1)), "CO2_SD"] = None
+    resampled_df.loc[((resampled_df["MPVPosition"] != 0) & (resampled_df["MPVPosition"] != 1)), "CH4_SD"] = None
     return resampled_df
 
 
@@ -260,7 +290,7 @@ def plot_1min_avg_sd(df):
 
 
 
-def plot_gei_avg_sd_monthly(df):
+def plot_avg_sd_month(df):
     """
     Plots average and standard deviation for CO2, CH4, and CO 
     separately for each month in the DataFrame.
@@ -270,10 +300,10 @@ def plot_gei_avg_sd_monthly(df):
     df['Time'] = pd.to_datetime(df['Time'])
 
     # Group data by month
-    for month, group in df.groupby(df['Time'].dt.month):
+    for (year, month), group in df.groupby([df['Time'].dt.year, df['Time'].dt.month]):
         # Create a figure and subplots for each month
         fig, axes = plt.subplots(3, 1, figsize=(10, 12), sharex=True)
-        fig.suptitle(f'Month: {month}')  # Set title for the month
+        fig.suptitle(f'GEI {month} - {year} ')  # Set title for the month
 
         # Plot CO2 data for the month
         ax1 = axes[0]

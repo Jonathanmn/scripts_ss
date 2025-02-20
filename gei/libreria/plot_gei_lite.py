@@ -10,20 +10,21 @@ output_folder= '/home/jmn/picarro_data'
 
 gei=raw_gei_folder(folder_path)
 gei=umbrales_gei(gei, CO2_umbral=300, CH4_umbral=1.6)
-print('ya amonos al mpv')
+print('aplicando flags a especies mpv')
 
-print('ya fue')
 
 gei=flags_species_1min(gei)
 
-print('amonos a las flags')
+print('flags de MPV')
 gei=flags_mpv(gei,'CO2_Avg','CH4_Avg','CO_Avg')
 
 
 gei=correccion_utc(gei, 'Time')
 
-#plot_gei_avg_sd_monthly(gei)
+gei=filter_sd(gei,num_sd=2)
+
+plot_avg_sd_month(gei)
 
 
 
-gei_l0(gei,output_folder)
+#gei_l0(gei,output_folder)
