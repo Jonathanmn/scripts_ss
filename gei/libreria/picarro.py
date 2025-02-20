@@ -117,6 +117,20 @@ def umbrales_gei(df, CO2_umbral=None, CH4_umbral=None, CO_umbral=None):
     df['CO'] = np.where(df['CO'] <= CO_umbral, np.nan, df['CO'])
   return df
 
+
+
+def umbrales_sd(df, CO2_umbral=None, CH4_umbral=None, CO_umbral=None):
+  ''' Aplica el umbral a las columnas 'CO2_SD', 'CH4_SD', y 'CO_SD' del DataFrame. '''
+
+  if CO2_umbral is not None:
+    df['CO2_Avg'] = np.where(df['CO2_SD'] <= CO2_umbral, np.nan, df['CO2_Avg'])
+  if CH4_umbral is not None:
+    df['CH4_Avg'] = np.where(df['CH4_SD'] <= CH4_umbral, np.nan, df['CH4_Avg'])
+  if CO_umbral is not None:
+    df['CO_Avg'] = np.where(df['CO_SD'] <= CO_umbral, np.nan, df['CO_Avg'])
+  return df
+
+
 def filter_sd(df, num_sd=2):
     """
     Filters the DataFrame by removing outliers based on standard deviation.
@@ -130,16 +144,16 @@ def filter_sd(df, num_sd=2):
         pandas.DataFrame: The DataFrame with outliers replaced by NaN.
     """
 
-    # Get columns for CO2, CH4, and CO averages
+    
     avg_cols = ['CO2_Avg', 'CH4_Avg', 'CO_Avg']
 
-    # Iterate through average columns
+    
     for col in avg_cols:
-        # Calculate upper and lower bounds for outlier detection
+        
         upper_bound = df[col] + num_sd * df[f'{col[:-3]}SD']
         lower_bound = df[col] - num_sd * df[f'{col[:-3]}SD']
 
-        # Replace outliers with NaN
+        
         df.loc[~df[col].between(lower_bound, upper_bound), col] = np.nan
 
     return df
