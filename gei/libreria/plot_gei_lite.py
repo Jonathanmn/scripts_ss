@@ -3,12 +3,14 @@
 
 from picarro import *
 
-#plot_raw
+
 folder_path= '/home/jmn/server_gei'
 output_folder= '/home/jmn/picarro_data'
 
 
-gei=raw_gei_folder(folder_path)
+gei=read_raw_gei_folder(folder_path)
+
+
 gei=umbrales_gei(gei, CO2_umbral=300, CH4_umbral=1.6)
 print('aplicando flags a especies mpv')
 

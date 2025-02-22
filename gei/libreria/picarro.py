@@ -12,7 +12,7 @@ from datetime import timedelta
 ''' Lectura de archivos y guardado de archivos   '''
 
 
-def raw_gei_folder(folder_path):
+def read_raw_gei_folder(folder_path):
     """
     Lee los archivos .dat del folder donde se encuentran los archivos raw con subcarpetas
     retorna un solo data frame con los datos de toda la carpeta .
@@ -32,7 +32,7 @@ def raw_gei_folder(folder_path):
 
 
 
-def gei_l0(df, output_folder):
+def save_gei_l0(df, output_folder):
     """
     Saves the input DataFrame to separate .dat files, one for each month,
     in the specified output folder structure: minuto minuto/YYYY/MM/YYYY-MM_CMUL_LO.dat.
@@ -355,3 +355,71 @@ def plot_avg_sd_month(df):
         plt.xlabel('Time')
         plt.tight_layout()
         plt.show()
+
+
+
+
+def plot_raw(df, timestamp_column):
+
+
+  fig, axes = plt.subplots(3, 1, figsize=(10, 12), sharex=True)  
+
+  
+  axes[0].plot(df[timestamp_column], df['CO2_dry'], label='CO2_dry')
+  axes[0].set_ylabel('CO2_dry')
+  axes[0].legend()
+
+  # Plot CH4_dry
+  axes[1].plot(df[timestamp_column], df['CH4_dry'], label='CH4_dry')
+  axes[1].set_ylabel('CH4_dry')
+  axes[1].legend()
+
+  # Plot CO
+  axes[2].plot(df[timestamp_column], df['CO'], label='CO')
+  axes[2].set_ylabel('CO')
+  axes[2].legend()
+
+  plt.xlabel(timestamp_column)  
+  plt.suptitle('Raw Data Plot')  
+  plt.tight_layout()
+  plt.show()
+
+
+def plot_raw_grouped(df, timestamp_column):
+  """
+  Plots 'CO2_dry', 'CH4_dry', and 'CO' grouped by year and month.
+
+  Args:
+    df: The Pandas DataFrame containing the data.
+    timestamp_column: The name of the column containing timestamps.
+  """
+
+  # Ensure timestamp column is in datetime format
+  df[timestamp_column] = pd.to_datetime(df[timestamp_column])
+
+  # Group data by year and month
+  grouped_data = df.groupby([df[timestamp_column].dt.year, df[timestamp_column].dt.month])
+
+  # Iterate through groups and create plots
+  for (year, month), group_df in grouped_data:
+    fig, axes = plt.subplots(3, 1, figsize=(10, 12), sharex=True)
+
+    # Plot CO2_dry
+    axes[0].plot(group_df[timestamp_column], group_df['CO2_dry'], label='CO2_dry')
+    axes[0].set_ylabel('CO2_dry')
+    axes[0].legend()
+
+    # Plot CH4_dry
+    axes[1].plot(group_df[timestamp_column], group_df['CH4_dry'], label='CH4_dry')
+    axes[1].set_ylabel('CH4_dry')
+    axes[1].legend()
+
+    # Plot CO
+    axes[2].plot(group_df[timestamp_column], group_df['CO'], label='CO')
+    axes[2].set_ylabel('CO')
+    axes[2].legend()
+
+    plt.xlabel(timestamp_column)
+    plt.suptitle(f'Raw Data Plot - Year: {year}, Month: {month}')
+    plt.tight_layout()
+    plt.show()
