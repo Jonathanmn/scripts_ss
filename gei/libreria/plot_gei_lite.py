@@ -19,12 +19,8 @@ gei=flags_species_1min(gei)
 
 print('flags de MPV')
 gei=flags_mpv(gei,'CO2_Avg','CH4_Avg','CO_Avg')
-
-
 gei=correccion_utc(gei, 'Time')
-
 gei=filter_sd(gei,num_sd=2)
-
 plot_avg_sd_month(gei)
 
 

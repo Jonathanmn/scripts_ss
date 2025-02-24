@@ -6,7 +6,7 @@ import glob
 from pathlib import Path
 from datetime import timedelta
 
-''' estamos haciendo prubeas de git'''
+''' estamos trabajando con archivos de picarro, por lo que se asume que los datos son de picarro,'''
 
 
 ''' Lectura de archivos y guardado de archivos   '''
@@ -42,20 +42,20 @@ def save_gei_l0(df, output_folder):
         output_folder: The path to the base output folder.
     """
     df['Time'] = pd.to_datetime(df['Time'])
-    for month, group in df.groupby(pd.Grouper(key='Time', freq='MEgit ')):
-        # Extract year and month for subfolder creation
+    for month, group in df.groupby(pd.Grouper(key='Time', freq='ME')):
+        
         year = month.strftime('%Y')
         month_str = month.strftime('%m')
 
-        # Create subfolders if they don't exist
+        
         subfolder_path = os.path.join(output_folder, 'minuto', year, month_str)
         os.makedirs(subfolder_path, exist_ok=True)
 
-        # Format filename
+        
         filename = month.strftime('%Y-%m') + '_CMUL_L0.dat'
         filepath = os.path.join(subfolder_path, filename)
 
-        # Save to .dat file
+        
         group.to_csv(filepath, sep=',', index=False)
 
 
