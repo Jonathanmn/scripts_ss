@@ -66,6 +66,20 @@ def save_gei_l0(df, output_folder):
 
 ''' Correcciones de hora y fecha   '''
 
+def resample_to_1min(df, timestamp_column='timestamp'):
+    """
+    resamplea por un minuto
+    """
+    df = df.set_index(timestamp_column)
+    resampled_df = df.resample('1min').mean()
+    
+    resampled_df = resampled_df.reset_index().rename(columns={'timestamp': 'Time'})
+    return resampled_df
+
+
+
+
+
 
 def correccion_utc(df, column_name):
   """
@@ -78,7 +92,7 @@ def correccion_utc(df, column_name):
 
 
 def timestamp_l0(df, timestamp_column):
-
+  'se asegura que cada timestamp sea un minuto exacto'
 
   start_date = df[timestamp_column].min().floor('D').replace(day=1)  
   end_date = df[timestamp_column].max().floor('D') + pd.offsets.MonthEnd(0)  
@@ -89,11 +103,7 @@ def timestamp_l0(df, timestamp_column):
       end=end_date + pd.Timedelta(days=1) - pd.Timedelta(seconds=1),  
       freq='1min'
   )
-
-  
   complete_df = pd.DataFrame({timestamp_column: complete_timestamps})
-
-  
   df_complete = pd.merge(complete_df, df, on=timestamp_column, how='left')
 
   return df_complete
@@ -104,7 +114,7 @@ def timestamp_l0(df, timestamp_column):
 
 ''' Pruebas umbrales  '''
 
-def umbrales_gei(df, CO2_umbral=None, CH4_umbral=None, CO_umbral=None):
+def umbrales_gei(df, CO2_umbral=None, CH4_umbral=None):
   """
  Aplica el umbral a las columnas 'CO2_dry', 'CH4_dry', y 'CO' del DataFrame.
 
@@ -113,52 +123,59 @@ def umbrales_gei(df, CO2_umbral=None, CH4_umbral=None, CO_umbral=None):
     df['CO2_dry'] = np.where(df['CO2_dry'] <= CO2_umbral, np.nan, df['CO2_dry'])
   if CH4_umbral is not None:
     df['CH4_dry'] = np.where(df['CH4_dry'] <= CH4_umbral, np.nan, df['CH4_dry'])
-  if CO_umbral is not None:
-    df['CO'] = np.where(df['CO'] <= CO_umbral, np.nan, df['CO'])
+  df['CO'] = np.where((df['CO'] > 0) & (df['CO'] <= 200), df['CO'], np.nan)
+
   return df
 
 
-
-def umbrales_sd(df, CO2_umbral=None, CH4_umbral=None, CO_umbral=None):
-  ''' Aplica el umbral a las columnas 'CO2_SD', 'CH4_SD', y 'CO_SD' del DataFrame. '''
-
-  if CO2_umbral is not None:
-    df['CO2_Avg'] = np.where(df['CO2_SD'] <= CO2_umbral, np.nan, df['CO2_Avg'])
-  if CH4_umbral is not None:
-    df['CH4_Avg'] = np.where(df['CH4_SD'] <= CH4_umbral, np.nan, df['CH4_Avg'])
-  if CO_umbral is not None:
-    df['CO_Avg'] = np.where(df['CO_SD'] <= CO_umbral, np.nan, df['CO_Avg'])
-  return df
+''' Filtrado de datos   '''
 
 
-def filter_sd(df, num_sd=2):
-    """
-    Filters the DataFrame by removing outliers based on standard deviation.
+def filter_spikes_with_rolling_criteria(df, columns, window_size=10, threshold=1.5):
 
-    Args:
-        df: The Pandas DataFrame containing the data.
-        num_stds: The number of standard deviations to use as the threshold
-                   for identifying outliers (default: 2).
-
-    Returns:
-        pandas.DataFrame: The DataFrame with outliers replaced by NaN.
-    """
-
-    
-    avg_cols = ['CO2_Avg', 'CH4_Avg', 'CO_Avg']
-
-    
-    for col in avg_cols:
-        
-        upper_bound = df[col] + num_sd * df[f'{col[:-3]}SD']
-        lower_bound = df[col] - num_sd * df[f'{col[:-3]}SD']
+    for column in columns: 
+      
+        rolling_median = df[column].rolling(window=window_size, center=True).median()
 
         
-        df.loc[~df[col].between(lower_bound, upper_bound), col] = np.nan
+        spikes = (df[column] > rolling_median * threshold) & (df[column].rolling(window=window_size, center=True).count() >= window_size)
+
+       
+        df[column] = df[column].copy() 
+        df.loc[spikes, column] = np.nan 
+
+    return df  
+
+
+
+
+def filter_by_std(df, columns, num_stds=2):
+
+
+    for column in columns:
+        # Calculate the mean and standard deviation for the column
+        mean = df[column].mean()
+        std = df[column].std()
+
+        # Calculate the upper and lower bounds for outlier detection
+        upper_bound = mean + num_stds * std
+        lower_bound = mean - num_stds * std
+
+        # Replace values outside the bounds with np.nan
+        df[column] = np.where(
+            (df[column] > upper_bound) | (df[column] < lower_bound),
+            np.nan,
+            df[column]
+        )
 
     return df
-''' Flags   '''
 
+
+
+
+
+
+''' Flags de MPV y especies   '''
 
 
 def flags_mpv(df,CO2,CH4,CO):
@@ -235,6 +252,19 @@ def flags_species_1min(df):
     })
 
     resampled_df = resampled_df.reset_index().rename(columns={'timestamp': 'Time'})
+    resampled_df['CO2_MPVPosition'] = np.nan
+    resampled_df['CH4_MPVPosition'] = np.nan
+    resampled_df['CO_MPVPosition'] = np.nan
+
+    mask = resampled_df['MPVPosition'].isin([0, 1])
+
+    resampled_df.loc[~mask, 'CO2_MPVPosition'] = resampled_df.loc[~mask, 'CO2_Avg']
+    resampled_df.loc[~mask, 'CH4_MPVPosition'] = resampled_df.loc[~mask, 'CH4_Avg']
+    resampled_df.loc[~mask, 'CO_MPVPosition'] = resampled_df.loc[~mask, 'CO_Avg']
+
+    resampled_df.loc[~mask, 'CO2_Avg'] = np.nan
+    resampled_df.loc[~mask, 'CH4_Avg'] = np.nan
+    resampled_df.loc[~mask, 'CO_Avg'] = np.nan
     resampled_df.loc[((resampled_df["MPVPosition"] != 0) & (resampled_df["MPVPosition"] != 1)), "CO2_SD"] = None
     resampled_df.loc[((resampled_df["MPVPosition"] != 0) & (resampled_df["MPVPosition"] != 1)), "CH4_SD"] = None
     return resampled_df
@@ -254,6 +284,65 @@ def flags_species_1min(df):
 
 
 ''' Ploteos    '''
+
+
+def plot_comparacion(df1, df2, columns1, columns2, time_column1='Time', time_column2='Time'):
+
+    num_plots = len(columns1)
+    fig, axes = plt.subplots(num_plots, 1, figsize=(10, 5 * num_plots), sharex=True)
+
+    if num_plots == 1:
+        axes = [axes]
+
+    for i, (col1, col2) in enumerate(zip(columns1, columns2)):
+        ax = axes[i]
+        ax.plot(df1[time_column1], df1[col1], color='black', alpha=0.5, label=f'{col1} (df1)')
+        ax.plot(df2[time_column2], df2[col2], color='red', alpha=0.8, label=f'{col2} (df2)')
+        ax.set_ylabel(col1)
+        ax.legend()
+
+    plt.xlabel("Time") 
+    plt.title('Comparacion series de versiones gei')
+    plt.show()
+
+
+def plot_comparacion_monthly(df1, df2, columns1, columns2, time_column1='Time', time_column2='Time'):
+
+    # Ensure timestamp columns are in datetime format
+    df1[time_column1] = pd.to_datetime(df1[time_column1])
+    df2[time_column2] = pd.to_datetime(df2[time_column2])
+
+    # Get unique years and months
+    years = df1[time_column1].dt.year.unique()
+    months = df1[time_column1].dt.month.unique()
+
+    # Iterate through years and months
+    for year in years:
+        for month in months:
+            # Filter data for the current month
+            df1_month = df1[(df1[time_column1].dt.year == year) & (df1[time_column1].dt.month == month)]
+            df2_month = df2[(df2[time_column2].dt.year == year) & (df2[time_column2].dt.month == month)]
+
+            # Check if data exists for the current month
+            if not df1_month.empty and not df2_month.empty:
+                # Create subplots for the current month
+                num_plots = len(columns1)
+                fig, axes = plt.subplots(num_plots, 1, figsize=(10, 5 * num_plots), sharex=True)
+                if num_plots == 1:
+                    axes = [axes]
+
+                # Iterate through columns and plot data for the current month
+                for i, (col1, col2) in enumerate(zip(columns1, columns2)):
+                    ax = axes[i]
+                    ax.plot(df1_month[time_column1], df1_month[col1], color='black', alpha=0.5, label=f'{col1} (df1)')
+                    ax.plot(df2_month[time_column2], df2_month[col2], color='red', alpha=0.8, label=f'{col2} (df2)')
+                    ax.set_ylabel(col1)
+                    ax.legend()
+
+                plt.xlabel("Time")
+                plt.title(f'Comparacion series de tiempo - {year}-{month}')
+                plt.show()
+
 
 def plot_1min_avg_sd(df):
     """
@@ -423,3 +512,61 @@ def plot_raw_grouped(df, timestamp_column):
     plt.suptitle(f'Raw Data Plot - Year: {year}, Month: {month}')
     plt.tight_layout()
     plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def filtrar_sd_por_hora(df, columnas_a_filtrar, std):
+    """
+    Filtra un DataFrame basado en la media y desviación estándar por hora.
+    
+    Parámetros:
+    - df: DataFrame original que contiene los datos.
+    - columnas_a_filtrar: Lista de nombres de columnas numéricas a filtrar (ej. ['CO2_Avg', 'CH4_Avg', 'CO_Avg']).
+    - std: Número de desviaciones estándar para identificar valores atípicos (default: 2).
+    
+    Retorna:
+    - DataFrame filtrado.
+    """
+    # Convertir la columna 'timestamp' a formato datetime si no lo está
+    df['Time'] = pd.to_datetime(df['Time'])
+
+    # Crear una nueva columna que agrupe los datos por hora
+    df['Time'] = df['Time'].dt.floor('H')  # Agrupa por hora (sin minutos ni segundos)
+
+    # Calcular la media y desviación estándar por hora para las columnas numéricas
+    stats = df.groupby('hour')[columnas_a_filtrar].agg(['mean', 'std'])
+
+    # Aplanar las columnas del DataFrame de estadísticas
+    stats.columns = ['_'.join(col) for col in stats.columns]
+
+    # Unir las estadísticas al DataFrame original
+    df = df.merge(stats, left_on='hour', right_index=True)
+
+    # Filtrar los datos que estén dentro de `std` desviaciones estándar para cada columna numérica
+    for col in columnas_a_filtrar:
+        mean_col = f"{col}_mean"
+        std_col = f"{col}_std"
+        df = df[(df[col] >= df[mean_col] - std * df[std_col]) & (df[col] <= df[mean_col] + std * df[std_col])]
+
+    # Eliminar columnas auxiliares si ya no son necesarias
+    df = df.drop(columns=[col for col in df.columns if '_mean' in col or '_std' in col or col == 'hour'])
+
+    return df
