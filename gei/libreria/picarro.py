@@ -131,6 +131,26 @@ def umbrales_gei(df, CO2_umbral=None, CH4_umbral=None):
 ''' Filtrado de datos   '''
 
 
+def limpieza_intervalos(df, start_date, end_date):
+  """Sets 'CO2_Avg' to None for a specific date range.
+
+  Args:
+    df: The Pandas DataFrame.
+    start_date: The start date of the range (inclusive).
+    end_date: The end date of the range (inclusive).
+  """
+  # Convert start_date and end_date to pandas Timestamp objects
+  start_date = pd.Timestamp(start_date)
+  end_date = pd.Timestamp(end_date)
+
+  # Use loc to filter the DataFrame and set 'CO2_Avg' to None
+  df.loc[(df['Time'] >= start_date) & (df['Time'] <= end_date), 'CO2_Avg'] = np.nan
+  df.loc[(df['Time'] >= start_date) & (df['Time'] <= end_date), 'CH4_Avg'] = np.nan
+  df.loc[(df['Time'] >= start_date) & (df['Time'] <= end_date), 'CO_Avg'] = np.nan
+
+  return df
+
+
 def filter_spikes_with_rolling_criteria(df, columns, window_size=10, threshold=1.5):
 
     for column in columns: 
