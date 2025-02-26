@@ -12,25 +12,25 @@ gei=read_raw_gei_folder(folder_path)
 gei=correccion_utc(gei, 'timestamp')
 
 
-gei_raw1min=resample_to_1min(gei,timestamp_column='timestamp')
+#gei_raw1min=resample_to_1min(gei,timestamp_column='timestamp')
 
 
 gei=umbrales_gei(gei, CO2_umbral=300, CH4_umbral=1.6)
 print('aplicando flags a especies mpv')
 
 gei_species=flags_species_1min(gei)
-columns = ['CO2_Avg', 'CH4_Avg', 'CO_Avg']
+clean=clean_surrounding_values(gei_species)
 
 
 '''Ploteo '''
-columns1=['CO2_dry','CH4_dry','CO']
+columns1=['CO2_Avg','CH4_Avg','CO_Avg']
 columns2=['CO2_Avg','CH4_Avg','CO_Avg']
 
 time_column1='Time'
 time_column2='Time'
 
 #plot_comparacion_monthly(gei_raw1min,gei_species, columns1, columns2, time_column1='Time', time_column2='Time')
-plot_comparacion(gei_raw1min, gei_species, columns1, columns2, time_column1='Time', time_column2='Time')
+plot_comparacion(gei_species,clean, columns1, columns2, time_column1='Time', time_column2='Time')
 
 
 

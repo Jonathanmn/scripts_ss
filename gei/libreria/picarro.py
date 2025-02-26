@@ -151,6 +151,25 @@ def limpieza_intervalos(df, start_date, end_date):
   return df
 
 
+# Función para eliminar valores antes y después de encontrar 2, 3, 4 o 5 en 'MPVPosition'
+def clean_surrounding_values(df):
+    # Identificar las filas donde 'MPVPosition' tiene valores 2, 3, 4 o 5
+    condition = df['MPVPosition'].isin([2, 3, 4, 5])
+    
+    # Crear máscaras para las filas anteriores y posteriores
+    previous_mask = condition.shift(5, fill_value=False)  # Fila anterior
+    next_mask = condition.shift(-5, fill_value=False)     # Fila posterior
+    
+    # Combinar las máscaras con la condición actual
+    mask = condition | previous_mask | next_mask
+    
+    # Reemplazar valores en las columnas específicas con NaN donde la máscara es True
+    df.loc[mask, ['CO2_Avg', 'CH4_Avg', 'CO_Avg']] = np.nan
+    
+    return df
+
+
+
 def filter_spikes_with_rolling_criteria(df, columns, window_size=10, threshold=1.5):
 
     for column in columns: 
