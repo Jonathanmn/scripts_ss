@@ -707,3 +707,28 @@ def filtrar_sd_por_hora(df, columnas_a_filtrar, std):
     df = df.drop(columns=[col for col in df.columns if '_mean' in col or '_std' in col or col == 'hour'])
 
     return df
+
+
+
+
+
+
+
+
+
+
+def plot_scatter(df, column):
+    """
+    Creates a scatter plot using the DataFrame index as the x-axis and the specified column as the y-axis.
+
+    Args:
+        df: The Pandas DataFrame containing the data.
+        column: The name of the column to plot on the y-axis.
+    """
+    plt.figure(figsize=(10, 6))  # Adjust figure size if needed
+    plt.scatter(df.index, df[column])  # Use df.index for x-axis
+    plt.xlabel("Index")
+    plt.ylabel(column)
+    plt.title(f"Scatter Plot of {column} vs. Index")
+    plt.grid(True)
+    plt.show()
