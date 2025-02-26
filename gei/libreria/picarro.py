@@ -66,18 +66,12 @@ def save_to(df, time_column, folder):
         time_column: La columna de tiempo en el DataFrame.
         folder_path: La carpeta donde se guardará el archivo.
     """
-    # Asegurarse de que la columna de tiempo sea de tipo datetime
-    df[time_column] = pd.to_datetime(df[time_column])
-
-    # Extraer el año y el mes del DataFrame
     year = df[time_column].dt.strftime('%Y').iloc[0]
     month = df[time_column].dt.strftime('%m').iloc[0]
 
-    # Crear el nombre del archivo
     filename = f"{year}-{month}_CMUL_L0.dat"
     filepath = os.path.join(folder, filename)
 
-    # Guardar el DataFrame en el archivo .dat con el separador ','
     df.to_csv(filepath, sep=',', index=False)
 
 
@@ -179,6 +173,30 @@ def limpieza_intervalos(df, start_date, end_date):
   df.loc[(df['Time'] >= start_date) & (df['Time'] <= end_date), 'CO_Avg'] = np.nan
 
   return df
+
+
+def apply_nan_intervals(df, intervals_CO2=None, intervals_CH4=None, intervals_CO=None):
+    """
+    Aplica np.nan a los intervalos especificados en las columnas 'CO2_Avg', 'CH4_Avg' y 'CO_Avg' del DataFrame.
+
+    
+    """
+    if intervals_CO2:
+        for start_index, end_index in intervals_CO2:
+            df.loc[start_index:end_index, 'CO2_Avg'] = np.nan
+            df.loc[start_index:end_index, 'CO2_SD'] = np.nan
+
+    if intervals_CH4:
+        for start_index, end_index in intervals_CH4:
+            df.loc[start_index:end_index, 'CH4_Avg'] = np.nan
+            df.loc[start_index:end_index, 'CH4_SD'] = np.nan
+
+    if intervals_CO:
+        for start_index, end_index in intervals_CO:
+            df.loc[start_index:end_index, 'CO_Avg'] = np.nan
+            df.loc[start_index:end_index, 'CO_SD'] = np.nan
+
+    return df
 
 
 # Función para eliminar valores antes y después de encontrar 2, 3, 4 o 5 en 'MPVPosition'
