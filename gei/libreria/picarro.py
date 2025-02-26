@@ -12,7 +12,7 @@ from datetime import timedelta
 ''' Lectura de archivos y guardado de archivos   '''
 
 
-def read_raw_gei_folder(folder_path):
+def read_raw_gei_folder(folder_path, time):
     """
     Lee los archivos .dat del folder donde se encuentran los archivos raw con subcarpetas
     retorna un solo data frame con los datos de toda la carpeta .
@@ -24,8 +24,8 @@ def read_raw_gei_folder(folder_path):
         dataframes.append(df)
 
     gei = pd.concat(dataframes, ignore_index=True)
-    gei['timestamp'] = pd.to_datetime(gei['timestamp'])
-    gei = gei.sort_values(by='timestamp').reset_index(drop=True)
+    gei[time] = pd.to_datetime(gei[time])
+    gei = gei.sort_values(by=time).reset_index(drop=True)
 
 
     return gei
@@ -34,12 +34,9 @@ def read_raw_gei_folder(folder_path):
 
 def save_gei_l0(df, output_folder):
     """
-    Saves the input DataFrame to separate .dat files, one for each month,
-    in the specified output folder structure: minuto minuto/YYYY/MM/YYYY-MM_CMUL_LO.dat.
+    guarda el archivo mensual en la carpeta minuto/YYYY/MM/YYYY-MM_CMUL_L0.dat.
 
-    Args:
-        df: The Pandas DataFrame to save.
-        output_folder: The path to the base output folder.
+
     """
     df['Time'] = pd.to_datetime(df['Time'])
     for month, group in df.groupby(pd.Grouper(key='Time', freq='ME')):
@@ -57,6 +54,32 @@ def save_gei_l0(df, output_folder):
 
         
         group.to_csv(filepath, sep=',', index=False)
+
+
+
+
+
+def save_to(df, time_column, folder):
+    """
+    Guarda el DataFrame en un archivo .dat con el formato YYYY-MM_CMUL_L0.dat.
+
+        time_column: La columna de tiempo en el DataFrame.
+        folder_path: La carpeta donde se guardará el archivo.
+    """
+    # Asegurarse de que la columna de tiempo sea de tipo datetime
+    df[time_column] = pd.to_datetime(df[time_column])
+
+    # Extraer el año y el mes del DataFrame
+    year = df[time_column].dt.strftime('%Y').iloc[0]
+    month = df[time_column].dt.strftime('%m').iloc[0]
+
+    # Crear el nombre del archivo
+    filename = f"{year}-{month}_CMUL_L0.dat"
+    filepath = os.path.join(folder, filename)
+
+    # Guardar el DataFrame en el archivo .dat con el separador ','
+    df.to_csv(filepath, sep=',', index=False)
+
 
 
 
@@ -91,6 +114,8 @@ def correccion_utc(df, column_name):
   return df
 
 
+
+
 def timestamp_l0(df, timestamp_column):
   'se asegura que cada timestamp sea un minuto exacto'
 
@@ -107,6 +132,11 @@ def timestamp_l0(df, timestamp_column):
   df_complete = pd.merge(complete_df, df, on=timestamp_column, how='left')
 
   return df_complete
+
+
+
+
+
 
 
 
@@ -426,6 +456,56 @@ def plot_1min_avg_sd(df):
     plt.xlabel('Time')
     plt.tight_layout()
     plt.show()
+
+
+
+
+def plot_1min_index(df):
+    """
+    Ploteo de los valores promedio y desviacion estandar para gei.
+    """
+
+    fig, axes = plt.subplots(3, 1, figsize=(10, 12), sharex=True)
+
+    # CO2
+    ax1 = axes[0]
+    ax1.plot(df.index, df['CO2_Avg'], label='CO2_Avg', color='#123456')
+    ax1_twin = ax1.twinx()
+    ax1_twin.plot(df.index, df['CO2_SD'], label='CO2_SD', color='#F7883F', alpha=0.8)
+    ax1.set_ylabel('CO2_Avg')
+    ax1_twin.set_ylabel('CO2_SD')
+    ax1.legend(loc='upper left')
+    ax1_twin.legend(loc='upper right')
+    ax1.set_title('CO2 Concentration')
+
+    # CH4
+    ax2 = axes[1]
+    ax2.plot(df.index, df['CH4_Avg'], label='CH4_Avg', color='#123456')
+    ax2_twin = ax2.twinx()
+    ax2_twin.plot(df.index, df['CH4_SD'], label='CH4_SD', color='#F7883F', alpha=0.8)
+    ax2.set_ylabel('CH4_Avg')
+    ax2_twin.set_ylabel('CH4_SD')
+    ax2.legend(loc='upper left')
+    ax2_twin.legend(loc='upper right')
+    ax2.set_title('CH4 Concentration')
+
+    # CO
+    ax3 = axes[2]
+    ax3.plot(df.index, df['CO_Avg'], label='CO_Avg', color='#123456')
+    ax3_twin = ax3.twinx()
+    ax3_twin.plot(df.index, df['CO_SD'], label='CO_SD', color='#F7883F', alpha=0.8)
+    ax3.set_ylabel('CO_Avg')
+    ax3_twin.set_ylabel('CO_SD')
+    ax3.legend(loc='upper left')
+    ax3_twin.legend(loc='upper right')
+    ax3.set_title('CO Concentration')
+
+    plt.xlabel('Time')
+    plt.tight_layout()
+    plt.show()
+
+
+
 
 
 

@@ -19,10 +19,10 @@ gei=umbrales_gei(gei, CO2_umbral=300, CH4_umbral=1.6)
 print('aplicando flags a especies mpv')
 
 gei_species=flags_species_1min(gei)
-clean=clean_surrounding_values(gei_species)
+gei_species=timestamp_l0(gei_species,'Time')
 
 
-'''Ploteo '''
+'''Ploteo 
 columns1=['CO2_Avg','CH4_Avg','CO_Avg']
 columns2=['CO2_Avg','CH4_Avg','CO_Avg']
 
@@ -33,14 +33,5 @@ time_column2='Time'
 plot_comparacion(gei_species,clean, columns1, columns2, time_column1='Time', time_column2='Time')
 
 
-
-
-#plot_1min_avg_sd(gei_filtrado)
-
-
-
-#plot_avg_sd_month(gei)
-
-
-
-#gei_l0(gei,output_folder)
+'''
+save_gei_l0(gei_species,output_folder)
