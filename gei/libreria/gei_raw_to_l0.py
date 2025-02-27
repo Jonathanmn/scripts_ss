@@ -1,6 +1,6 @@
 '''Este script va a a tratar de dejar un archivo l0 limpio con flags y umbrales aplicados'''
 
-from picarro_server import *
+from picarro_l0_server import *
 
 
 #folder_path = '/home/gei/scripts_j/raw'
@@ -21,7 +21,7 @@ gei=flags_species_1min(gei)
 
 gei=timestamp_l0(gei,'Time')
 #se aplica la correcion -6h - 170s de valvula 
-correccion_utc(gei, 'Time')
+gei=correccion_utc(gei, 'Time')
 
 
 

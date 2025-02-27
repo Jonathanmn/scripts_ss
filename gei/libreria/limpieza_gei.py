@@ -12,11 +12,6 @@ plot_1min_index(gei)
 
 
 
-gei_clean = apply_nan_intervals(gei, intervals_CO2=None, intervals_CH4=intervals_CH4, intervals_CO=None)
-
-
-
-
 
 
 
