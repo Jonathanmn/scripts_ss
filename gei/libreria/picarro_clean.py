@@ -59,7 +59,7 @@ def clean_plotly_gei(df, CH4, CO2, CO):
     selected_indices_CO2 = []
     selected_indices_CO = []
     month_year = df['Time'].dt.to_period('M').unique()[0]
-    fig, axs = plt.subplots(3, 1, figsize=(20, 15), sharex=True, sharey=False)
+    fig, axs = plt.subplots(3, 1, figsize=(20, 15), sharex=True)
 
     # Plot for CH4_Avg
     axs[0].plot(df.index, df[CH4], '-', color='black', linewidth=1, alpha=0.2)

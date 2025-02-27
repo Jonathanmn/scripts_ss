@@ -56,7 +56,32 @@ def save_gei_l0(df, output_folder):
         group.to_csv(filepath, sep=',', index=False)
 
 
+def save_gei_l1(df, output_folder):
+    """
+    guarda el archivo mensual en la carpeta minuto/YYYY/MM/YYYY-MM_CMUL_L1.dat.
+    """
+    descriptive_text = (
+        "Red Universitaria de Observatorios Atmosfericos (RUOA)\n"
+        "Atmospheric Observatory Calakmul (cmul), Campeche\n"
+        "Lat 18.5956 N, Lon 89.4137 W, Alt 275 masl\n"
+        "Time UTC-6h\n"
+        "\n"
+        "TIMESTAMP,Temp_Avg,RH_Avg,WSpeed_Avg,WSpeed_Max,WDir_Avg,WDir_SD,Rain_Tot,Press_Avg,Rad_Avg\n"
+    )
 
+    for month, group in df.groupby(pd.Grouper(key='Time', freq='ME')):
+        year = month.strftime('%Y')
+        month_str = month.strftime('%m')
+
+        subfolder_path = os.path.join(output_folder, 'minuto', year, month_str)
+        os.makedirs(subfolder_path, exist_ok=True)
+
+        filename = month.strftime('%Y-%m') + '_CMUL_L1.dat'
+        filepath = os.path.join(subfolder_path, filename)
+
+        with open(filepath, 'w') as file:
+            file.write(descriptive_text)
+            group.to_csv(file, sep=',', index=False, mode='a')
 
 
 def save_to(df, time_column, folder):
