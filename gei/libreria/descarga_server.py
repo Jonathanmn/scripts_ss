@@ -6,7 +6,7 @@ hostname = "132.248.8.32"
 username = "gei"
 password = "ru04g31"
 remote_path = "/home/gei/scripts_j/l0"
-local_path = "/home/jmn/l0"
+local_path = "/home/jonathan_mn/server_gei"
 
 
 
