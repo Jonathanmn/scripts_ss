@@ -124,7 +124,7 @@ def flags_species_1min(df):
 
 
 
-    df = df.set_index('timestamp')
+    df = df.set_index('Time')
 
     agg_funcs = {
         'MPVPosition': lambda x: x.mode()[0] if not x.empty else np.nan,
@@ -150,7 +150,7 @@ def flags_species_1min(df):
     'CO_std': 'CO_SD'
     })
 
-    resampled_df = resampled_df.reset_index().rename(columns={'timestamp': 'Time'})
+    resampled_df = resampled_df.reset_index().rename(columns={'Time': 'Time'})
     resampled_df['CO2_MPVPosition'] = np.nan
     resampled_df['CH4_MPVPosition'] = np.nan
     resampled_df['CO_MPVPosition'] = np.nan
@@ -167,3 +167,6 @@ def flags_species_1min(df):
     resampled_df.loc[((resampled_df["MPVPosition"] != 0) & (resampled_df["MPVPosition"] != 1)), "CO2_SD"] = None
     resampled_df.loc[((resampled_df["MPVPosition"] != 0) & (resampled_df["MPVPosition"] != 1)), "CH4_SD"] = None
     return resampled_df
+
+
+
