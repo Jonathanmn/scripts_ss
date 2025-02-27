@@ -660,7 +660,7 @@ def plot_scatter(df, column):
 
     """
     plt.figure(figsize=(16, 12))
-    plt.plot(df.index, df[column], '-', color='black', linewidth=1, alpha=0.5) 
+    plt.plot(df.index, df[column], '-', color='black', linewidth=1, alpha=0.2) 
     plt.scatter(df.index, df[column],s=4,color='red' ) 
     plt.xlabel("Index")
     plt.ylabel(column)
