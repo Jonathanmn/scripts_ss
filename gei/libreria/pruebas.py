@@ -10,9 +10,9 @@ gei = read_raw_gei_folder(folder_path, 'Time')
 gei['Time'] = pd.to_datetime(gei['Time'])
 
 
-clean_plotly(gei, 'CH4_Avg')
+#clean_plotly(gei, 'CH4_Avg')
 
-
+gei_clean = clean_plotly_gei(gei, 'CH4_Avg', 'CO2_Avg', 'CO_Avg')
 
 #plot_scatter(gei, 'CH4_Avg')
 
