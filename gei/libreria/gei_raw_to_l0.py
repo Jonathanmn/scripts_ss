@@ -3,9 +3,13 @@
 from picarro_server import *
 
 
-folder_path = '/home/gei/scripts_j/raw'
-output_folder = '/home/gei/scripts_j/l0'
+#folder_path = '/home/gei/scripts_j/raw'
+#output_folder = '/home/gei/scripts_j/l0'
 
+
+
+folder_path = '/home/jmn/server_gei'
+output_folder = '/home/jmn/gei-l0'
 
 gei = read_raw_gei_folder(folder_path, 'Time')
 
