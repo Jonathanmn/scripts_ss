@@ -85,7 +85,7 @@ def save_to(df, time_column, folder):
 
 def resample_to_1min(df, timestamp_column='timestamp'):
     """
-    resamplea por un minuto
+    resamplea por un minuto todos los datos.
     """
     df = df.set_index(timestamp_column)
     resampled_df = df.resample('1min').mean()
@@ -265,29 +265,6 @@ def filter_by_std(df, columns, num_stds=2):
 ''' Flags de MPV y especies   '''
 
 
-def flags_mpv(df,CO2,CH4,CO):
-  df['MPVPosition'] = df['MPVPosition'].fillna(0).astype(int)
-
-  df['MPVPosition'] = df['MPVPosition'].round().astype(int)
-
-  MPVcount = df['MPVPosition'].value_counts(dropna=False)
- 
-  for value, count in MPVcount.items():
-    if value != 0 and value != 1:
-      column_name = f'MPV_{value}'
-
-      temp_df = df[df['MPVPosition'] == value][[CO2,CH4,CO]]
-      
-      temp_df = temp_df.rename(columns={
-          CO2: f'{column_name}_CO2',
-          CH4: f'{column_name}_CH4',
-          CO: f'{column_name}_CO'
-      })
-      df = pd.merge(df, temp_df, left_index=True, right_index=True, how='left')
-
-  df.loc[((df['MPVPosition'] != 0) & (df['MPVPosition'] != 1)), CO2] = None
-  df.loc[((df['MPVPosition'] != 0) & (df['MPVPosition'] != 1)), CH4] = None
-  return df
 
 def flags_species_1min(df):
     """
@@ -670,45 +647,6 @@ def plot_raw_grouped(df, timestamp_column):
 
 
 
-def filtrar_sd_por_hora(df, columnas_a_filtrar, std):
-    """
-    Filtra un DataFrame basado en la media y desviación estándar por hora.
-    
-    Parámetros:
-    - df: DataFrame original que contiene los datos.
-    - columnas_a_filtrar: Lista de nombres de columnas numéricas a filtrar (ej. ['CO2_Avg', 'CH4_Avg', 'CO_Avg']).
-    - std: Número de desviaciones estándar para identificar valores atípicos (default: 2).
-    
-    Retorna:
-    - DataFrame filtrado.
-    """
-    # Convertir la columna 'timestamp' a formato datetime si no lo está
-    df['Time'] = pd.to_datetime(df['Time'])
-
-    # Crear una nueva columna que agrupe los datos por hora
-    df['Time'] = df['Time'].dt.floor('H')  # Agrupa por hora (sin minutos ni segundos)
-
-    # Calcular la media y desviación estándar por hora para las columnas numéricas
-    stats = df.groupby('hour')[columnas_a_filtrar].agg(['mean', 'std'])
-
-    # Aplanar las columnas del DataFrame de estadísticas
-    stats.columns = ['_'.join(col) for col in stats.columns]
-
-    # Unir las estadísticas al DataFrame original
-    df = df.merge(stats, left_on='hour', right_index=True)
-
-    # Filtrar los datos que estén dentro de `std` desviaciones estándar para cada columna numérica
-    for col in columnas_a_filtrar:
-        mean_col = f"{col}_mean"
-        std_col = f"{col}_std"
-        df = df[(df[col] >= df[mean_col] - std * df[std_col]) & (df[col] <= df[mean_col] + std * df[std_col])]
-
-    # Eliminar columnas auxiliares si ya no son necesarias
-    df = df.drop(columns=[col for col in df.columns if '_mean' in col or '_std' in col or col == 'hour'])
-
-    return df
-
-
 
 
 
@@ -719,14 +657,11 @@ def filtrar_sd_por_hora(df, columnas_a_filtrar, std):
 
 def plot_scatter(df, column):
     """
-    Creates a scatter plot using the DataFrame index as the x-axis and the specified column as the y-axis.
 
-    Args:
-        df: The Pandas DataFrame containing the data.
-        column: The name of the column to plot on the y-axis.
     """
-    plt.figure(figsize=(10, 6))  # Adjust figure size if needed
-    plt.scatter(df.index, df[column])  # Use df.index for x-axis
+    plt.figure(figsize=(16, 12))
+    plt.plot(df.index, df[column], '-', color='black', linewidth=1, alpha=0.5) 
+    plt.scatter(df.index, df[column],s=4,color='red' ) 
     plt.xlabel("Index")
     plt.ylabel(column)
     plt.title(f"Scatter Plot of {column} vs. Index")

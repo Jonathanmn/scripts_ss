@@ -10,7 +10,7 @@ def clean_plotly(df, column):
 
     
     fig, ax = plt.subplots()
-    ax.plot(df.index, df[column], '-', color='black', linewidth=1, alpha=0.5)
+    ax.plot(df.index, df[column], '-', color='black', linewidth=1, alpha=0.2)
     scatter = ax.scatter(df.index, df[column], s=4, picker=True, color='red')
      
     ax.set_title(f'Interactive Plot for {column}')
