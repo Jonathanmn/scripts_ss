@@ -112,9 +112,9 @@ def flags_species_1min(df):
     df.loc[((df["species"] != 3)), "CH4_dry"] = None
     df.loc[((df["species"] != 1) & (df["species"] != 4)), "CO"] = None
 
-    size_CO2 = df.groupby(pd.Grouper(key='timestamp', freq='1min'))['CO2_dry'].transform('size')
-    size_CH4 = df.groupby(pd.Grouper(key='timestamp', freq='1min'))['CH4_dry'].transform('size')
-    size_CO = df.groupby(pd.Grouper(key='timestamp', freq='1min'))['CO'].transform('size')
+    size_CO2 = df.groupby(pd.Grouper(key='Time', freq='1min'))['CO2_dry'].transform('size')
+    size_CH4 = df.groupby(pd.Grouper(key='Time', freq='1min'))['CH4_dry'].transform('size')
+    size_CO = df.groupby(pd.Grouper(key='Time', freq='1min'))['CO'].transform('size')
     
     
     df.loc[(size_CO2 < 30), 'CO2_dry'] = None
