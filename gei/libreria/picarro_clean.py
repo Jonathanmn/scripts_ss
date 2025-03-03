@@ -5,6 +5,11 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+from picarro import *
+
+folder_path = '/home/jmn/picarro_data/minuto/2024/02'
+gei = read_raw_gei_folder(folder_path, 'Time')
+
 def clean_plotly(df, column):
     """ un scatter que selecciona puntos y los elimina del data frame """
     selected_indices = []
@@ -151,57 +156,30 @@ def plot_scatter(df, column):
     plt.grid(True)
     plt.show()
 
-def diurno(df, CH4, CO2, CO):
-    """ Grafica los promedios diarios de CO2, CH4 y CO (Avg) agrupados por día y por mes """
-    df['Date'] = df['Time'].dt.date
-    grouped = df.groupby('Date').mean()
+def interactive_plot(df):
+    fig = go.Figure()
 
-    days = grouped.index
-    num_days = len(days)
+    # Add scatter traces for each column
+    fig.add_trace(go.Scatter(x=df['Time'], y=df['CO2_Avg'], mode='markers+lines', name='CO2_Avg'))
+    fig.add_trace(go.Scatter(x=df['Time'], y=df['CH4_Avg'], mode='markers+lines', name='CH4_Avg'))
+    fig.add_trace(go.Scatter(x=df['Time'], y=df['CO_Avg'], mode='markers+lines', name='CO_Avg'))
 
-    fig, axs = plt.subplots(num_days, 1, figsize=(20, 5 * num_days), sharex=True)
+    # Add a callback to handle point deletion
+    def delete_point(trace, points, selector):
+        for point in points.point_inds:
+            df.loc[point, ['CO2_Avg', 'CH4_Avg', 'CO_Avg']] = np.nan
+        # Update the plot with the new data
+        fig.data[0].y = df['CO2_Avg']
+        fig.data[1].y = df['CH4_Avg']
+        fig.data[2].y = df['CO_Avg']
 
-    for i, day in enumerate(days):
-        axs[i].plot(grouped.loc[day].index, grouped.loc[day][CH4], label=CH4, color='blue')
-        axs[i].plot(grouped.loc[day].index, grouped.loc[day][CO2], label=CO2, color='green')
-        axs[i].plot(grouped.loc[day].index, grouped.loc[day][CO], label=CO, color='red')
-        axs[i].set_title(f'Daily Averages for {day}')
-        axs[i].set_xlabel('Time')
-        axs[i].set_ylabel('Concentration')
-        axs[i].legend()
+    fig.data[0].on_click(delete_point)
+    fig.data[1].on_click(delete_point)
+    fig.data[2].on_click(delete_point)
 
-    fig.tight_layout()
-    plt.show()
-
-def plot_hourly_resampled(df, CH4, CO2, CO):
-    """ Resample data to hourly intervals and plot using Plotly Express """
-    df_resampled = df.resample('H', on='Time').mean().reset_index()
-
-    fig = px.line(df_resampled, x='Time', y=[CH4, CO2, CO], 
-                  labels={'value': 'Concentration', 'variable': 'Gas'},
-                  title='Hourly Resampled Data for CH4, CO2, and CO')
-    fig.update_layout(xaxis_title='Time', yaxis_title='Concentration')
     fig.show()
+    return df
 
-def plot_hourly_subplots(df, CH4, CO2, CO):
-    """ Create subplots for each gas and plot hourly data for each day """
-    df['Hour'] = df['Time'].dt.hour
-    df['Date'] = df['Time'].dt.date
-
-    gases = [CH4, CO2, CO]
-    fig = make_subplots(rows=3, cols=1, shared_xaxes=True, subplot_titles=gases)
-
-    for i, gas in enumerate(gases, start=1):
-        for date in df['Date'].unique():
-            daily_data = df[df['Date'] == date]
-            fig.add_trace(go.Scatter(x=daily_data['Hour'], y=daily_data[gas], mode='lines', name=str(date)), row=i, col=1)
-
-    fig.update_layout(height=900, width=1200, title_text="Hourly Data for Each Day")
-    fig.update_xaxes(title_text="Hour of the Day", row=3, col=1)
-    fig.update_yaxes(title_text="Concentration", row=1, col=1)
-    fig.update_yaxes(title_text="Concentration", row=2, col=1)
-    fig.update_yaxes(title_text="Concentration", row=3, col=1)
-    fig.show()
 
 
 

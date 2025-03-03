@@ -4,8 +4,7 @@ import pandas as pd
 from picarro import *
 
 from picarro_clean import *
-from picarro_clean import plot_hourly_resampled
-from picarro_clean import plot_hourly_subplots
+
 # Cargar los datos
 #folder_path = '/home/jmn/l0/minuto/2024/07'
 #/home/jonathan_mn/server_gei/minuto/2024/06
@@ -17,10 +16,12 @@ gei['Time'] = pd.to_datetime(gei['Time'])
 
 
 
+# Example usage
+updated_gei = interactive_plot(gei)
 
 
 
-plot_hourly_subplots(gei, 'CH4_Avg', 'CO2_Avg', 'CO_Avg')
+#plot_hourly_subplots(gei, 'CH4_Avg', 'CO2_Avg', 'CO_Avg')
 
 
 
