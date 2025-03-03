@@ -57,6 +57,11 @@ def save_gei_l0(df, output_folder):
 
 
 def save_gei_l1(df, output_folder):
+
+
+
+
+    df[['CO2_Avg', 'CO2_SD', 'CH4_Avg', 'CH4_SD', 'CO_Avg', 'CO_SD']].round(4)
     """
     guarda el archivo mensual en la carpeta minuto/YYYY/MM/YYYY-MM_CMUL_L1.dat.
     """
@@ -64,12 +69,32 @@ def save_gei_l1(df, output_folder):
         "Red Universitaria de Observatorios Atmosfericos (RUOA)\n"
         "Atmospheric Observatory Calakmul (cmul), Campeche\n"
         "Lat 18.5956 N, Lon 89.4137 W, Alt 275 masl\n"
-        "Time UTC-6h\n"
-        "\n"
-        "TIMESTAMP,Temp_Avg,RH_Avg,WSpeed_Avg,WSpeed_Max,WDir_Avg,WDir_SD,Rain_Tot,Press_Avg,Rad_Avg\n"
+        "Time UTC-6h + 170 S correction for height position \n"
+        "Greenhouse Gas data\n"
+        'Concentrations correspond to dry molar fractions\n'
+        "Time,MPVPosition,Height,CO2_Avg,CO2_SD,CH4_Avg,CH4_SD,CO_Avg,CO_SD,CO2_MPVPosition,CH4_MPVPosition,CO_MPVPosition\n"
     )
 
-    for month, group in df.groupby(pd.Grouper(key='Time', freq='ME')):
+    df.insert(df.columns.get_loc('CO2_Avg'), 'Height', 16)
+    #df['Height'] = 16
+
+    # Renombrar las columnas
+    df = df.rename(columns={
+        'Time': 'yyyy-mm-dd HH:MM:SS',
+        'MPVPosition': '1-5',
+        'Height': 'm agl',
+        'CO2_Avg': 'ppm',
+        'CO2_SD': 'ppm',
+        'CH4_Avg': 'ppb',
+        'CH4_SD': 'ppb',
+        'CO_Avg': 'ppb',
+        'CO_SD': 'ppm',
+        'CO2_MPVPosition': '1-5',
+        'CH4_MPVPosition': '1-5',
+        'CO_MPVPosition': '1-5'
+    })
+
+    for month, group in df.groupby(pd.Grouper(key='yyyy-mm-dd HH:MM:SS', freq='ME')):
         year = month.strftime('%Y')
         month_str = month.strftime('%m')
 
