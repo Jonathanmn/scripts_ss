@@ -5,19 +5,17 @@ from picarro import *
 
 from picarro_clean import *
 
-# Cargar los datos
-#folder_path = '/home/jmn/l0/minuto/2024/07'
-#/home/jonathan_mn/server_gei/minuto/2024/06
-#folder_path = '/home/jonathan_mn/clean_prueba'
 
-folder_path = '/home/jmn/l0-1/minuto/2024/02'
+folder_path = '/home/jonathan_mn/l0-1/minuto/2024/02'
 gei = read_raw_gei_folder(folder_path, 'Time')
 gei['Time'] = pd.to_datetime(gei['Time'])
 
 
+ciclo_diurno_plottly_4(gei, 'CH4_Avg', 'CO2_Avg', 'CO_Avg')
 
-# Example usage
-updated_gei = interactive_plot(gei)
+
+
+
 
 
 
@@ -25,8 +23,6 @@ updated_gei = interactive_plot(gei)
 
 
 
-
-#diurno(gei, 'CH4_Avg', 'CO2_Avg', 'CO_Avg')
 
 '''
 gei_clean = clean_plotly_gei(gei, 'CH4_Avg', 'CO2_Avg', 'CO_Avg')
