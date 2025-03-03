@@ -6,7 +6,7 @@ from picarro import *
 from picarro_clean import *
 
 
-folder_path = '/home/jonathan_mn/l0-1/minuto/2024/02'
+folder_path = '/home/jonathan_mn/l0-1/minuto/2024/03'
 gei = read_raw_gei_folder(folder_path, 'Time')
 gei['Time'] = pd.to_datetime(gei['Time'])
 
