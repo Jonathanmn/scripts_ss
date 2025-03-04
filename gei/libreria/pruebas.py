@@ -1,8 +1,5 @@
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-from picarro import *
 
+from picarro import *
 from picarro_clean import *
 
 

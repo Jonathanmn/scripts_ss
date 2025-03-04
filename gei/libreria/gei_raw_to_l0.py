@@ -19,10 +19,10 @@ gei=flags_species_1min(gei)
 
 #revisamos que los timestamps sean exactos
 
-gei=timestamp_l0(gei,'Time')
+
 #se aplica la correcion -6h - 170s de valvula 
 gei=correccion_utc(gei, 'Time')
-
+gei=timestamp_l0(gei,'Time')
 
 
 
