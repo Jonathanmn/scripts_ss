@@ -8,12 +8,7 @@ from picarro_clean import *
 folder_path = '/home/jonathan_mn/l0-1/minuto/2024/03'
 
 
-
 // local
-folder_path = '/home/jmn/l0-1/minuto/2024/05'
-
-
-
 
 
 folder_path = '/home/jmn/L1/minuto/2024/03'
@@ -27,32 +22,9 @@ gei=reverse_rename_columns(gei)
 gei['Time'] = pd.to_datetime(gei['Time'])
 
 
+#ciclo_diurno_plottly_6(gei, 'CH4_Avg', 'CO2_Avg', 'CO_Avg')
 
-
-
-
-'''
-folder_path = '/home/jmn/gei-l1/minuto/2023/10'
-gei = read_raw_gei_folder(folder_path, 'Time')
-gei['Time'] = pd.to_datetime(gei['Time'])
-
-
-
-
-
-    colors = [
-        'rgba(0, 0, 255, 1)',  
-        'rgba(75, 0, 130, 1)',  
-        'rgba(138, 43, 226, 1)',  
-    ]
-
-
-
-'''
-
-ciclo_diurno_plottly_6(gei, 'CH4_Avg', 'CO2_Avg', 'CO_Avg')
-
-
+ciclo_diurno_3(gei, 'CH4_Avg', 'CO2_Avg', 'CO_Avg')
 '''
 save_data = input("revisamos la linea de tiempo? (yes/no): ")
 
@@ -61,7 +33,6 @@ if save_data.lower() == 'yes':
     plot_1min_avg_sd(gei)
 else:
     print("Los datos no se han guardado.")
-
 '''
 
 
