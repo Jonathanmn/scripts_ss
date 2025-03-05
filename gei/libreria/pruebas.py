@@ -14,7 +14,7 @@ folder_path = '/home/jonathan_mn/l0-1/minuto/2024/03'
 folder_path = '/home/jmn/L1/minuto/2024/03'
 '''
 
-folder_path = '/home/jmn/L1/minuto/2024/03'
+folder_path = '/home/jmn/L1/minuto/2024'
 
 
 gei=read_L0_or_L1(folder_path, 'yyyy-mm-dd HH:MM:SS', header=7)
@@ -24,7 +24,11 @@ gei['Time'] = pd.to_datetime(gei['Time'])
 
 #ciclo_diurno_plottly_6(gei, 'CH4_Avg', 'CO2_Avg', 'CO_Avg')
 
-ciclo_diurno_3(gei, 'CH4_Avg', 'CO2_Avg', 'CO_Avg')
+
+ciclo_diurno_mensual_anual(gei, 'CH4_Avg', 'CO2_Avg', 'CO_Avg')
+
+
+#ciclo_diurno_3(gei, 'CH4_Avg', 'CO2_Avg', 'CO_Avg')
 '''
 save_data = input("revisamos la linea de tiempo? (yes/no): ")
 
