@@ -5,9 +5,6 @@ import os
 from pathlib import Path
 from datetime import timedelta
 
-''' estamos trabajando con archivos de picarro, por lo que se asume que los datos son de picarro,'''
-
-
 ''' Lectura de archivos y guardado de archivos   '''
 
 
@@ -29,6 +26,24 @@ def read_raw_gei_folder(folder_path, time):
 
     return gei
 
+def reverse_rename_columns(df):
+    reverse_rename_dict = {
+        'yyyy-mm-dd HH:MM:SS': 'Time',
+        '1-5': 'MPVPosition',
+        'm agl': 'Height',
+        'ppm': 'CO2_Avg',
+        'ppm': 'CO2_SD',
+        'ppb': 'CH4_Avg',
+        'ppb': 'CH4_SD',
+        'ppb': 'CO_Avg',
+        'ppm': 'CO_SD',
+        '1-5': 'CO2_MPVPosition',
+        '1-5': 'CH4_MPVPosition',
+        '1-5': 'CO_MPVPosition'
+    }
+
+    df = df.rename(columns=reverse_rename_dict)
+    return df
 
 
 def save_gei_l0(df, output_folder):
@@ -58,12 +73,8 @@ def save_gei_l0(df, output_folder):
 def save_gei_l1(df, output_folder):
 
 
-
-
     df[['CO2_Avg', 'CO2_SD', 'CH4_Avg', 'CH4_SD', 'CO_Avg', 'CO_SD']].round(4)
-    """
-    guarda el archivo mensual en la carpeta minuto/YYYY/MM/YYYY-MM_CMUL_L1.dat.
-    """
+
     descriptive_text = (
         "Red Universitaria de Observatorios Atmosfericos (RUOA)\n"
         "Atmospheric Observatory Calakmul (cmul), Campeche\n"
@@ -71,6 +82,7 @@ def save_gei_l1(df, output_folder):
         "Time UTC-6h + 170 S correction for height position \n"
         "Greenhouse Gas data\n"
         'Concentrations correspond to dry molar fractions\n'
+        '\n'
         "Time,MPVPosition,Height,CO2_Avg,CO2_SD,CH4_Avg,CH4_SD,CO_Avg,CO_SD,CO2_MPVPosition,CH4_MPVPosition,CO_MPVPosition\n"
     )
 
@@ -108,7 +120,7 @@ def save_gei_l1(df, output_folder):
             group.to_csv(file, sep=',', index=False, mode='a')
 
 
-def save_to(df, time_column, folder):
+def raw_lite(df, time_column, folder):
     """
     Guarda el DataFrame en un archivo .dat con el formato YYYY-MM_CMUL_L0.dat.
 
@@ -126,10 +138,6 @@ def save_to(df, time_column, folder):
 
 
 
-
-
-
-
 ''' Correcciones de hora y fecha   '''
 
 def resample_to_1min(df, timestamp_column='timestamp'):
@@ -141,8 +149,6 @@ def resample_to_1min(df, timestamp_column='timestamp'):
     
     resampled_df = resampled_df.reset_index().rename(columns={'timestamp': 'Time'})
     return resampled_df
-
-
 
 
 
@@ -204,25 +210,6 @@ def umbrales_gei(df, CO2_umbral=None, CH4_umbral=None):
 ''' Filtrado de datos   '''
 
 
-def limpieza_intervalos(df, start_date, end_date):
-  """Sets 'CO2_Avg' to None for a specific date range.
-
-  Args:
-    df: The Pandas DataFrame.
-    start_date: The start date of the range (inclusive).
-    end_date: The end date of the range (inclusive).
-  """
-  # Convert start_date and end_date to pandas Timestamp objects
-  start_date = pd.Timestamp(start_date)
-  end_date = pd.Timestamp(end_date)
-
-  # Use loc to filter the DataFrame and set 'CO2_Avg' to None
-  df.loc[(df['Time'] >= start_date) & (df['Time'] <= end_date), 'CO2_Avg'] = np.nan
-  df.loc[(df['Time'] >= start_date) & (df['Time'] <= end_date), 'CH4_Avg'] = np.nan
-  df.loc[(df['Time'] >= start_date) & (df['Time'] <= end_date), 'CO_Avg'] = np.nan
-
-  return df
-
 
 def apply_nan_intervals(df, intervals_CO2=None, intervals_CH4=None, intervals_CO=None):
     """
@@ -247,40 +234,6 @@ def apply_nan_intervals(df, intervals_CO2=None, intervals_CH4=None, intervals_CO
 
     return df
 
-
-# Función para eliminar valores antes y después de encontrar 2, 3, 4 o 5 en 'MPVPosition'
-def clean_surrounding_values(df):
-    # Identificar las filas donde 'MPVPosition' tiene valores 2, 3, 4 o 5
-    condition = df['MPVPosition'].isin([2, 3, 4, 5])
-    
-    # Crear máscaras para las filas anteriores y posteriores
-    previous_mask = condition.shift(5, fill_value=False)  # Fila anterior
-    next_mask = condition.shift(-5, fill_value=False)     # Fila posterior
-    
-    # Combinar las máscaras con la condición actual
-    mask = condition | previous_mask | next_mask
-    
-    # Reemplazar valores en las columnas específicas con NaN donde la máscara es True
-    df.loc[mask, ['CO2_Avg', 'CH4_Avg', 'CO_Avg']] = np.nan
-    
-    return df
-
-
-
-def filter_spikes_with_rolling_criteria(df, columns, window_size=10, threshold=1.5):
-
-    for column in columns: 
-      
-        rolling_median = df[column].rolling(window=window_size, center=True).median()
-
-        
-        spikes = (df[column] > rolling_median * threshold) & (df[column].rolling(window=window_size, center=True).count() >= window_size)
-
-       
-        df[column] = df[column].copy() 
-        df.loc[spikes, column] = np.nan 
-
-    return df  
 
 
 
@@ -556,22 +509,17 @@ def plot_1min_index(df):
 
 
 
-def plot_avg_sd_month(df):
+def plot_avg_sd_monthly(df):
     """
-    Plots average and standard deviation for CO2, CH4, and CO 
-    separately for each month in the DataFrame.
+    grafica por mes los datos de co2, ch4 y co en toda la serie de tiempo, cada mes se grafica al cerrar el anterior
     """
     
-    # Ensure 'Time' column is datetime type
-    df['Time'] = pd.to_datetime(df['Time'])
-
-    # Group data by month
     for (year, month), group in df.groupby([df['Time'].dt.year, df['Time'].dt.month]):
-        # Create a figure and subplots for each month
+        
         fig, axes = plt.subplots(3, 1, figsize=(10, 12), sharex=True)
-        fig.suptitle(f'GEI {month} - {year} ')  # Set title for the month
+        fig.suptitle(f'GEI {month} - {year} ') 
 
-        # Plot CO2 data for the month
+        
         ax1 = axes[0]
         ax1.plot(group['Time'], group['CO2_Avg'], label='CO2_Avg', color='#123456')
         ax1_twin = ax1.twinx()
@@ -582,7 +530,7 @@ def plot_avg_sd_month(df):
         ax1_twin.legend(loc='upper right')
         ax1.set_title('CO2 Concentration')
 
-        # Plot CH4 data for the month
+        
         ax2 = axes[1]
         ax2.plot(group['Time'], group['CH4_Avg'], label='CH4_Avg', color='#123456')
         ax2_twin = ax2.twinx()
@@ -593,7 +541,7 @@ def plot_avg_sd_month(df):
         ax2_twin.legend(loc='upper right')
         ax2.set_title('CH4 Concentration')
 
-        # Plot CO data for the month
+        
         ax3 = axes[2]
         ax3.plot(group['Time'], group['CO_Avg'], label='CO_Avg', color='#123456')
         ax3_twin = ax3.twinx()
@@ -621,12 +569,12 @@ def plot_raw(df, timestamp_column):
   axes[0].set_ylabel('CO2_dry')
   axes[0].legend()
 
-  # Plot CH4_dry
+  #  CH4_dry
   axes[1].plot(df[timestamp_column], df['CH4_dry'], label='CH4_dry')
   axes[1].set_ylabel('CH4_dry')
   axes[1].legend()
 
-  # Plot CO
+  #  CO
   axes[2].plot(df[timestamp_column], df['CO'], label='CO')
   axes[2].set_ylabel('CO')
   axes[2].legend()
@@ -637,36 +585,28 @@ def plot_raw(df, timestamp_column):
   plt.show()
 
 
-def plot_raw_grouped(df, timestamp_column):
+def plot_raw_per_month(df, timestamp_column):
   """
-  Plots 'CO2_dry', 'CH4_dry', and 'CO' grouped by year and month.
-
-  Args:
-    df: The Pandas DataFrame containing the data.
-    timestamp_column: The name of the column containing timestamps.
+grafica por mes los datos de co2, ch4 y co en toda la serie de tiempo, cada mes se grafica al cerrar el anterior
   """
 
-  # Ensure timestamp column is in datetime format
-  df[timestamp_column] = pd.to_datetime(df[timestamp_column])
-
-  # Group data by year and month
   grouped_data = df.groupby([df[timestamp_column].dt.year, df[timestamp_column].dt.month])
 
-  # Iterate through groups and create plots
+
   for (year, month), group_df in grouped_data:
     fig, axes = plt.subplots(3, 1, figsize=(10, 12), sharex=True)
 
-    # Plot CO2_dry
+    #  CO2_dry
     axes[0].plot(group_df[timestamp_column], group_df['CO2_dry'], label='CO2_dry')
     axes[0].set_ylabel('CO2_dry')
     axes[0].legend()
 
-    # Plot CH4_dry
+    # CH4_dry
     axes[1].plot(group_df[timestamp_column], group_df['CH4_dry'], label='CH4_dry')
     axes[1].set_ylabel('CH4_dry')
     axes[1].legend()
 
-    # Plot CO
+    #  CO
     axes[2].plot(group_df[timestamp_column], group_df['CO'], label='CO')
     axes[2].set_ylabel('CO')
     axes[2].legend()

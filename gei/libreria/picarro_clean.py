@@ -8,6 +8,11 @@ import plotly.colors
 
 
 
+
+
+
+'''herramienta para desplegar el plotly y eliminar datos de forma visual '''
+
 def clean_plotly(df, column):
     """ un scatter que selecciona puntos y los elimina del data frame """
     selected_indices = []

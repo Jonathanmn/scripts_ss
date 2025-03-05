@@ -10,15 +10,6 @@ from picarro import *
 output_folder = '/home/jmn/gei-l1'
 
 
-
-
-
-
-
-
-
-
-
 folder_path = '/home/jmn/l0-1'
 gei = read_raw_gei_folder(folder_path, 'Time')
 gei['Time'] = pd.to_datetime(gei['Time'])
