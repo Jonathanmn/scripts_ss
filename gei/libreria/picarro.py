@@ -26,6 +26,29 @@ def read_raw_gei_folder(folder_path, time):
 
     return gei
 
+def read_l1_gei_folder(folder_path,time,header=None):
+    """
+    Lee los archivos .dat del folder donde se encuentran los archivos raw con subcarpetas
+    retorna un solo data frame con los datos de toda la carpeta .
+    """
+    dataframes = []
+
+    for file_path in Path(folder_path).rglob('*.dat'):
+        df = pd.read_csv(file_path, delimiter=r',')
+        dataframes.append(df)
+
+    gei = pd.concat(dataframes, ignore_index=True)
+    gei[time] = pd.to_datetime(gei[time])
+    gei = gei.sort_values(by=time).reset_index(drop=True)
+
+
+    return gei
+
+
+
+
+
+
 def reverse_rename_columns(df):
     reverse_rename_dict = {
         'yyyy-mm-dd HH:MM:SS': 'Time',
