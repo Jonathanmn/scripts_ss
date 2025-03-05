@@ -14,7 +14,7 @@ folder_path = '/home/jonathan_mn/l0-1/minuto/2024/03'
 folder_path = '/home/jmn/L1/minuto/2024/03'
 '''
 
-folder_path = '/home/jmn/L1/minuto/2024'
+folder_path = '/home/jmn/L1/minuto/2023'
 
 
 gei=read_L0_or_L1(folder_path, 'yyyy-mm-dd HH:MM:SS', header=7)

@@ -440,7 +440,6 @@ def ciclo_diurno_plottly_7(df, CO2, CH4, CO):
     fig.show()
 
 
-
 def ciclo_diurno_mensual_anual(df, CO2, CH4, CO):
     """
     Esta función resamplea el DataFrame a intervalos de 1 hora, agrupa los datos por mes y hora,
@@ -457,17 +456,30 @@ def ciclo_diurno_mensual_anual(df, CO2, CH4, CO):
     # Obtener el año del DataFrame
     year = df.index.year[0]
 
-    # Definir un colormap personalizado de azul a violeta
-    colors = px.colors.qualitative.Plotly
+    # Definir un colormap personalizado
+    colors = [
+        'rgba(242, 24, 24, 1)',  
+        'rgba(253, 103, 13, 1)',  
+        'rgba(253, 178, 13, 1)',
+        'rgba(253, 223, 13, 1)',
+        'rgba(228, 253, 13, 1)',
+        'rgba(148, 253, 13, 1)',
+        'rgba(93, 253, 13, 1)',
+        'rgba(13, 253, 193, 1)',
+        'rgba(13, 193, 253, 1)',
+        'rgba(13, 133, 253, 1)',
+        'rgba(173, 13, 253, 1)',
+        'rgba(253, 13, 198, 1)' 
+    ]
 
     # Función para crear el plot de cada gas
     def plot_gas(df_monthly_avg, gas, title):
         fig = go.Figure()
 
         # Iterar sobre cada mes y plotear las 24 horas en el mismo plot
-        for mes in df_monthly_avg['Mes'].unique():
+        for i, mes in enumerate(df_monthly_avg['Mes'].unique()):
             group = df_monthly_avg[df_monthly_avg['Mes'] == mes]
-            color = colors[mes % len(colors)]  # Asignar color del colormap
+            color = colors[i % len(colors)]  # Asignar color del colormap
             fig.add_trace(go.Scatter(x=group['Hora'], y=group[gas], mode='lines', line=dict(width=3, color=color), opacity=0.9, name=f'Mes {mes}'))
 
         # Configurar el plot
@@ -480,12 +492,4 @@ def ciclo_diurno_mensual_anual(df, CO2, CH4, CO):
     plot_gas(df_monthly_avg, CO, f'Ciclo Diurno de {CO}')
     plot_gas(df_monthly_avg, CO2, f'Ciclo Diurno de {CO2}')
     plot_gas(df_monthly_avg, CH4, f'Ciclo Diurno de {CH4}')
-
-
-
-
-
-
-
-
 
