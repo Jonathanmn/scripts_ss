@@ -8,7 +8,25 @@ from datetime import timedelta
 ''' Lectura de archivos y guardado de archivos   '''
 
 
-def read_raw_gei_folder(folder_path, time):
+def read_raw_gei_folder(folder_path):
+
+    dataframes = []
+
+    for file_path in Path(folder_path).rglob('*.dat'):
+    
+        df = pd.read_csv(file_path, delimiter=r'\s+')#, usecols=columns_to_read)
+        dataframes.append(df)
+
+
+    gei = pd.concat(dataframes, ignore_index=True)
+    gei['Time'] = pd.to_datetime(gei['DATE'] + ' ' + gei['TIME'])
+    gei = gei.sort_values(by='Time').reset_index(drop=True)
+    gei = gei.drop(['DATE', 'TIME'], axis=1)
+
+    return gei
+
+
+def read_raw_lite(folder_path, time):
     """
     Lee los archivos .dat del folder donde se encuentran los archivos raw con subcarpetas
     retorna un solo data frame con los datos de toda la carpeta .
@@ -70,17 +88,14 @@ def reverse_rename_columns(df):
 def save_gei_l0(df, output_folder):
     """
     guarda el archivo mensual en la carpeta minuto/YYYY/MM/YYYY-MM_CMUL_L0.dat.
-
-
     """
-
     for month, group in df.groupby(pd.Grouper(key='Time', freq='ME')):
         
         year = month.strftime('%Y')
         month_str = month.strftime('%m')
 
         
-        subfolder_path = os.path.join(output_folder, 'minuto', year, month_str)
+        subfolder_path = os.path.join(output_folder,'L0' 'minuto', year, month_str)
         os.makedirs(subfolder_path, exist_ok=True)
 
         
@@ -91,10 +106,13 @@ def save_gei_l0(df, output_folder):
         group.to_csv(filepath, sep=',', index=False)
 
 
-def save_gei_l1(df, output_folder):
-
+def save_gei_l1_minuto(df, output_folder):
+    """
+    Guarda el archivo mensual en la carpeta minuto/YYYY/MM/YYYY-MM_CMUL_L1.dat.
+    También guarda una versión resampleada a intervalos de 1 hora en la carpeta hora/YYYY/MM/YYYY-MM_CMUL_L1.dat.
+    """
     df[['CO2_Avg', 'CO2_SD', 'CH4_Avg', 'CH4_SD', 'CO_Avg', 'CO_SD']].round(4)
-
+    
     descriptive_text = (
         "Red Universitaria de Observatorios Atmosfericos (RUOA)\n"
         "Atmospheric Observatory Calakmul (cmul), Campeche\n"
@@ -107,7 +125,7 @@ def save_gei_l1(df, output_folder):
     )
 
     df.insert(df.columns.get_loc('CO2_Avg'), 'Height', 16)
-    #df['Height'] = 16
+    
 
     # Renombrar las columnas
     df = df.rename(columns={
@@ -129,7 +147,7 @@ def save_gei_l1(df, output_folder):
         year = month.strftime('%Y')
         month_str = month.strftime('%m')
 
-        subfolder_path = os.path.join(output_folder,'L1', 'minuto', year, month_str)
+        subfolder_path = os.path.join(output_folder, 'L1', 'minuto', year, month_str)
         os.makedirs(subfolder_path, exist_ok=True)
 
         filename = month.strftime('%Y-%m') + '_CMUL_L1.dat'
@@ -138,6 +156,65 @@ def save_gei_l1(df, output_folder):
         with open(filepath, 'w') as file:
             file.write(descriptive_text)
             group.to_csv(file, sep=',', index=False, mode='a')
+
+def save_gei_l1_hora(df, output_folder):
+    """
+    Guarda el archivo mensual en la carpeta hora/YYYY/MM/YYYY-MM_CMUL_L1.dat.
+    Resamplea los datos a intervalos de 1 hora, calculando la media para las columnas AVG y SD,
+    y la moda para las columnas MPVPosition.
+    """
+    df[['CO2_Avg', 'CO2_SD', 'CH4_Avg', 'CH4_SD', 'CO_Avg', 'CO_SD']].round(4)
+    
+    descriptive_text = (
+        "Red Universitaria de Observatorios Atmosfericos (RUOA)\n"
+        "Atmospheric Observatory Calakmul (cmul), Campeche\n"
+        "Lat 18.5956 N, Lon 89.4137 W, Alt 275 masl\n"
+        "Time UTC-6h + 170 S correction for height position \n"
+        "Greenhouse Gas data\n"
+        'Concentrations correspond to dry molar fractions\n'
+        '\n'
+        "Time,MPVPosition,Height,CO2_Avg,CO2_SD,CH4_Avg,CH4_SD,CO_Avg,CO_SD,CO2_MPVPosition,CH4_MPVPosition,CO_MPVPosition\n"
+    )
+
+    df.insert(df.columns.get_loc('CO2_Avg'), 'Height', 16)
+    
+    df = df.set_index('Time')
+    resampled_df = df.resample('h').mean()
+
+    resampled_df = resampled_df.reset_index().rename(columns={'Time': 'yyyy-mm-dd HH:MM:SS'})
+    
+    resampled_df = resampled_df.rename(columns={
+        
+        'MPVPosition': '1-5',
+        'Height': 'm agl',
+        'CO2_Avg': 'ppm',
+        'CO2_SD': 'ppm',
+        'CH4_Avg': 'ppb',
+        'CH4_SD': 'ppb',
+        'CO_Avg': 'ppb',
+        'CO_SD': 'ppm',
+        'CO2_MPVPosition': '1-5',
+        'CH4_MPVPosition': '1-5',
+        'CO_MPVPosition': '1-5'
+    })
+
+    print(resampled_df.head())
+
+    for month, group in resampled_df.groupby(pd.Grouper(key='yyyy-mm-dd HH:MM:SS', freq='ME')):
+        year = month.strftime('%Y')
+        month_str = month.strftime('%m')
+
+        subfolder_path = os.path.join(output_folder, 'L1', 'hora', year, month_str)
+        os.makedirs(subfolder_path, exist_ok=True)
+
+        filename = month.strftime('%Y-%m') + '_CMUL_L1.dat'
+        filepath = os.path.join(subfolder_path, filename)
+
+        with open(filepath, 'w') as file:
+            file.write(descriptive_text)
+            group.to_csv(file, sep=',', index=False, mode='a')
+
+
 
 
 def raw_lite(df, time_column, folder):

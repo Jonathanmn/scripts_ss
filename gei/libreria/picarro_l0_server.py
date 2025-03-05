@@ -9,7 +9,25 @@ from datetime import timedelta
 ''' ESTA LIBRERIA TIENE FUNCIONS PARA LEER, LIMPIAR Y GUARDAR LOS ARCHIVOS L0 DE PICARRO'''
 
 
-def read_raw_gei_folder(folder_path, time):
+def read_raw_gei_folder(folder_path):
+
+    dataframes = []
+
+    for file_path in Path(folder_path).rglob('*.dat'):
+    
+        df = pd.read_csv(file_path, delimiter=r'\s+')#, usecols=columns_to_read)
+        dataframes.append(df)
+
+
+    gei = pd.concat(dataframes, ignore_index=True)
+    gei['Time'] = pd.to_datetime(gei['DATE'] + ' ' + gei['TIME'])
+    gei = gei.sort_values(by='Time').reset_index(drop=True)
+    gei = gei.drop(['DATE', 'TIME'], axis=1)
+
+    return gei
+
+
+def read_raw_lite(folder_path, time):
     """
     Lee los archivos .dat del folder donde se encuentran los archivos raw con subcarpetas
     retorna un solo data frame con los datos de toda la carpeta .
@@ -28,11 +46,9 @@ def read_raw_gei_folder(folder_path, time):
     return gei
 
 
-
 def save_gei_l0(df, output_folder):
     """
     guarda el archivo mensual en la carpeta minuto/YYYY/MM/YYYY-MM_CMUL_L0.dat.
-
 
     """
     df['Time'] = pd.to_datetime(df['Time'])
@@ -42,7 +58,7 @@ def save_gei_l0(df, output_folder):
         month_str = month.strftime('%m')
 
         
-        subfolder_path = os.path.join(output_folder, 'minuto', year, month_str)
+        subfolder_path = os.path.join(output_folder, 'L0','minuto', year, month_str)
         os.makedirs(subfolder_path, exist_ok=True)
 
         
