@@ -8,9 +8,6 @@ import plotly.colors
 
 
 
-
-
-
 '''herramienta para desplegar el plotly y eliminar datos de forma visual '''
 
 def clean_plotly(df, column):
@@ -315,27 +312,26 @@ def ciclo_diurno_3(df, CO2, CH4, CO):
 
 
 
-import plotly.express as px
-import plotly.graph_objects as go
+
 
 def ciclo_diurno_plottly(df, CO2, CH4, CO):
     """
     Esta función resamplea el DataFrame a intervalos de 1 hora, agrupa los datos por día,
     y plotea los valores promedio de CO2, CH4 y CO en subplots para un período de 24 horas.
     """
-    # Asegurarse de que 'Time' esté en el índice
+    
     df = df.set_index('Time')
 
-    # Resamplear el DataFrame a intervalos de 1 hora
+    
     df_resampled = df.resample('1H').mean()
 
-    # Crear una nueva columna 'Hora' que contiene solo la hora del día
+    
     df_resampled['Hora'] = df_resampled.index.hour
 
-    # Calcular el promedio mensual para cada hora del día
+    
     df_monthly_avg = df_resampled.groupby('Hora').mean().reset_index()
 
-    # Crear subplots
+    
     fig = make_subplots(rows=3, cols=1, shared_xaxes=True, subplot_titles=(f'Ciclo Diurno de {CO2}', f'Ciclo Diurno de {CH4}', f'Ciclo Diurno de {CO}'))
 
     # Iterar sobre cada día y plotear las 24 horas en el mismo subplot
@@ -358,94 +354,6 @@ def ciclo_diurno_plottly(df, CO2, CH4, CO):
 
     fig.update_layout(height=900, width=1200, title_text='Ciclo Diurno de Gases de Efecto Invernadero', showlegend=False)
     fig.show()
-
-
-
-
-def ciclo_diurno_plottly_2(df, CO2, CH4, CO):
-    """
-    Esta función resamplea el DataFrame a intervalos de 1 hora, agrupa los datos por día,
-    y plotea los valores promedio de CO2, CH4 y CO en subplots para un período de 24 horas.
-    """
-    # Asegurarse de que 'Time' esté en el índice
-    df = df.set_index('Time')
-
-    # Resamplear el DataFrame a intervalos de 1 hora
-    df_resampled = df.resample('1H').mean()
-
-    # Crear una nueva columna 'Hora' que contiene solo la hora del día
-    df_resampled['Hora'] = df_resampled.index.hour
-
-    # Calcular el promedio mensual para cada hora del día
-    df_monthly_avg = df_resampled.groupby('Hora').mean().reset_index()
-
-    # Función para crear el plot de cada gas
-    def plot_gas(df_resampled, df_monthly_avg, gas, title):
-        fig = go.Figure()
-
-        # Iterar sobre cada día y plotear las 24 horas en el mismo plot
-        for day, group in df_resampled.groupby(df_resampled.index.date):
-            group = group.reset_index()
-            fig.add_trace(go.Scatter(x=group['Hora'], y=group[gas], mode='lines', line=dict(width=1), opacity=0.7, name=str(day)))
-
-        # Plotear el promedio mensual como referencia
-        fig.add_trace(go.Scatter(x=df_monthly_avg['Hora'], y=df_monthly_avg[gas], mode='lines', line=dict(color='black', dash='dash', width=2), name='Promedio Mensual'))
-
-        # Configurar el plot
-        fig.update_xaxes(title_text='Hora del Día')
-        fig.update_yaxes(title_text=gas)
-        fig.update_layout(height=900, width=1520, autosize=True,title_text=title, showlegend=True)
-        fig.show()
-
-    # Plotear cada gas individualmente
-    plot_gas(df_resampled, df_monthly_avg, CO2, f'Ciclo Diurno de {CO2}')
-    plot_gas(df_resampled, df_monthly_avg, CH4, f'Ciclo Diurno de {CH4}')
-    plot_gas(df_resampled, df_monthly_avg, CO, f'Ciclo Diurno de {CO}')
-
-
-
-def ciclo_diurno_plottly_3(df, CO2, CH4, CO):
-    """
-    Esta función resamplea el DataFrame a intervalos de 1 hora, agrupa los datos por día,
-    y plotea los valores promedio de CO2, CH4 y CO en subplots para un período de 24 horas.
-    """
-    # Asegurarse de que 'Time' esté en el índice
-    df = df.set_index('Time')
-
-    # Resamplear el DataFrame a intervalos de 1 hora
-    df_resampled = df.resample('1H').mean()
-
-    # Crear una nueva columna 'Hora' que contiene solo la hora del día
-    df_resampled['Hora'] = df_resampled.index.hour
-
-    # Calcular el promedio mensual para cada hora del día
-    df_monthly_avg = df_resampled.groupby('Hora').mean().reset_index()
-
-    # Función para crear el plot de cada gas
-    def plot_gas(df_resampled, df_monthly_avg, gas, title):
-        fig = go.Figure()
-
-        # Iterar sobre cada día y plotear las 24 horas en el mismo plot
-        for day, group in df_resampled.groupby(df_resampled.index.date):
-            group = group.reset_index()
-            fig.add_trace(go.Scatter(x=group['Hora'], y=group[gas], mode='lines', line=dict(width=2), opacity=0.9, name=str(day)))
-
-        # Plotear el promedio mensual como referencia
-        fig.add_trace(go.Scatter(x=df_monthly_avg['Hora'], y=df_monthly_avg[gas], mode='lines', line=dict(color='black', dash='dash', width=2), name='Promedio Mensual'))
-
-        # Configurar el plot
-        fig.update_xaxes(title_text='Hora del Día', tickmode='linear', dtick=1, showgrid=True,gridwidth=1, gridcolor='grey')
-        fig.update_yaxes(title_text=gas, showgrid=True,gridwidth=1, gridcolor='grey')
-        fig.update_layout(title_text=title, showlegend=True, autosize=True, height=800, width=1520,plot_bgcolor='white')
-        fig.show()
-
-    # Plotear cada gas individualmente
-    plot_gas(df_resampled, df_monthly_avg, CO2, f'Ciclo Diurno de {CO2}')
-    plot_gas(df_resampled, df_monthly_avg, CH4, f'Ciclo Diurno de {CH4}')
-    plot_gas(df_resampled, df_monthly_avg, CO, f'Ciclo Diurno de {CO}')
-
-
-
 
 
 
@@ -492,9 +400,7 @@ def ciclo_diurno_plottly_4(df, CO2, CH4, CO):
 
 
 
-import plotly.express as px
-import plotly.graph_objects as go
-import plotly.colors
+
 
 def ciclo_diurno_plottly_5(df, CO2, CH4, CO):
     """
