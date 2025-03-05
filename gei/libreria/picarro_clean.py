@@ -318,18 +318,18 @@ def ciclo_diurno_plottly(df, CO2, CH4, CO):
     """
     Esta función resamplea el DataFrame a intervalos de 1 hora, agrupa los datos por día,
     y plotea los valores promedio de CO2, CH4 y CO en subplots para un período de 24 horas.
+    También grafica los outliers junto al promedio mensual.
     """
-    
     df = df.set_index('Time')
-
-    
     df_resampled = df.resample('1H').mean()
-
-    
     df_resampled['Hora'] = df_resampled.index.hour
 
-    
     df_monthly_avg = df_resampled.groupby('Hora').mean().reset_index()
+
+    # Calcular los outliers
+    df_monthly_std = df_resampled.groupby('Hora').std().reset_index()
+    df_monthly_outliers = df_monthly_avg.copy()
+    df_monthly_outliers[CO2 + '_upper'] = df_monthly_avg[CO2] + 2 * df_monthly_std[CO2]
 
     
     fig = make_subplots(rows=3, cols=1, shared_xaxes=True, subplot_titles=(f'Ciclo Diurno de {CO2}', f'Ciclo Diurno de {CH4}', f'Ciclo Diurno de {CO}'))
