@@ -414,7 +414,8 @@ def ciclo_diurno_plottly_5(df, CO2, CH4, CO):
     df_resampled['Hora'] = df_resampled.index.hour
 
     df_monthly_avg = df_resampled.groupby('Hora').mean().reset_index()
-
+    
+    year_month = df.index.to_period('M')[0].strftime('%Y-%m')
     # Definir un colormap personalizado de azul a violeta // mark: hola
     colors = [
         'rgba(0, 0, 255, 1)',  
@@ -442,7 +443,7 @@ def ciclo_diurno_plottly_5(df, CO2, CH4, CO):
         # Configurar el plot
         fig.update_xaxes(title_text='Hora del Día', tickmode='linear', dtick=1, showgrid=True, gridwidth=1, gridcolor='grey')
         fig.update_yaxes(title_text=gas, showgrid=True, gridwidth=1, gridcolor='grey')
-        fig.update_layout(title_text=title, showlegend=True, autosize=True, height=780, width=1520, plot_bgcolor='white')
+        fig.update_layout(title_text=f'{title} {year_month}', showlegend=True, autosize=True, height=780, width=1520, plot_bgcolor='white')
         fig.show()
 
     # Plotear cada gas individualmente
@@ -450,59 +451,3 @@ def ciclo_diurno_plottly_5(df, CO2, CH4, CO):
     plot_gas(df_resampled, df_monthly_avg, CH4, f'Ciclo Diurno de {CH4}')
     plot_gas(df_resampled, df_monthly_avg, CO, f'Ciclo Diurno de {CO}')
 
-
-
-
-
-
-
-
-def ciclo_diurno_plottly_6(df, CO2, CH4, CO):
-    """
-    Esta función resamplea el DataFrame a intervalos de 1 hora, agrupa los datos por día,
-    y plotea los valores promedio de CO2, CH4 y CO en subplots para un período de 24 horas.
-    """
-    df['Time'] = pd.to_datetime(df['Time'])  # Asegurarse de que 'Time' esté en formato datetime
-    df = df.set_index('Time')
-    df_resampled = df.resample('1h').mean()
-    df_resampled['Hora'] = df_resampled.index.hour
-
-    df_monthly_avg = df_resampled.groupby('Hora').mean().reset_index()
-
-    # Obtener el número de días únicos en los datos
-    num_days = pd.Series(df_resampled.index.date).nunique()
-
-    # Generar un colormap personalizado de azul a violeta con 30 colores
-    colors = plotly.colors.make_colorscale([
-        [0.0, 'rgb(0, 0, 255)'],  # Azul
-        [1.0, 'rgb(138, 43, 226)']  # Violeta
-    ])
-    colors = plotly.colors.sample_colorscale(colors, [n/29 for n in range(num_days)])
-
-    # Función para crear el plot de cada gas
-    def plot_gas(df_resampled, df_monthly_avg, gas, title):
-        fig = go.Figure()
-
-        # Iterar sobre cada día y plotear las 24 horas en el mismo plot
-        for i, (day, group) in enumerate(df_resampled.groupby(df_resampled.index.date)):
-            group = group.reset_index()
-            color = colors[i % len(colors)]  # Asignar color del colormap
-            fig.add_trace(go.Scatter(x=group['Hora'], y=group[gas], mode='lines', line=dict(width=2, color=color), opacity=0.8, name=str(day)))
-
-        # Plotear el promedio mensual como referencia
-        fig.add_trace(go.Scatter(x=df_monthly_avg['Hora'], y=df_monthly_avg[gas], mode='lines', line=dict(color='red', dash='dash', width=4), name='Promedio Mensual'))
-
-        # Agregar anotaciones de texto para cada hora
-        for i, row in df_monthly_avg.iterrows():
-            fig.add_annotation(x=row['Hora'], y=row[gas], text=f"{row[gas]:.2f}", showarrow=True, yshift=8, bgcolor="rgba(255, 255, 255, 0.8)")
-
-        # Configurar el plot
-        fig.update_xaxes(title_text='Hora del Día', tickmode='linear', dtick=1, showgrid=True, gridwidth=1, gridcolor='grey')
-        fig.update_yaxes(title_text=gas, showgrid=True, gridwidth=1, gridcolor='grey')
-        fig.update_layout(title_text=title, showlegend=True, autosize=True, height=780, width=1520, plot_bgcolor='white')
-        fig.show()
-
-    # Plotear cada gas individualmente
-    plot_gas(df_resampled, df_monthly_avg, CO2, f'Ciclo Diurno de {CO2}')
-    plot_gas(df_resampled, df_monthly_avg, CH4, f'Ciclo Diurno de {CH4}')
-    plot_gas(df_resampled, df_monthly_avg, CO, f'Ciclo Diurno de {CO}')

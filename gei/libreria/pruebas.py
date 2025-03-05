@@ -19,11 +19,9 @@ l1 /home/jmn/gei-l1/minuto/2023/10
 
 folder_path = '/home/jmn/L1/minuto/2024/03'
 
+
 gei=read_L0_or_L1(folder_path, 'yyyy-mm-dd HH:MM:SS', header=7)
-
-
 gei=reverse_rename_columns(gei)
-
 gei['Time'] = pd.to_datetime(gei['Time'])
 
 
