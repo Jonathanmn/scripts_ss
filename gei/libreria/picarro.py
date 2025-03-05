@@ -26,7 +26,7 @@ def read_raw_gei_folder(folder_path, time):
 
     return gei
 
-def read_l1_gei_folder(folder_path,time,header=None):
+def read_L0_or_L1(folder_path,time, header=None):
     """
     Lee los archivos .dat del folder donde se encuentran los archivos raw con subcarpetas
     retorna un solo data frame con los datos de toda la carpeta .
@@ -34,7 +34,7 @@ def read_l1_gei_folder(folder_path,time,header=None):
     dataframes = []
 
     for file_path in Path(folder_path).rglob('*.dat'):
-        df = pd.read_csv(file_path, delimiter=r',')
+        df = pd.read_csv(file_path, delimiter=r',', header=header)
         dataframes.append(df)
 
     gei = pd.concat(dataframes, ignore_index=True)
@@ -50,24 +50,22 @@ def read_l1_gei_folder(folder_path,time,header=None):
 
 
 def reverse_rename_columns(df):
-    reverse_rename_dict = {
-        'yyyy-mm-dd HH:MM:SS': 'Time',
-        '1-5': 'MPVPosition',
-        'm agl': 'Height',
-        'ppm': 'CO2_Avg',
-        'ppm': 'CO2_SD',
-        'ppb': 'CH4_Avg',
-        'ppb': 'CH4_SD',
-        'ppb': 'CO_Avg',
-        'ppm': 'CO_SD',
-        '1-5': 'CO2_MPVPosition',
-        '1-5': 'CH4_MPVPosition',
-        '1-5': 'CO_MPVPosition'
-    }
-
-    df = df.rename(columns=reverse_rename_dict)
+    """
+    Renombra las columnas del DataFrame basado en su posición para evitar conflictos.
+    """
+    column_names = [
+        'Time', 'MPVPosition', 'Height', 'CO2_Avg', 'CO2_SD', 
+        'CH4_Avg', 'CH4_SD', 'CO_Avg', 'CO_SD', 
+        'CO2_MPVPosition', 'CH4_MPVPosition', 'CO_MPVPosition'
+    ]
+    
+    # Asegurarse de que el DataFrame tenga al menos tantas columnas como nombres en column_names
+    if len(df.columns) >= len(column_names):
+        df.columns = column_names + list(df.columns[len(column_names):])
+    else:
+        raise ValueError("El DataFrame no tiene suficientes columnas para renombrar.")
+    
     return df
-
 
 def save_gei_l0(df, output_folder):
     """
@@ -75,7 +73,7 @@ def save_gei_l0(df, output_folder):
 
 
     """
-    df['Time'] = pd.to_datetime(df['Time'])
+
     for month, group in df.groupby(pd.Grouper(key='Time', freq='ME')):
         
         year = month.strftime('%Y')
@@ -94,7 +92,6 @@ def save_gei_l0(df, output_folder):
 
 
 def save_gei_l1(df, output_folder):
-
 
     df[['CO2_Avg', 'CO2_SD', 'CH4_Avg', 'CH4_SD', 'CO_Avg', 'CO_SD']].round(4)
 
@@ -132,7 +129,7 @@ def save_gei_l1(df, output_folder):
         year = month.strftime('%Y')
         month_str = month.strftime('%m')
 
-        subfolder_path = os.path.join(output_folder, 'minuto', year, month_str)
+        subfolder_path = os.path.join(output_folder,'L1', 'minuto', year, month_str)
         os.makedirs(subfolder_path, exist_ok=True)
 
         filename = month.strftime('%Y-%m') + '_CMUL_L1.dat'

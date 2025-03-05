@@ -1,7 +1,8 @@
 
 from picarro import *
 from picarro_clean import *
-
+import pandas as pd
+import numpy as np
 
 '''Lab
 
@@ -17,24 +18,28 @@ l1 /home/jmn/gei-l1/minuto/2023/10
 
 '''
 
-folder_path = '/home/jmn/gei-l1/minuto/2023/10'
-try:
-    gei = pd.read_csv(folder_path, delimiter=',', header=7, error_bad_lines=False, warn_bad_lines=True)
-    gei['yyyy-mm-dd HH:MM:SS'] = pd.to_datetime(gei['yyyy-mm-dd HH:MM:SS'])
-except pd.errors.ParserError as e:
-    print(f"Error al leer el archivo CSV: {e}")
-
-
 #gei = read_l1_gei_folder(folder_path, 'yyyy-mm-dd HH:MM:SS', header=7)
 #gei['yyyy-mm-dd HH:MM:SS'] = pd.to_datetime(gei['yyyy-mm-dd HH:MM:SS'])
 
 
 
-'''
-folder_path = '/home/jmn/gei-l1/minuto/2023/10'
-gei = read_raw_gei_folder(folder_path, 'Time')
-gei['Time'] = pd.to_datetime(gei['Time'])
-'''
+
+folder_path = '/home/jmn/L1/minuto/2023/11'
+
+
+gei = read_L0_or_L1(folder_path, 'yyyy-mm-dd HH:MM:SS',header=7)
+
+
+gei=reverse_rename_columns(gei)
+#gei['Time'] = pd.to_datetime(gei['Time'])
+print(gei.head())
+
+
+
+
+
+
+
 
 #ciclo_diurno_plottly_5(gei, 'CH4_Avg', 'CO2_Avg', 'CO_Avg')
 

@@ -7,11 +7,12 @@ from picarro import *
 #output_folder = '/home/gei/scripts_j/l0'
 
 
-output_folder = '/home/jmn/gei-l1'
+output_folder = '/home/jmn/'
 
 
-folder_path = '/home/jmn/l0-1'
+folder_path = '/home/jmn/l0-1/minuto'
 gei = read_raw_gei_folder(folder_path, 'Time')
 gei['Time'] = pd.to_datetime(gei['Time'])
 
+print('estamos guardando')
 save_gei_l1(gei,output_folder)
