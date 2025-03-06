@@ -25,7 +25,7 @@ gei['Time'] = pd.to_datetime(gei['Time'])
 #ciclo_diurno_plottly_6(gei, 'CH4_Avg', 'CO2_Avg', 'CO_Avg')
 
 
-ciclo_diurno_mensual_matplot(gei, 'CH4_Avg', 'CO2_Avg')
+ciclo_diurno_mensual_matplot2(gei, 'CH4_Avg', 'CO2_Avg')
 
 
 #ciclo_diurno_3(gei, 'CH4_Avg', 'CO2_Avg', 'CO_Avg')
