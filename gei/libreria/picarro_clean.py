@@ -555,3 +555,49 @@ def ciclo_diurno_mensual_matplot2(df, CO2=None, CH4=None, CO=None):
     fig.tight_layout(rect=[0, 0, 0.85, 0.95])
     fig.suptitle(f'Ciclo Diurno de Gases de Efecto Invernadero ({year})', fontsize=16)
     plt.show()
+
+
+
+
+
+
+
+'''////////// ciclos diurnos c //////////'''
+
+def custom_resample_and_group(df, time_col):
+
+    new_df = df[['Time', 'CO2_Avg', 'CH4_Avg', 'CO_Avg']].copy()
+
+    """
+    Resamples data within a specific time range, calculates statistics, and groups by date.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame.
+        time_col (str, optional): The name of the timestamp column. Defaults to 'timestamp'.
+
+    Returns:
+        pd.DataFrame: The resampled and grouped DataFrame.
+    """
+
+    # Convert timestamp column to datetime
+    new_df['Time'] = pd.to_datetime(new_df['Time'])
+
+    # Create 'date' column for grouping
+    df['date'] = df['Time'].dt.date
+
+    def _calculate_stats(group):
+        """Helper function to calculate statistics for each group."""
+        start_time = pd.to_datetime(str(group['date'].iloc[0]) + ' 19:00:00')
+        end_time = pd.to_datetime(str(group['date'].iloc[0] + pd.Timedelta(days=1)) + ' 05:00:00')
+
+        filtered_group = group[(group['Time'] >= start_time) & (group['Time'] <= end_time)]
+        agg_results = filtered_group['gas'].agg(['mean', 'std'])
+
+        return pd.DataFrame({'date': [group['date'].iloc[0]], 
+                             'mean_gas': [agg_results['mean']], 
+                             'std_gas': [agg_results['std']]})
+                             
+    # Group by 'date' and apply the helper function
+    gei_19_05_h = df.groupby('date').apply(_calculate_stats).reset_index(drop=True)
+
+    return gei_19_05_h

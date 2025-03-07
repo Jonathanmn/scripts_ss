@@ -22,10 +22,14 @@ gei=reverse_rename_columns(gei)
 gei['Time'] = pd.to_datetime(gei['Time'])
 
 
+gei=custom_resample_and_group(gei, 'Time')
+
+
+
 #ciclo_diurno_plottly_6(gei, 'CH4_Avg', 'CO2_Avg', 'CO_Avg')
 
 
-ciclo_diurno_mensual_matplot2(gei, 'CH4_Avg', 'CO2_Avg')
+#ciclo_diurno_mensual_matplot2(gei, 'CH4_Avg', 'CO2_Avg')
 
 
 #ciclo_diurno_3(gei, 'CH4_Avg', 'CO2_Avg', 'CO_Avg')
