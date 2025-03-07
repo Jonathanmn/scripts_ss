@@ -22,7 +22,73 @@ gei=reverse_rename_columns(gei)
 gei['Time'] = pd.to_datetime(gei['Time'])
 
 
-gei=custom_resample_and_group(gei, 'Time')
+gei_nocturno=gei[['Time', 'CH4_Avg', 'CO2_Avg', 'CO_Avg']].copy()
+gei_diario=gei[['Time', 'CH4_Avg', 'CO2_Avg', 'CO_Avg']].copy()
+
+gei_nocturno['Time'] = pd.to_datetime(gei_nocturno['Time'])
+
+
+ciclo_filtrado=gei_nocturno[((gei_nocturno['Time'].dt.hour >= 19) | (gei_nocturno['Time'].dt.hour <= 5))].copy().reset_index(drop=True)
+
+
+print(ciclo_filtrado.head())
+
+ciclo_filtrado['Time'] = ciclo_filtrado['Time'] - timedelta(hours=5)
+
+print(ciclo_filtrado.head())
+
+ciclo_filtrado=ciclo_filtrado.set_index('Time')
+
+ciclo_dia=ciclo_filtrado.resample('1D').agg(['mean','std'])
+# Rename columns
+ciclo_dia.columns = ['_'.join(col).replace('_mean', '').replace('_std', '_SD') for col in ciclo_dia.columns] 
+ciclo_dia=ciclo_dia.reset_index()
+
+
+print(ciclo_dia.head())
+
+
+
+
+import matplotlib.pyplot as plt
+
+# Assuming ciclo_dia has columns like 'CO2_Avg', 'CO2_Avg_SD', 'CH4_Avg', 'CH4_Avg_SD', etc.
+gas_cols = ['CO2_Avg', 'CH4_Avg']  # List of gas columns
+
+fig, axes = plt.subplots(len(gas_cols), 1, sharex=True, figsize=(10, 6))  # Create subplots
+
+for i, gas in enumerate(gas_cols):
+    ax = axes[i]  # Get the current subplot
+    ax.plot(ciclo_dia['Time'], ciclo_dia[gas], label='Mean', color='blue')  # Plot mean
+    
+    # Create a secondary y-axis for SD
+    ax2 = ax.twinx()  
+    ax2.plot(ciclo_dia['Time'], ciclo_dia[gas + '_SD'], label='SD', color='red')  # Plot SD on secondary axis
+    
+    ax.set_ylabel(gas, color='blue')  # Set y-axis label for mean
+    ax2.set_ylabel(gas + ' SD', color='red')  # Set y-axis label for SD
+    
+    # Combine legends from both axes
+    lines, labels = ax.get_legend_handles_labels()
+    lines2, labels2 = ax2.get_legend_handles_labels()
+    ax.legend(lines + lines2, labels + labels2)
+
+plt.xlabel('Time')  # Set x-axis label for the entire figure
+plt.suptitle('Mean and Standard Deviation of Gases')  # Set overall title
+plt.tight_layout()  # Adjust layout for better spacing
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
