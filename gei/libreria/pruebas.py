@@ -1,35 +1,26 @@
-
 from picarro import *
 from picarro_clean import *
 
-
-'''Lab
-
-folder_path = '/home/jonathan_mn/l0-1/minuto/2024/03'
-
-
-// local
-
-
-folder_path = '/home/jmn/L1/minuto/2024/03'
-'''
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import pandas as pd
+import numpy as np
+from datetime import timedelta
 
 folder_path = '/home/jmn/L1/minuto/2024'
 
-
-gei=read_L0_or_L1(folder_path, 'yyyy-mm-dd HH:MM:SS', header=7)
-gei=reverse_rename_columns(gei)
+gei = read_L0_or_L1(folder_path, 'yyyy-mm-dd HH:MM:SS', header=7)
+gei = reverse_rename_columns(gei)
 gei['Time'] = pd.to_datetime(gei['Time'])
 
-
-gei_nocturno=gei[['Time', 'CH4_Avg', 'CO2_Avg', 'CO_Avg']].copy()
-gei_diario=gei[['Time', 'CH4_Avg', 'CO2_Avg', 'CO_Avg']].copy()
+gei_nocturno = gei[['Time', 'CH4_Avg', 'CO2_Avg', 'CO_Avg']].copy()
+gei_diario = gei[['Time', 'CH4_Avg', 'CO2_Avg', 'CO_Avg']].copy()
+gei_diario.rename(columns={'CH4_Avg': 'CH4', 'CO2_Avg': 'CO2', 'CO_Avg': 'CO'}, inplace=True)
+gei_nocturno.rename(columns={'CH4_Avg': 'CH4', 'CO2_Avg': 'CO2', 'CO_Avg': 'CO'}, inplace=True)
 
 gei_nocturno['Time'] = pd.to_datetime(gei_nocturno['Time'])
 
-
-ciclo_filtrado=gei_nocturno[((gei_nocturno['Time'].dt.hour >= 19) | (gei_nocturno['Time'].dt.hour <= 5))].copy().reset_index(drop=True)
-
+ciclo_filtrado = gei_nocturno[((gei_nocturno['Time'].dt.hour >= 19) | (gei_nocturno['Time'].dt.hour <= 5))].copy().reset_index(drop=True)
 
 print(ciclo_filtrado.head())
 
@@ -37,105 +28,55 @@ ciclo_filtrado['Time'] = ciclo_filtrado['Time'] - timedelta(hours=5)
 
 print(ciclo_filtrado.head())
 
-ciclo_filtrado=ciclo_filtrado.set_index('Time')
+ciclo_filtrado = ciclo_filtrado.set_index('Time')
 
-ciclo_dia=ciclo_filtrado.resample('1D').agg(['mean','std'])
+ciclo_dia = ciclo_filtrado.resample('1D').agg(['mean', 'std'])
 # Rename columns
-ciclo_dia.columns = ['_'.join(col).replace('_mean', '').replace('_std', '_SD') for col in ciclo_dia.columns] 
-ciclo_dia=ciclo_dia.reset_index()
-
+ciclo_dia.columns = ['_'.join(col).replace('_mean', '_Avg').replace('_std', '_SD') for col in ciclo_dia.columns]
+ciclo_dia = ciclo_dia.reset_index()
 
 print(ciclo_dia.head())
 
+print(ciclo_dia.columns)
 
 
 
-import matplotlib.pyplot as plt
+# Lista de columnas de gases
+gas_cols = ['CO2_Avg', 'CH4_Avg']
 
-# Assuming ciclo_dia has columns like 'CO2_Avg', 'CO2_Avg_SD', 'CH4_Avg', 'CH4_Avg_SD', etc.
-gas_cols = ['CO2_Avg', 'CH4_Avg']  # List of gas columns
+fig, axes = plt.subplots(len(gas_cols), 1, sharex=True, figsize=(10, 6))  # Crear subplots
 
-fig, axes = plt.subplots(len(gas_cols), 1, sharex=True, figsize=(10, 6))  # Create subplots
+# Diccionario para mapear los números de los meses a sus nombres
+month_names = {
+    1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 6: 'Junio',
+    7: 'Julio', 8: 'Agosto', 9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'
+}
 
 for i, gas in enumerate(gas_cols):
-    ax = axes[i]  # Get the current subplot
-    ax.plot(ciclo_dia['Time'], ciclo_dia[gas], label='Mean', color='blue')  # Plot mean
+    ax = axes[i]  # Obtener el subplot actual
+    ax.plot(ciclo_dia['Time'], ciclo_dia[gas], label='Mean', color='blue')  # Graficar la media
     
-    # Create a secondary y-axis for SD
-    ax2 = ax.twinx()  
-    ax2.plot(ciclo_dia['Time'], ciclo_dia[gas + '_SD'], label='SD', color='red')  # Plot SD on secondary axis
+    # Añadir una línea de tendencia
+    x = mdates.date2num(ciclo_dia['Time'])
+    y = ciclo_dia[gas]
+    coefficients = np.polyfit(x, y, 1)  # 1 para tendencia lineal
+    trend_line = np.poly1d(coefficients)  # Crear función de línea de tendencia
+    ax.plot(ciclo_dia['Time'], trend_line(x), "--", color='green', label='Trend')
+
+    ax.set_ylabel(gas, color='blue')  # Establecer la etiqueta del eje y para la media
     
-    ax.set_ylabel(gas, color='blue')  # Set y-axis label for mean
-    ax2.set_ylabel(gas + ' SD', color='red')  # Set y-axis label for SD
-    
-    # Combine legends from both axes
+    # Combinar leyendas
     lines, labels = ax.get_legend_handles_labels()
-    lines2, labels2 = ax2.get_legend_handles_labels()
-    ax.legend(lines + lines2, labels + labels2)
+    ax.legend(lines, labels)
 
-plt.xlabel('Time')  # Set x-axis label for the entire figure
-plt.suptitle('Mean and Standard Deviation of Gases')  # Set overall title
-plt.tight_layout()  # Adjust layout for better spacing
+# Formatear el eje x para mostrar ticks mensuales
+ax.xaxis.set_major_locator(mdates.MonthLocator())
+ax.xaxis.set_major_formatter(mdates.DateFormatter('%m'))
+
+# Ajustar las etiquetas de los ticks para mostrar los nombres de los meses
+ax.set_xticklabels([month_names[int(tick.get_text())] for tick in ax.get_xticklabels()])
+
+plt.xlabel('Mes')  # Establecer la etiqueta del eje x para toda la figura
+plt.suptitle('Mean and Trend Line of Gases')  # Establecer el título general
+plt.tight_layout()  # Ajustar el diseño para un mejor espaciado
 plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#ciclo_diurno_plottly_6(gei, 'CH4_Avg', 'CO2_Avg', 'CO_Avg')
-
-
-#ciclo_diurno_mensual_matplot2(gei, 'CH4_Avg', 'CO2_Avg')
-
-
-#ciclo_diurno_3(gei, 'CH4_Avg', 'CO2_Avg', 'CO_Avg')
-'''
-save_data = input("revisamos la linea de tiempo? (yes/no): ")
-
-if save_data.lower() == 'yes':
-
-    plot_1min_avg_sd(gei)
-else:
-    print("Los datos no se han guardado.")
-
-
-
-
-#plot_hourly_subplots(gei, 'CH4_Avg', 'CO2_Avg', 'CO_Avg')
-
-
-'''
-
-
-
-
-'''
-gei_clean = clean_plotly_gei(gei, 'CH4_Avg', 'CO2_Avg', 'CO_Avg')
-plot_scatter(gei_clean, 'CH4_Avg')
-
-limpieza usando el scatter 
-
-
-save_data = input("¿Desea guardar los datos limpios? (yes/no): ")
-
-if save_data.lower() == 'yes':
-    folder = '/home/jmn'
-    save_to(gei_clean, 'Time', folder)
-    print("Datos guardados en la carpeta:", folder)
-else:
-    print("Los datos no se han guardado.")
-
-#save_to(gei, 'Time', folder)  #home/jonathan_mn/clean_prueba
-
-#home/jonathan_mn/clean_prueba
-'''
