@@ -22,6 +22,10 @@ gei_nocturno['Time'] = pd.to_datetime(gei_nocturno['Time'])
 
 ciclo_filtrado = gei_nocturno[((gei_nocturno['Time'].dt.hour >= 19) | (gei_nocturno['Time'].dt.hour <= 5))].copy().reset_index(drop=True)
 
+
+
+
+
 print(ciclo_filtrado.head())
 
 ciclo_filtrado['Time'] = ciclo_filtrado['Time'] - timedelta(hours=5)
