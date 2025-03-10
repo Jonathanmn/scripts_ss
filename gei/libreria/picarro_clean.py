@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.colors
 import matplotlib.cm as cm
-
+import matplotlib.dates as mdates
 
 '''herramienta para desplegar el plotly y eliminar datos de forma visual '''
 
@@ -563,14 +563,17 @@ def ciclo_diurno_mensual_matplot(df, CO2=None, CH4=None, CO=None,start_month=1, 
             ax.set_ylabel(f'{label} (ppm)')
         ax.grid(True)
         ax.legend(loc='upper left', bbox_to_anchor=(1, 1), fontsize='small')
-        ax.set_xticks(range(24)) 
+        ax.set_xticks(range(24))
+        ax.set_xticklabels([f'{hour:02d}:00' for hour in range(24)])  # Formato de hora hh:mm
+
+          # Formato de hora hh:mm
     # Plotear cada gas individualmente
     for ax, (gas, label) in zip(axs, gases):
         plot_gas(ax, df_monthly_avg, df_avg, df_std, gas, label)
 
     # Ajustar la figura para que se adapte al tamaño de la ventana
     fig.tight_layout(rect=[0, 0, 0.95, 0.95])
-    fig.suptitle(f'Ciclo Diurno de Gases de Efecto Invernadero ({year})', fontsize=16)
+    fig.suptitle(f'Ciclo Diurno de Gases de Efecto Invernadero, Estación Calakmul ({year})', fontsize=16)
     plt.show()
 
 
