@@ -124,8 +124,8 @@ def save_gei_l1_minuto(df, output_folder):
         "Time,MPVPosition,Height,CO2_Avg,CO2_SD,CH4_Avg,CH4_SD,CO_Avg,CO_SD,CO2_MPVPosition,CH4_MPVPosition,CO_MPVPosition\n"
     )
 
-    df.insert(df.columns.get_loc('CO2_Avg'), 'Height', 16)
-    
+    if 'Height' not in df.columns:
+        df.insert(df.columns.get_loc('CO2_Avg'), 'Height', 16)
 
     # Renombrar las columnas
     df = df.rename(columns={
@@ -176,8 +176,8 @@ def save_gei_l1_hora(df, output_folder):
         "Time,MPVPosition,Height,CO2_Avg,CO2_SD,CH4_Avg,CH4_SD,CO_Avg,CO_SD,CO2_MPVPosition,CH4_MPVPosition,CO_MPVPosition\n"
     )
 
-    df.insert(df.columns.get_loc('CO2_Avg'), 'Height', 16)
-    
+    if 'Height' not in df.columns:
+        df.insert(df.columns.get_loc('CO2_Avg'), 'Height', 16)
     df = df.set_index('Time')
     resampled_df = df.resample('h').mean()
 

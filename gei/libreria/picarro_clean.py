@@ -10,139 +10,217 @@ import matplotlib.cm as cm
 
 '''herramienta para desplegar el plotly y eliminar datos de forma visual '''
 
-def clean_plotly(df, column):
-    """ un scatter que selecciona puntos y los elimina del data frame """
-    selected_indices = []
 
-    fig, ax = plt.subplots()
-    ax.plot(df.index, df[column], '-', color='black', linewidth=1, alpha=0.2)
-    scatter = ax.scatter(df.index, df[column], s=4, picker=True, color='red')
-
-    ax.set_title(f'Interactive Plot for {column}')
-    ax.set_xlabel('Index')
-    ax.set_ylabel(column)
-
-    def onpick(event):
-        if event.artist != scatter:
-            return True
-
-        ind = event.ind
-        if not len(ind):
-            return True
-
-        for i in ind:
-            selected_indices.append(df.index[i])
-            df.at[df.index[i], column] = np.nan
-
-        # Actualizar el gráfico
-        scatter.set_offsets(np.c_[df.index, df[column]])
-        fig.canvas.draw_idle()
-
-    fig.canvas.mpl_connect('pick_event', onpick)
-    plt.show()
-
-    print("Selected indices:", selected_indices)
-    df.loc[selected_indices, column] = np.nan
-
-    sd_column = column[:-3] + 'SD'
-    if sd_column in df.columns:
-        df.loc[selected_indices, sd_column] = np.nan
-
-    return df
 
 def clean_plotly_gei(df, CH4, CO2, CO):
+ 
+
     """ Un scatter que selecciona puntos y los elimina del data frame para CH4_Avg, CO2_Avg y CO_Avg """
+ 
+
     selected_indices_CH4 = []
+ 
+
     selected_indices_CO2 = []
+ 
+
     selected_indices_CO = []
+ 
 
-    # Obtener el mes y el año del DataFrame
     month_year = df['Time'].dt.to_period('M').unique()[0]
+ 
 
-    # Crear subplots con tamaño grande
     fig, axs = plt.subplots(3, 1, figsize=(20, 15), sharex=True)
+ 
+
+
+ 
 
     # Plot for CH4_Avg
+ 
+
     axs[0].plot(df.index, df[CH4], '-', color='black', linewidth=1, alpha=0.2)
+ 
+
     scatter_CH4 = axs[0].scatter(df.index, df[CH4], s=4, picker=True, color='red')
-    ax2_0 = axs[0].twiny()
-    ax2_0.set_xlim(axs[0].get_xlim())
-    valid_ticks_0 = [tick for tick in axs[0].get_xticks() if 0 <= tick < len(df)]
-    ax2_0.set_xticks(valid_ticks_0)
-    ax2_0.set_xticklabels(df['Time'].dt.strftime('%Y-%m-%d %H:%M:%S').iloc[valid_ticks_0])
-    axs[0].set_title(f'Interactive Plot for {CH4}')
+ 
+
+    axs[0].set_title(f'{CH4}')
+ 
+
+    axs[0].set_xlabel('Index')
+ 
+
     axs[0].set_ylabel(CH4)
+ 
+
+
+ 
 
     # Plot for CO2_Avg
+ 
+
     axs[1].plot(df.index, df[CO2], '-', color='black', linewidth=1, alpha=0.2)
+ 
+
     scatter_CO2 = axs[1].scatter(df.index, df[CO2], s=4, picker=True, color='red')
-    ax2_1 = axs[1].twiny()
-    ax2_1.set_xlim(axs[1].get_xlim())
-    valid_ticks_1 = [tick for tick in axs[1].get_xticks() if 0 <= tick < len(df)]
-    ax2_1.set_xticks(valid_ticks_1)
-    ax2_1.set_xticklabels(df['Time'].dt.strftime('%Y-%m-%d %H:%M:%S').iloc[valid_ticks_1])
-    axs[1].set_title(f'Interactive Plot for {CO2}')
+ 
+
+    axs[1].set_title(f'{CO2}')
+ 
+
     axs[1].set_xlabel('Index')
+ 
+
     axs[1].set_ylabel(CO2)
+ 
+
+
+ 
 
     # Plot for CO_Avg
+ 
+
     axs[2].plot(df.index, df[CO], '-', color='black', linewidth=1, alpha=0.2)
+ 
+
     scatter_CO = axs[2].scatter(df.index, df[CO], s=4, picker=True, color='red')
-    ax2_2 = axs[2].twiny()
-    ax2_2.set_xlim(axs[2].get_xlim())
-    valid_ticks_2 = [tick for tick in axs[2].get_xticks() if 0 <= tick < len(df)]
-    ax2_2.set_xticks(valid_ticks_2)
-    ax2_2.set_xticklabels(df['Time'].dt.strftime('%Y-%m-%d %H:%M:%S').iloc[valid_ticks_2])
-    axs[2].set_title(f'Interactive Plot for {CO}')
+ 
+
+    axs[2].set_title(f'{CO}')
+ 
+
     axs[2].set_xlabel('Index')
+ 
+
     axs[2].set_ylabel(CO)
+ 
+
+
+ 
 
     def onpick(event):
+ 
+
         if event.artist == scatter_CH4:
+ 
+
             ind = event.ind
+ 
+
             for i in ind:
+ 
+
                 selected_indices_CH4.append(df.index[i])
+ 
+
                 df.at[df.index[i], CH4] = np.nan
+ 
+
         elif event.artist == scatter_CO2:
+ 
+
             ind = event.ind
+ 
+
             for i in ind:
+ 
+
                 selected_indices_CO2.append(df.index[i])
+ 
+
                 df.at[df.index[i], CO2] = np.nan
+ 
+
         elif event.artist == scatter_CO:
+ 
+
             ind = event.ind
+ 
+
             for i in ind:
+ 
+
                 selected_indices_CO.append(df.index[i])
+ 
+
                 df.at[df.index[i], CO] = np.nan
+ 
+
+
+ 
 
         # Actualizar los gráficos
+ 
+
         scatter_CH4.set_offsets(np.c_[df.index, df[CH4]])
+ 
+
         scatter_CO2.set_offsets(np.c_[df.index, df[CO2]])
+ 
+
         scatter_CO.set_offsets(np.c_[df.index, df[CO]])
+ 
+
         fig.canvas.draw_idle()
+ 
+
+    fig.tight_layout()
+ 
 
     fig.canvas.mpl_connect('pick_event', onpick)
+ 
 
-    # Ajustar la figura para que se adapte al tamaño de la ventana
-    fig.tight_layout()
-    fig.suptitle(f'Interactive Plots for {month_year}', fontsize=16)
+    fig.suptitle(f'Picarro {month_year}', fontsize=16)
+ 
+
+
+ 
+
     plt.show()
+ 
 
-    print("Selected indices for CH4:", selected_indices_CH4)
-    print("Selected indices for CO2:", selected_indices_CO2)
-    print("Selected indices for CO:", selected_indices_CO)
 
-    # Aplicar np.nan a los índices seleccionados en cada gas
+ 
+
+    
+ 
+
     df.loc[selected_indices_CH4, CH4] = np.nan
+ 
+
     df.loc[selected_indices_CO2, CO2] = np.nan
+ 
+
     df.loc[selected_indices_CO, CO] = np.nan
+ 
 
-    # Aplicar np.nan a las columnas de desviación estándar si existen
+
+ 
+
+    
+ 
+
     for gas, selected_indices in zip([CH4, CO2, CO], [selected_indices_CH4, selected_indices_CO2, selected_indices_CO]):
-        sd_column = gas[:-3] + 'SD'
-        if sd_column in df.columns:
-            df.loc[selected_indices, sd_column] = np.nan
+ 
 
+        sd_column = gas[:-3] + 'SD'
+ 
+
+        if sd_column in df.columns:
+ 
+
+            df.loc[selected_indices, sd_column] = np.nan
+ 
+
+
+ 
     return df
+
+
+
+
+
 
 def plot_scatter(df, column):
     """
@@ -403,92 +481,16 @@ def ciclo_diurno_mensual_anual(df, CO2, CH4, CO):
 
 
 
-def ciclo_diurno_mensual_matplot(df, CO2=None, CH4=None, CO=None):
+
+def ciclo_diurno_mensual_matplot(df, CO2=None, CH4=None, CO=None,start_month=1, end_month=12):
     """
     Esta función resamplea el DataFrame a intervalos de 1 hora, agrupa los datos por mes y hora,
     y plotea los valores promedio de CO2, CH4 y CO en subplots para un período de 24 horas utilizando matplotlib.
     También grafica el promedio de todo el DataFrame y los outliers.
     """
-    df = df.set_index('Time')
-    df_resampled = df.resample('1h').mean()
-    df_resampled['Hora'] = df_resampled.index.hour
-    df_resampled['Mes'] = df_resampled.index.month
+    if start_month & end_month is not None:
+        df = df[df['Time'].dt.month.between(start_month, end_month)]
 
-    # Calcular el promedio mensual para cada hora del día
-    df_monthly_avg = df_resampled.groupby(['Mes', 'Hora']).mean().reset_index()
-
-    # Calcular el promedio y la desviación estándar para todo el DataFrame
-    df_avg = df_resampled.groupby('Hora').mean().reset_index()
-    df_std = df_resampled.groupby('Hora').std().reset_index()
-
-    # Obtener el año del DataFrame
-    year = df.index.year[0]
-
-    # Diccionario para mapear los números de los meses a sus nombres
-    month_names = {
-        1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 6: 'Junio',
-        7: 'Julio', 8: 'Agosto', 9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'
-    }
-
-    # Definir el colormap viridis
-    viridis = cm.get_cmap('viridis', 12)
-
-    # Contar el número de argumentos no None
-    gases = [(CO2, 'CO2'), (CH4, 'CH4'), (CO, 'CO')]
-    gases = [(gas, label) for gas, label in gases if gas is not None]
-    num_gases = len(gases)
-
-    # Crear subplots dinámicamente en función del número de gases
-    fig, axs = plt.subplots(num_gases, 1, figsize=(16, 4 * num_gases), sharex=True)
-
-    # Asegurarse de que axs sea una lista incluso si hay solo un subplot
-    if num_gases == 1:
-        axs = [axs]
-
-    # Función para crear el plot de cada gas
-    def plot_gas(ax, df_monthly_avg, df_avg, df_std, gas, label, title):
-        # Iterar sobre cada mes y plotear las 24 horas en el mismo plot
-        for i, mes in enumerate(df_monthly_avg['Mes'].unique()):
-            group = df_monthly_avg[df_monthly_avg['Mes'] == mes]
-            color = viridis(i / 11)  # Asignar color del colormap
-            month_name = month_names[mes]  # Obtener el nombre del mes
-            ax.plot(group['Hora'], group[gas], '-', linewidth=2, color=color, label=f'{month_name}')
-
-        # Plotear el promedio de todo el DataFrame
-        ax.plot(df_avg['Hora'], df_avg[gas], 'r--', linewidth=4, label='Promedio Anual')
-
-        # Plotear los outliers
-        ax.plot(df_avg['Hora'], df_avg[gas] + 2 * df_std[gas], 'r:', linewidth=2, label='Outliers Superior')
-        ax.plot(df_avg['Hora'], df_avg[gas] - 2 * df_std[gas], 'r:', linewidth=2, label='Outliers Inferior')
-
-        # Configurar el plot
-        #ax.set_title(f'{title} ({year})')
-        ax.set_xlabel('Hora del Día')
-        ax.set_ylabel(label)
-        ax.grid(True)
-        ax.legend(loc='upper left', bbox_to_anchor=(1,1),fontsize='small')
-
-    # Plotear cada gas individualmente
-    for ax, (gas, label) in zip(axs, gases):
-        plot_gas(ax, df_monthly_avg, df_avg, df_std, gas, label, title='')
-
-    # Ajustar la figura para que se adapte al tamaño de la ventana
-    fig.tight_layout(rect=[0, 0, 0.98, 0.95])
-    fig.suptitle(f'Ciclo diurno Mensual (promedio) {year}\n', fontsize=16)
-    plt.show()
-
-
-
-
-
-
-
-def ciclo_diurno_mensual_matplot2(df, CO2=None, CH4=None, CO=None):
-    """
-    Esta función resamplea el DataFrame a intervalos de 1 hora, agrupa los datos por mes y hora,
-    y plotea los valores promedio de CO2, CH4 y CO en subplots para un período de 24 horas utilizando matplotlib.
-    También grafica el promedio de todo el DataFrame y los outliers.
-    """
     df = df.set_index('Time')
     df_resampled = df.resample('1h').mean()
     df_resampled['Hora'] = df_resampled.index.hour
@@ -541,63 +543,34 @@ def ciclo_diurno_mensual_matplot2(df, CO2=None, CH4=None, CO=None):
         ax.plot(df_avg['Hora'], df_avg[gas] + 2 * df_std[gas], 'r:', linewidth=3, label='Outliers Superior')
         ax.plot(df_avg['Hora'], df_avg[gas] - 2 * df_std[gas], 'r:', linewidth=3, label='Outliers Inferior')
 
+
+        # Encontrar los valores máximos y mínimos
+        max_value = df_monthly_avg[gas].max()
+        min_value = df_monthly_avg[gas].min()
+        max_month = df_monthly_avg.loc[df_monthly_avg[gas].idxmax(), 'Mes']
+        min_month = df_monthly_avg.loc[df_monthly_avg[gas].idxmin(), 'Mes']
+
+        bbox_props = dict(boxstyle="round,pad=0.3", edgecolor="none", facecolor="white", alpha=0.8)
+        ax.text(0.95, 0.95, f'Valores máx y mínimos:\nMáx: {max_value:.2f} ({month_names[max_month]})\nMín: {min_value:.2f} ({month_names[min_month]})', transform=ax.transAxes,
+                fontsize=12, verticalalignment='top', horizontalalignment='right', bbox=bbox_props)
+
+
         # Configurar el plot
         ax.set_xlabel('Hora del Día')
-        ax.set_ylabel(label)
+        if label == 'CH4':
+            ax.set_ylabel(f'{label} (ppb)')
+        else:
+            ax.set_ylabel(f'{label} (ppm)')
         ax.grid(True)
         ax.legend(loc='upper left', bbox_to_anchor=(1, 1), fontsize='small')
-
+        ax.set_xticks(range(24)) 
     # Plotear cada gas individualmente
     for ax, (gas, label) in zip(axs, gases):
         plot_gas(ax, df_monthly_avg, df_avg, df_std, gas, label)
 
     # Ajustar la figura para que se adapte al tamaño de la ventana
-    fig.tight_layout(rect=[0, 0, 0.85, 0.95])
+    fig.tight_layout(rect=[0, 0, 0.95, 0.95])
     fig.suptitle(f'Ciclo Diurno de Gases de Efecto Invernadero ({year})', fontsize=16)
     plt.show()
 
 
-
-
-
-
-
-'''////////// ciclos diurnos c //////////'''
-
-def custom_resample_and_group(df, time_col):
-
-    new_df = df[['Time', 'CO2_Avg', 'CH4_Avg', 'CO_Avg']].copy()
-
-    """
-    Resamples data within a specific time range, calculates statistics, and groups by date.
-
-    Args:
-        df (pd.DataFrame): The input DataFrame.
-        time_col (str, optional): The name of the timestamp column. Defaults to 'timestamp'.
-
-    Returns:
-        pd.DataFrame: The resampled and grouped DataFrame.
-    """
-
-    # Convert timestamp column to datetime
-    new_df['Time'] = pd.to_datetime(new_df['Time'])
-
-    # Create 'date' column for grouping
-    df['date'] = df['Time'].dt.date
-
-    def _calculate_stats(group):
-        """Helper function to calculate statistics for each group."""
-        start_time = pd.to_datetime(str(group['date'].iloc[0]) + ' 19:00:00')
-        end_time = pd.to_datetime(str(group['date'].iloc[0] + pd.Timedelta(days=1)) + ' 05:00:00')
-
-        filtered_group = group[(group['Time'] >= start_time) & (group['Time'] <= end_time)]
-        agg_results = filtered_group['gas'].agg(['mean', 'std'])
-
-        return pd.DataFrame({'date': [group['date'].iloc[0]], 
-                             'mean_gas': [agg_results['mean']], 
-                             'std_gas': [agg_results['std']]})
-                             
-    # Group by 'date' and apply the helper function
-    gei_19_05_h = df.groupby('date').apply(_calculate_stats).reset_index(drop=True)
-
-    return gei_19_05_h
