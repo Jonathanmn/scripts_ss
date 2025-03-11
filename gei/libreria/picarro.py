@@ -217,7 +217,7 @@ def save_gei_l1_hora(df, output_folder):
 
 
 
-def raw_lite(df, time_column, folder):
+def guardar_raw_lite(df, time_column, folder):
     """
     Guarda el DataFrame en un archivo .dat con el formato YYYY-MM_CMUL_L0.dat.
 
@@ -518,7 +518,7 @@ def plot_1min_avg_sd(df):
     ax1 = axes[0]
     ax1.plot(df['Time'], df['CO2_Avg'], label='CO2_Avg', color='#123456')
     ax1_twin = ax1.twinx()
-    ax1_twin.plot(df['Time'], df['CO2_SD'], label='CO2_SD', color='#F7883F', alpha=0.8)
+    ax1_twin.plot(df['Time'], df['CO2_SD'], label='CO2_SD', color='#F7883F', alpha=0.5)
     ax1.set_ylabel('CO2_Avg')
     ax1_twin.set_ylabel('CO2_SD')
     ax1.legend(loc='upper left')
@@ -529,7 +529,7 @@ def plot_1min_avg_sd(df):
     ax2 = axes[1]
     ax2.plot(df['Time'], df['CH4_Avg'], label='CH4_Avg', color='#123456')
     ax2_twin = ax2.twinx()
-    ax2_twin.plot(df['Time'], df['CH4_SD'], label='CH4_SD', color='#F7883F',alpha=0.8)
+    ax2_twin.plot(df['Time'], df['CH4_SD'], label='CH4_SD', color='#F7883F',alpha=0.5)
     ax2.set_ylabel('CH4_Avg')
     ax2_twin.set_ylabel('CH4_SD')
     ax2.legend(loc='upper left')
@@ -540,7 +540,7 @@ def plot_1min_avg_sd(df):
     ax3 = axes[2]
     ax3.plot(df['Time'], df['CO_Avg'], label='CO_Avg', color='#123456')
     ax3_twin = ax3.twinx()
-    ax3_twin.plot(df['Time'], df['CO_SD'], label='CO_SD', color='#F7883F', alpha=0.8)
+    ax3_twin.plot(df['Time'], df['CO_SD'], label='CO_SD', color='#F7883F', alpha=0.5)
     ax3.set_ylabel('CO_Avg')
     ax3_twin.set_ylabel('CO_SD')
     ax3.legend(loc='upper left')

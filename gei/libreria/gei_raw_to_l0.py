@@ -1,7 +1,7 @@
 '''Este script va a a tratar de dejar un archivo l0 limpio con flags y umbrales aplicados'''
 
 from picarro_l0_server import *
-from
+
 
 #folder_path = '/home/gei/scripts_j/raw'
 #output_folder = '/home/gei/scripts_j/l0'

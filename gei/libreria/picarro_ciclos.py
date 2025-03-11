@@ -19,7 +19,7 @@ def copy_and_rename_columns(df):
 
 def ciclo_diurno_avg_19_05(ciclo_filtrado):
 
-    ciclo_filtrado['Time']=ciclo_filtrado['Time'] - timedelta(hours=5)
+    #ciclo_filtrado['Time']=ciclo_filtrado['Time'] - timedelta(hours=5)
     ciclo_filtrado = ciclo_filtrado.set_index('Time')
     #resampleo por dia
     ciclo_dia = ciclo_filtrado.resample('1D').agg(['mean', 'std'])
@@ -28,9 +28,26 @@ def ciclo_diurno_avg_19_05(ciclo_filtrado):
     ciclo_dia.columns = ['_'.join(col).replace('_mean', '_Avg').replace('_std', '_SD') for col in ciclo_dia.columns]
     ciclo_dia = ciclo_dia.reset_index()
  
-
-    
     return ciclo_dia
+
+
+
+def ciclo_dia_19_05(ciclo_filtrado):
+
+    ciclo_filtrado['Time']=ciclo_filtrado['Time'] - timedelta(hours=5)
+    ciclo_filtrado = ciclo_filtrado.set_index('Time')
+    #resampleo por dia
+    ciclo_dia = ciclo_filtrado.resample('1D').agg(['mean', 'std'])
+    
+    # Rename columns
+    ciclo_dia.columns = ['_'.join(col).replace('_mean', '_Avg').replace('_std', '_SD') for col in ciclo_dia.columns]
+    ciclo_dia = ciclo_dia.reset_index()
+
+
+
+
+
+
 
 
 def plot_gei_nocturno_19_05(gei_nocturno, std_ch4=None, std_co2=None):

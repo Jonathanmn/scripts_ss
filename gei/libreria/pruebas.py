@@ -11,18 +11,26 @@ gei = reverse_rename_columns(gei)
 gei['Time'] = pd.to_datetime(gei['Time'])
 
 
-gei_nocturno= copy_and_rename_columns(gei)
 
-print(gei_nocturno.head())
 
-gei_nocturno['Time'] = pd.to_datetime(gei_nocturno['Time'])
-gei_nocturno = gei_nocturno[((gei_nocturno['Time'].dt.hour >= 19) | (gei_nocturno['Time'].dt.hour <= 5))].copy().reset_index(drop=True)
+print(gei.columns)
 
-print(gei_nocturno.head())
+def umbrales_sd(df, CO2_umbral=None, CH4_umbral=None):
+  """
+ Aplica el umbral a las columnas 'CO2_dry', 'CH4_dry', y 'CO' del DataFrame.
 
-#se calcula el ciclo diurno
-gei_nocturno= ciclo_diurno_avg_19_05(gei_nocturno)
+  """
+  if CO2_umbral is not None:
+    df['CO2_Avg'] = np.where(df['CO2_SD'] > CO2_umbral, np.nan, df['CO2_Avg'])
+  if CH4_umbral is not None:
+    df['CH4_Avg'] = np.where(df['CH4_SD'] > CH4_umbral, np.nan, df['CH4_Avg'])
+  
+  df['CO_Avg'] = np.where((df['CO_Avg'] > 0) & (df['CO_Avg'] <= 1), df['CO_Avg'], np.nan)
 
-print(gei_nocturno.head())
+  return df
 
-plot_gei_nocturno_19_05(gei_nocturno)
+gei=umbrales_sd(gei, CO2_umbral=2,CH4_umbral=0.002)
+
+
+plot_1min_avg_sd(gei)
+
