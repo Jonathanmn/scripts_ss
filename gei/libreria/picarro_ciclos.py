@@ -162,8 +162,8 @@ def plot_comparacion(*dfs, column='CO2_Avg'):
         else:
             print("se deben meter valores en tupla ('df_name', df_data)")
     
-    plt.xlabel('Time')
-    plt.ylabel(column)
+ 
+    plt.ylabel('CO$_{2}$ ppm')
     plt.title('Comparación de intervalos de tiempo de CO$_{2}$')
     plt.legend()
     
@@ -173,5 +173,5 @@ def plot_comparacion(*dfs, column='CO2_Avg'):
     month_labels = [month_names[month] for month in months]
 
     plt.xticks(month_starts, month_labels, rotation=45)
-    
+    plt.grid()
     plt.show()

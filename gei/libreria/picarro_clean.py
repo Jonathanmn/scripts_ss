@@ -714,9 +714,9 @@ def plot_24h_anual_subplot_comparacion(df, df2, CO2=None, CH4=None, CO=None, sta
         # Configurar el plot
         ax.set_title(f'{month_name}', size=10)
         if label == 'CH4':
-            ax.set_ylabel(f'{label} (ppb)')
+            ax.set_ylabel('CH$_{4}$ (ppb)')
         else:
-            ax.set_ylabel(f'{label} (ppm)')
+            ax.set_ylabel('CO$_{2}$ (ppm)')
         ax.grid(True)
         ax.legend(loc='upper right', fontsize='x-small')
         ax.set_xticks(range(24))
