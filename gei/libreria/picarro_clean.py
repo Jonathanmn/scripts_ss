@@ -513,7 +513,7 @@ def ciclo_diurno_mensual_matplot(df, CO2=None, CH4=None, CO=None,start_month=1, 
     }
 
     # Definir el colormap   plasma  summer
-    sequential2_cmap = cm.get_cmap('turbo', 12)
+    sequential2_cmap = cm.get_cmap('gist_rainbow', 12)
 
     # Contar el número de argumentos no None
     gases = [(CO2, 'CO2'), (CH4, 'CH4'), (CO, 'CO')]
@@ -537,11 +537,11 @@ def ciclo_diurno_mensual_matplot(df, CO2=None, CH4=None, CO=None,start_month=1, 
             ax.plot(group['Hora'], group[gas], '-', linewidth=2, color=color, label=f'{month_name}')
 
         # Plotear el promedio de todo el DataFrame
-        ax.plot(df_avg['Hora'], df_avg[gas], 'r--', linewidth=4, label='Promedio Anual')
+        ax.plot(df_avg['Hora'], df_avg[gas], 'k--', linewidth=4, label='Promedio Anual')
 
         # Plotear los outliers
-        ax.plot(df_avg['Hora'], df_avg[gas] + 2 * df_std[gas], 'r:', linewidth=3, label='Outliers Superior')
-        ax.plot(df_avg['Hora'], df_avg[gas] - 2 * df_std[gas], 'r:', linewidth=3, label='Outliers Inferior')
+        ax.plot(df_avg['Hora'], df_avg[gas] + 2 * df_std[gas], 'k:', linewidth=3, label='Outliers Superior')
+        ax.plot(df_avg['Hora'], df_avg[gas] - 2 * df_std[gas], 'k:', linewidth=3, label='Outliers Inferior')
 
 
         # Encontrar los valores máximos y mínimos
@@ -578,11 +578,11 @@ def ciclo_diurno_mensual_matplot(df, CO2=None, CH4=None, CO=None,start_month=1, 
 
 
 
-def ciclo_diurno_mensual_subplot_matplot(df, CO2=None, CH4=None, CO=None, start_month=1, end_month=12):
+def plot_24h_anual_subplot(df, CO2=None, CH4=None, CO=None, start_month=1, end_month=12):
     """
     Esta función resamplea el DataFrame a intervalos de 1 hora, agrupa los datos por mes y hora,
     y plotea los valores promedio de CO2, CH4 y CO en subplots para un período de 24 horas utilizando matplotlib.
-    Cada mes se plotea en un subplot separado en una cuadrícula de 6x2.
+    Cada mes se plotea en un subplot separado en una cuadrícula de 3x4.
     """
     if start_month & end_month is not None:
         df = df[df['Time'].dt.month.between(start_month, end_month)]
@@ -591,6 +591,7 @@ def ciclo_diurno_mensual_subplot_matplot(df, CO2=None, CH4=None, CO=None, start_
     df_resampled = df.resample('1h').mean()
     df_resampled['Hora'] = df_resampled.index.hour
     df_resampled['Mes'] = df_resampled.index.month
+
 
     # Calcular el promedio mensual para cada hora del día
     df_monthly_avg = df_resampled.groupby(['Mes', 'Hora']).mean().reset_index()
@@ -604,47 +605,133 @@ def ciclo_diurno_mensual_subplot_matplot(df, CO2=None, CH4=None, CO=None, start_
         1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 6: 'Junio',
         7: 'Julio', 8: 'Agosto', 9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'
     }
-    # Definir el colormap
-    sequential2_cmap = cm.get_cmap('summer', 12)
 
     # Contar el número de argumentos no None
     gases = [(CO2, 'CO2'), (CH4, 'CH4'), (CO, 'CO')]
     gases = [(gas, label) for gas, label in gases if gas is not None]
 
-    # Crear subplots 6x2
-    fig, axs = plt.subplots(6, 2, figsize=(15, 9), sharex=True)
+    # Crear subplots 3x4
+    fig, axs = plt.subplots(3, 4, figsize=(15, 9), sharex=True)
 
     # Función para crear el plot de cada gas
     def plot_gas(ax, df_monthly_avg, df_avg, gas, label, month):
         group = df_monthly_avg[df_monthly_avg['Mes'] == month]
-        color = sequential2_cmap((month - 1) / 11)  # Asignar color del colormap
+        color= 'green'
         month_name = month_names[month]  # Obtener el nombre del mes
         ax.plot(group['Hora'], group[gas], '-', linewidth=2, color=color, label=f'{month_name}')
 
         # Plotear el promedio de todo el DataFrame
-        ax.plot(df_avg['Hora'], df_avg[gas], 'r--', linewidth=2, label='Promedio Anual')
+        ax.plot(df_avg['Hora'], df_avg[gas], 'r--', linewidth=1, label='Promedio Anual')
+
+        ylim_min=df_monthly_avg[gas].min() - 5
+        ylim_max=df_monthly_avg[gas].max() + 5
+
 
         # Configurar el plot
-        ax.set_title(f'{month_name}')
+        ax.set_title(f'{month_name}', size=10)
         #ax.set_xlabel('Hora del Día')
         if label == 'CH4':
             ax.set_ylabel(f'{label} (ppb)')
         else:
             ax.set_ylabel(f'{label} (ppm)')
         ax.grid(True)
-        ax.legend(loc='lower left', fontsize='small')
+        ax.legend(loc='upper right', fontsize='small')
         ax.set_xticks(range(24))
-        ax.set_xticklabels([f'{hour:02d}:00' for hour in range(24)], rotation=90)
+        ax.set_xticklabels([f'{hour:02d}' for hour in range(24)], rotation=90)
+
+        ax.set_ylim([ylim_min,ylim_max])
 
     # Plotear cada gas individualmente en cada subplot
     for month in range(start_month, end_month + 1):
-        row = (month - 1) % 6
-        col = (month - 1) // 6
+        row = (month - 1) // 4
+        col = (month - 1) % 4
         for gas, label in gases:
             plot_gas(axs[row, col], df_monthly_avg, df_avg, gas, label, month)
 
-
-    #plt.tight_layout(pad=20, w_pad=0.5, h_pad=30.0)
-    plt.tight_layout(rect=[0,0,0,0.98],h_pad=90.0)
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
     fig.suptitle(f'Ciclo Diario de {label}, Estación Calakmul ({year})', fontsize=16)
     plt.show()
+
+
+def plot_24h_anual_subplot_comparacion(df, df2, CO2=None, CH4=None, CO=None, start_month=1, end_month=12):
+    """
+    Esta función resamplea dos DataFrames a intervalos de 1 hora, agrupa los datos por mes y hora,
+    y plotea los valores promedio de CO2, CH4 y CO en subplots para un período de 24 horas utilizando matplotlib.
+    Cada mes se plotea en un subplot separado en una cuadrícula de 3x4, comparando los dos DataFrames.
+    """
+    if start_month & end_month is not None:
+        df = df[df['Time'].dt.month.between(start_month, end_month)]
+        df2 = df2[df2['Time'].dt.month.between(start_month, end_month)]
+
+    df = df.set_index('Time')
+    df2 = df2.set_index('Time')
+    df_resampled = df.resample('1h').mean()
+    df2_resampled = df2.resample('1h').mean()
+    df_resampled['Hora'] = df_resampled.index.hour
+    df2_resampled['Hora'] = df2_resampled.index.hour
+    df_resampled['Mes'] = df_resampled.index.month
+    df2_resampled['Mes'] = df2_resampled.index.month
+
+    # Calcular el promedio mensual para cada hora del día
+    df_monthly_avg = df_resampled.groupby(['Mes', 'Hora']).mean().reset_index()
+    df2_monthly_avg = df2_resampled.groupby(['Mes', 'Hora']).mean().reset_index()
+    # Calcular el promedio para todo el DataFrame
+    df_avg = df_resampled.groupby('Hora').mean().reset_index()
+    df2_avg = df2_resampled.groupby('Hora').mean().reset_index()
+    # Obtener el año del DataFrame
+    year = df.index.year[0]
+
+    # Diccionario para mapear los números de los meses a sus nombres
+    month_names = {
+        1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 6: 'Junio',
+        7: 'Julio', 8: 'Agosto', 9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'
+    }
+
+    # Contar el número de argumentos no None
+    gases = [(CO2, 'CO2'), (CH4, 'CH4'), (CO, 'CO')]
+    gases = [(gas, label) for gas, label in gases if gas is not None]
+
+    # Crear subplots 3x4
+    fig, axs = plt.subplots(3, 4, figsize=(15, 9), sharex=True)
+
+    # Función para crear el plot de cada gas
+    def plot_gas(ax, df_monthly_avg, df2_monthly_avg, df_avg, df2_avg, gas, label, month):
+        group = df_monthly_avg[df_monthly_avg['Mes'] == month]
+        group2 = df2_monthly_avg[df2_monthly_avg['Mes'] == month]
+        color1 = 'green'
+        color2 = 'blue'
+        month_name = month_names[month]  # Obtener el nombre del mes
+        ax.plot(group['Hora'], group[gas], '-', linewidth=2, color=color1, label=f'{month_name} L1')
+        ax.plot(group2['Hora'], group2[gas], '-', linewidth=2, color=color2,alpha=0.8, label=f'{month_name} L1b')
+
+        # Plotear el promedio de todo el DataFrame
+        ax.plot(df_avg['Hora'], df_avg[gas], 'r--', linewidth=1, label='Promedio Anual DF1')
+        ax.plot(df2_avg['Hora'], df2_avg[gas], 'r--', linewidth=1, label='Promedio Anual DF2')
+
+        ylim_min = min(df_monthly_avg[gas].min(), df2_monthly_avg[gas].min()) - 5
+        ylim_max = max(df_monthly_avg[gas].max(), df2_monthly_avg[gas].max()) + 5
+
+        # Configurar el plot
+        ax.set_title(f'{month_name}', size=10)
+        if label == 'CH4':
+            ax.set_ylabel(f'{label} (ppb)')
+        else:
+            ax.set_ylabel(f'{label} (ppm)')
+        ax.grid(True)
+        ax.legend(loc='upper right', fontsize='x-small')
+        ax.set_xticks(range(24))
+        ax.set_xticklabels([f'{hour:02d}' for hour in range(24)], rotation=90)
+        ax.set_ylim([ylim_min, ylim_max])
+
+    # Plotear cada gas individualmente en cada subplot
+    for month in range(start_month, end_month + 1):
+        row = (month - 1) // 4
+        col = (month - 1) % 4
+        for gas, label in gases:
+            plot_gas(axs[row, col], df_monthly_avg, df2_monthly_avg, df_avg, df2_avg, gas, label, month)
+
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
+    fig.suptitle(f'Ciclo Diario de {label}, Estación Calakmul ({year})', fontsize=16)
+    plt.show()
+
+
