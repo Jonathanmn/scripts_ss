@@ -158,13 +158,13 @@ def plot_comparacion(*dfs, column='CO2_Avg'):
             if column in df_data.columns:
                 plt.plot(df_data['Time'], df_data[column], label=df_name)
             else:
-                print(f"Column '{column}' not found in DataFrame '{df_name}'")
+                print(f"Column '{column}' no se encontro en '{df_name}'")
         else:
-            print("Each DataFrame should be passed as a tuple with its name, e.g., ('df_name', df_data)")
+            print("se deben meter valores en tupla ('df_name', df_data)")
     
     plt.xlabel('Time')
     plt.ylabel(column)
-    plt.title(f'Comparison of {column} across DataFrames')
+    plt.title('Comparación de intervalos de tiempo de CO$_{2}$')
     plt.legend()
     
     # Set month names as x-tick labels

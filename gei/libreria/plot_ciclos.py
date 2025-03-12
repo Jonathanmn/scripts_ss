@@ -24,18 +24,20 @@ gei = gei.between_time('19:00', '23:59').reset_index()
 gei_nocturno=intervalo_horas(gei,'19:00','23:59')
 gei_dia=intervalo_horas(gei,'09:00','16:00')
 
+gei_0_5am=intervalo_horas(gei,'00:00','05:00')
 
 
+print(gei_0_5am)
 
-print(gei_dia)
-print(gei_nocturno)
 
 
 gei24h=ciclo_1d_avg(gei)
 gei_nocturno=ciclo_1d_avg(gei_nocturno)
 gei_dia=ciclo_1d_avg(gei_dia)
-print(gei_nocturno)
-print(gei_dia)
+
+gei_0_5am=ciclo_1d_avg(gei_0_5am)
 
 
-plot_comparacion(('gei_nocturno', gei_nocturno), ('gei_dia', gei_dia),('gei24',gei24h), column='CO2_Avg')
+
+
+plot_comparacion(('gei 19-23h', gei_nocturno),('gei 0-5h',gei_0_5am), ('gei 09-16h', gei_dia),('gei 24h',gei24h), column='CO2_Avg')
