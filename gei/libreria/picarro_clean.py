@@ -698,15 +698,15 @@ def plot_24h_anual_subplot_comparacion(df, df2, CO2=None, CH4=None, CO=None, sta
     def plot_gas(ax, df_monthly_avg, df2_monthly_avg, df_avg, df2_avg, gas, label, month):
         group = df_monthly_avg[df_monthly_avg['Mes'] == month]
         group2 = df2_monthly_avg[df2_monthly_avg['Mes'] == month]
-        color1 = 'green'
-        color2 = 'blue'
+        color1 = 'blue'
+        color2 = 'green'
         month_name = month_names[month]  # Obtener el nombre del mes
-        ax.plot(group['Hora'], group[gas], '-', linewidth=2, color=color1, label=f'{month_name} L1')
-        ax.plot(group2['Hora'], group2[gas], '-', linewidth=2, color=color2,alpha=0.8, label=f'{month_name} L1b')
+        ax.plot(group['Hora'], group[gas], '-', linewidth=2, color=color1, label=f'L1')
+        ax.plot(group2['Hora'], group2[gas], '-', linewidth=2, color=color2,alpha=0.8, label=f'L1b')
 
         # Plotear el promedio de todo el DataFrame
-        ax.plot(df_avg['Hora'], df_avg[gas], 'r--', linewidth=1, label='Promedio Anual DF1')
-        ax.plot(df2_avg['Hora'], df2_avg[gas], 'r--', linewidth=1, label='Promedio Anual DF2')
+        ax.plot(df_avg['Hora'], df_avg[gas], 'r--', linewidth=1, label='L1 Avg')
+        ax.plot(df2_avg['Hora'], df2_avg[gas], 'm--', linewidth=1, label='L1b Avg')
 
         ylim_min = min(df_monthly_avg[gas].min(), df2_monthly_avg[gas].min()) - 5
         ylim_max = max(df_monthly_avg[gas].max(), df2_monthly_avg[gas].max()) + 5
