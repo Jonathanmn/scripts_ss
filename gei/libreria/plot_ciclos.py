@@ -12,10 +12,16 @@ gei['Time'] = pd.to_datetime(gei['Time'])
 
 
 gei_nocturno= copy_and_rename_columns(gei)
+
 gei_dia=copy_and_rename_columns(gei)
+gei_9_16=copy_and_rename_columns(gei)
+
 
 gei_nocturno['Time'] = pd.to_datetime(gei_nocturno['Time'])
-gei_9_16 = gei_nocturno[((gei_nocturno['Time'].dt.hour >= 16) | (gei_nocturno['Time'].dt.hour <= 9))].copy().reset_index(drop=True)
+gei_9_16['Time']=pd.to_datetime(gei_9_16['Time'])
+gei_dia['Time']= pd.to_datetime(gei_dia['Time'])
+
+gei_9_16 = gei_9_16[((gei_9_16['Time'].dt.hour >= 16) | (gei_nocturno['Time'].dt.hour <= 9))].copy().reset_index(drop=True)
 
 gei_nocturno_19_5 = gei_nocturno[((gei_nocturno['Time'].dt.hour >= 19) | (gei_nocturno['Time'].dt.hour <= 5))].copy().reset_index(drop=True)
 print(' ssssssssssssssssssssssssssssssssssssssssssssssss')

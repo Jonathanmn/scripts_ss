@@ -13,7 +13,6 @@ gei['Time'] = pd.to_datetime(gei['Time'])
 
 
 
-print(gei.columns)
 
 def umbrales_sd(df, CO2_umbral=None, CH4_umbral=None):
   """
@@ -29,7 +28,7 @@ def umbrales_sd(df, CO2_umbral=None, CH4_umbral=None):
 
   return df
 
-gei=umbrales_sd(gei, CO2_umbral=2,CH4_umbral=0.002)
+gei=umbrales_sd(gei, CO2_umbral=0.2,CH4_umbral=0.002)
 
 
 plot_1min_avg_sd(gei)

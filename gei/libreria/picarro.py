@@ -518,7 +518,7 @@ def plot_1min_avg_sd(df):
     ax1 = axes[0]
     ax1.plot(df['Time'], df['CO2_Avg'], label='CO2_Avg', color='#123456')
     ax1_twin = ax1.twinx()
-    ax1_twin.plot(df['Time'], df['CO2_SD'], label='CO2_SD', color='#F7883F', alpha=0.5)
+    ax1_twin.plot(df['Time'], df['CO2_SD'], label='CO2_SD', color='#F7883F', alpha=0.9,linestyle='solid',linewidth=0.5)
     ax1.set_ylabel('CO2_Avg')
     ax1_twin.set_ylabel('CO2_SD')
     ax1.legend(loc='upper left')
@@ -529,7 +529,7 @@ def plot_1min_avg_sd(df):
     ax2 = axes[1]
     ax2.plot(df['Time'], df['CH4_Avg'], label='CH4_Avg', color='#123456')
     ax2_twin = ax2.twinx()
-    ax2_twin.plot(df['Time'], df['CH4_SD'], label='CH4_SD', color='#F7883F',alpha=0.5)
+    ax2_twin.plot(df['Time'], df['CH4_SD'], label='CH4_SD', color='#F7883F',alpha=0.9,linestyle='solid',linewidth=0.5)
     ax2.set_ylabel('CH4_Avg')
     ax2_twin.set_ylabel('CH4_SD')
     ax2.legend(loc='upper left')
@@ -540,7 +540,7 @@ def plot_1min_avg_sd(df):
     ax3 = axes[2]
     ax3.plot(df['Time'], df['CO_Avg'], label='CO_Avg', color='#123456')
     ax3_twin = ax3.twinx()
-    ax3_twin.plot(df['Time'], df['CO_SD'], label='CO_SD', color='#F7883F', alpha=0.5)
+    ax3_twin.plot(df['Time'], df['CO_SD'], label='CO_SD', color='#F7883F', alpha=0.9,linestyle='solid',linewidth=0.5)
     ax3.set_ylabel('CO_Avg')
     ax3_twin.set_ylabel('CO_SD')
     ax3.legend(loc='upper left')
@@ -551,7 +551,49 @@ def plot_1min_avg_sd(df):
     plt.tight_layout()
     plt.show()
 
+def plot_1min_avg_sd1(df):
+    """
+    Ploteo de los valores promedio y desviacion estandar para gei.
+    """
 
+    fig, axes = plt.subplots(3, 1, figsize=(10, 12), sharex=True)
+
+    # CO2
+    ax1 = axes[0]
+    ax1_twin = ax1.twinx()
+    ax1_twin.plot(df['Time'], df['CO2_SD'], label='CO2_SD', color='#F7883F', alpha=0.5)
+    ax1.plot(df['Time'], df['CO2_Avg'], label='CO2_Avg', color='#123456')
+    ax1.set_ylabel('CO2_Avg')
+    ax1_twin.set_ylabel('CO2_SD')
+    ax1.legend(loc='upper left')
+    ax1_twin.legend(loc='upper right')
+    ax1.set_title('CO2 Concentration')
+
+    # CH4
+    ax2 = axes[1]
+    ax2_twin = ax2.twinx()
+    ax2_twin.plot(df['Time'], df['CH4_SD'], label='CH4_SD', color='#F7883F', alpha=0.5)
+    ax2.plot(df['Time'], df['CH4_Avg'], label='CH4_Avg', color='#123456')
+    ax2.set_ylabel('CH4_Avg')
+    ax2_twin.set_ylabel('CH4_SD')
+    ax2.legend(loc='upper left')
+    ax2_twin.legend(loc='upper right')
+    ax2.set_title('CH4 Concentration')
+
+    # CO
+    ax3 = axes[2]
+    ax3_twin = ax3.twinx()
+    ax3_twin.plot(df['Time'], df['CO_SD'], label='CO_SD', color='#F7883F', alpha=0.5)
+    ax3.plot(df['Time'], df['CO_Avg'], label='CO_Avg', color='#123456')
+    ax3.set_ylabel('CO_Avg')
+    ax3_twin.set_ylabel('CO_SD')
+    ax3.legend(loc='upper left')
+    ax3_twin.legend(loc='upper right')
+    ax3.set_title('CO Concentration')
+
+    plt.xlabel('Time')
+    plt.tight_layout()
+    plt.show()
 
 
 def plot_1min_index(df):

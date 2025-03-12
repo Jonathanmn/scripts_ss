@@ -513,7 +513,7 @@ def ciclo_diurno_mensual_matplot(df, CO2=None, CH4=None, CO=None,start_month=1, 
     }
 
     # Definir el colormap   plasma  summer
-    sequential2_cmap = cm.get_cmap('summer', 12)
+    sequential2_cmap = cm.get_cmap('turbo', 12)
 
     # Contar el número de argumentos no None
     gases = [(CO2, 'CO2'), (CH4, 'CH4'), (CO, 'CO')]
