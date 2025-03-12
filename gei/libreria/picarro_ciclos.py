@@ -17,7 +17,7 @@ def copy_and_rename_columns(df):
 
 
 
-def ciclo_diurno_avg_19_05(ciclo_filtrado):
+def ciclo_1d_avg(ciclo_filtrado):
 
     #ciclo_filtrado['Time']=ciclo_filtrado['Time'] - timedelta(hours=5)
     ciclo_filtrado = ciclo_filtrado.set_index('Time')
@@ -32,18 +32,16 @@ def ciclo_diurno_avg_19_05(ciclo_filtrado):
 
 
 
-def ciclo_dia_19_05(ciclo_filtrado):
+def intervalo_horas(df, h0, hf):
+    """
+    filtra en que intervalo de horas (hh:mm) quieres mantener en el df, df=dataframe h0=hora inicial, hf=hora final
 
-    ciclo_filtrado['Time']=ciclo_filtrado['Time'] - timedelta(hours=5)
-    ciclo_filtrado = ciclo_filtrado.set_index('Time')
-    #resampleo por dia
-    ciclo_dia = ciclo_filtrado.resample('1D').agg(['mean', 'std'])
-    
-    # Rename columns
-    ciclo_dia.columns = ['_'.join(col).replace('_mean', '_Avg').replace('_std', '_SD') for col in ciclo_dia.columns]
-    ciclo_dia = ciclo_dia.reset_index()
+    ejemplo ciclo_9_16h=intervalo_horas(ciclo_9_16h,'09:00','16:00')
 
-
+    """
+    df = df.set_index('Time')
+    df = df.between_time(h0, hf).reset_index()
+    return df
 
 
 
@@ -126,3 +124,54 @@ def plot_gei_nocturno_19_05(gei_nocturno, std_ch4=None, std_co2=None):
     fig.tight_layout(rect=[0, 0.03, 1, 0.95])  
     plt.show()
 
+
+
+
+def plot_comparacion(*dfs, column='CO2_Avg'):
+    plt.figure(figsize=(10, 6))
+    
+    for i, df in enumerate(dfs):
+        if column in df.columns:
+            plt.plot(df['Time'], df[column], label=f' {df}')
+        else:
+            print(f"Column '{column}' not found in DataFrame {i+1}")
+    
+    plt.xlabel('Time')
+    plt.ylabel(column)
+    plt.title(f'Comparison of {column} across DataFrames')
+    plt.legend()
+    plt.show()
+
+
+
+def plot_comparacion(*dfs, column='CO2_Avg'):
+    month_names = {
+        1: 'Ene', 2: 'Feb', 3: 'Mar', 4: 'Abr', 5: 'May', 6: 'Jun',
+        7: 'Jul', 8: 'Ago', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dic'
+    }
+    
+    plt.figure(figsize=(10, 6))
+    
+    for df in dfs:
+        if isinstance(df, tuple) and len(df) == 2:
+            df_name, df_data = df
+            if column in df_data.columns:
+                plt.plot(df_data['Time'], df_data[column], label=df_name)
+            else:
+                print(f"Column '{column}' not found in DataFrame '{df_name}'")
+        else:
+            print("Each DataFrame should be passed as a tuple with its name, e.g., ('df_name', df_data)")
+    
+    plt.xlabel('Time')
+    plt.ylabel(column)
+    plt.title(f'Comparison of {column} across DataFrames')
+    plt.legend()
+    
+    # Set month names as x-tick labels
+    months = dfs[0][1]['Time'].dt.month.unique()
+    month_starts = [dfs[0][1][dfs[0][1]['Time'].dt.month == month]['Time'].iloc[0] for month in months]
+    month_labels = [month_names[month] for month in months]
+
+    plt.xticks(month_starts, month_labels, rotation=45)
+    
+    plt.show()

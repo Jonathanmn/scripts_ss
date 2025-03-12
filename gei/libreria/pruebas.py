@@ -14,22 +14,19 @@ gei['Time'] = pd.to_datetime(gei['Time'])
 
 
 
-def umbrales_sd(df, CO2_umbral=None, CH4_umbral=None):
-  """
- Aplica el umbral a las columnas 'CO2_dry', 'CH4_dry', y 'CO' del DataFrame.
 
-  """
-  if CO2_umbral is not None:
-    df['CO2_Avg'] = np.where(df['CO2_SD'] > CO2_umbral, np.nan, df['CO2_Avg'])
-  if CH4_umbral is not None:
-    df['CH4_Avg'] = np.where(df['CH4_SD'] > CH4_umbral, np.nan, df['CH4_Avg'])
-  
-  df['CO_Avg'] = np.where((df['CO_Avg'] > 0) & (df['CO_Avg'] <= 1), df['CO_Avg'], np.nan)
 
-  return df
+#gei=umbrales_sd(gei, CO2_umbral=0.2,CH4_umbral=0.002)
+gei=umbrales_sd(gei)
 
-gei=umbrales_sd(gei, CO2_umbral=0.2,CH4_umbral=0.002)
+
 
 
 plot_1min_avg_sd(gei)
 
+output_folder='/home/jmn/L1_2'
+
+'''
+save_gei_l1_minuto(gei,output_folder)
+
+save_gei_l1_hora(gei,output_folder)'''

@@ -11,47 +11,31 @@ gei = reverse_rename_columns(gei)
 gei['Time'] = pd.to_datetime(gei['Time'])
 
 
-gei_nocturno= copy_and_rename_columns(gei)
-
-gei_dia=copy_and_rename_columns(gei)
-gei_9_16=copy_and_rename_columns(gei)
-
-
-gei_nocturno['Time'] = pd.to_datetime(gei_nocturno['Time'])
-gei_9_16['Time']=pd.to_datetime(gei_9_16['Time'])
-gei_dia['Time']= pd.to_datetime(gei_dia['Time'])
-
-gei_9_16 = gei_9_16[((gei_9_16['Time'].dt.hour >= 16) | (gei_nocturno['Time'].dt.hour <= 9))].copy().reset_index(drop=True)
-
-gei_nocturno_19_5 = gei_nocturno[((gei_nocturno['Time'].dt.hour >= 19) | (gei_nocturno['Time'].dt.hour <= 5))].copy().reset_index(drop=True)
-print(' ssssssssssssssssssssssssssssssssssssssssssssssss')
-print(gei_nocturno_19_5)
-print(' ssssssssssssssssssssssssssssssssssssssssssssssss')
-#gei_nocturno_19_5['Time']=gei_nocturno_19_5['Time'] - timedelta(hours=5)
 
 
 
-#se calcula el ciclo diurno
-gei_9_16= ciclo_diurno_avg_19_05(gei_9_16)
-gei_nocturno_19_5=ciclo_diurno_avg_19_05(gei_nocturno_19_5)
-gei_dia=ciclo_diurno_avg_19_05(gei_dia)
+gei= copy_and_rename_columns(gei)
+
+'''
+gei = gei.set_index('Time')
+gei = gei.between_time('19:00', '23:59').reset_index()
+'''
+
+gei_nocturno=intervalo_horas(gei,'19:00','23:59')
+gei_dia=intervalo_horas(gei,'09:00','16:00')
 
 
-print('dia')
-print(gei_dia.head())
-
-print('9-16 h')
 
 
-
-print('nocturno')
-print(gei_nocturno_19_5.head())
-
-
-plt.plot(gei_nocturno_19_5['Time'],gei_nocturno_19_5['CO2_Avg'], color='blue')
-plt.plot(gei_9_16['Time'],gei_9_16['CO2_Avg'],color='red')
-plt.plot(gei_dia['Time'],gei_dia['CO2_Avg'], color='black', alpha=0.5)
-plt.tight_layout()
-plt.show()
+print(gei_dia)
+print(gei_nocturno)
 
 
+gei24h=ciclo_1d_avg(gei)
+gei_nocturno=ciclo_1d_avg(gei_nocturno)
+gei_dia=ciclo_1d_avg(gei_dia)
+print(gei_nocturno)
+print(gei_dia)
+
+
+plot_comparacion(('gei_nocturno', gei_nocturno), ('gei_dia', gei_dia),('gei24',gei24h), column='CO2_Avg')
