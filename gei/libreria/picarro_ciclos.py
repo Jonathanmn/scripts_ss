@@ -175,3 +175,54 @@ def plot_comparacion(*dfs, column='CO2_Avg'):
     plt.xticks(month_starts, month_labels, rotation=45)
     plt.grid()
     plt.show()
+
+
+
+
+
+
+
+
+def plot_intervalos_subplot_4x1(df1, df2, column='CO2_Avg', intervalos=[('19:00', '23:59'), ('00:00', '05:00'), ('09:00', '16:00')]):
+    """
+    Esta función toma dos DataFrames y una lista de intervalos de tiempo, filtra los datos según los intervalos,
+    aplica ciclo_1d_avg y plotea los resultados en un subplot de 3x1.
+    """
+    fig, axs = plt.subplots(4, 1, figsize=(6, 10), sharex=True)
+
+    for i, (h0, hf) in enumerate(intervalos):
+        df1_interval = intervalo_horas(df1, h0, hf)
+        df2_interval = intervalo_horas(df2, h0, hf)
+
+        df1_avg = ciclo_1d_avg(df1_interval)
+        df2_avg = ciclo_1d_avg(df2_interval)
+
+        axs[i].plot(df1_avg['Time'], df1_avg[column], label=f'L1 {h0}-{hf}', color='orange')
+        axs[i].plot(df2_avg['Time'], df2_avg[column], label=f'L1b {h0}-{hf}', color='blue')
+
+        df2_monthly_avg = df2_avg.set_index('Time').resample('ME').mean().reset_index()
+        df2_monthly_avg['Time'] = df2_monthly_avg['Time'] + pd.offsets.MonthBegin(1) - pd.offsets.Day(15)
+        axs[i].scatter(df2_monthly_avg['Time'], df2_monthly_avg[column], color='red', label='Promedio Mensual', s=30, zorder=5)
+        axs[i].plot(df2_monthly_avg['Time'], df2_monthly_avg[column], color='red', linestyle='--', linewidth=1, zorder=4)
+
+
+        axs[i].set_ylabel('CO$_{2}$ ppm')
+        axs[i].legend(loc='upper right')
+        axs[i].grid(True)
+        axs[i].set_ylim(405, 580)
+
+    axs[-1].set_xlabel('2024')
+    fig.suptitle('Promedios diarios de CO$_{2}$ para diferentes horarios', fontsize=14)
+    # Set month names as x-tick labels
+    months = df1['Time'].dt.month.unique()
+    month_starts = [df1[df1['Time'].dt.month == month]['Time'].iloc[0] for month in months]
+    month_names = {1: 'Ene', 2: 'Feb', 3: 'Mar', 4: 'Abr', 5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Ago', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dic'}
+    month_labels = [month_names[month] for month in months]
+
+    for ax in axs:
+        ax.set_xticks(month_starts)
+        ax.set_xticklabels(month_labels, rotation=45)
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
+
+    plt.tight_layout(rect=[0, 0, 1, 0.98])
+    plt.show()

@@ -55,6 +55,7 @@ gei_0_5am=ciclo_1d_avg(gei_0_5am)
 
 
 
-plot_comparacion(('9 16h',gei_dia),('9 16 b',gei_9_16_b), column='CO2_Avg')
+#plot_comparacion(('9 16h',gei_dia),('9 16 b',gei_9_16_b), column='CO2_Avg')
 
+plot_intervalos_subplot_4x1(gei,geib, column='CO2_Avg', intervalos=[('00:00','23:59'),('00:00','05:00'),('09:00', '16:00'),('19:00', '23:59') ])
 #plot_comparacion(('19-23h', gei_nocturno),('00-05h',gei_0_5am), ('09-16h', gei_dia),('24h',gei24h), column='CO2_Avg')

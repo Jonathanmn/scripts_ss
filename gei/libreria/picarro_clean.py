@@ -7,7 +7,7 @@ from plotly.subplots import make_subplots
 import plotly.colors
 import matplotlib.cm as cm
 import matplotlib.dates as mdates
-
+from matplotlib.ticker import MaxNLocator
 '''herramienta para desplegar el plotly y eliminar datos de forma visual '''
 
 
@@ -433,9 +433,9 @@ def ciclo_diurno_mensual_matplot(df, CO2=None, CH4=None, CO=None,start_month=1, 
         # Configurar el plot
         ax.set_xlabel('Hora del Día')
         if label == 'CH4':
-            ax.set_ylabel(f'{label} (ppb)')
+            ax.set_ylabel('CH$_{4}$ (ppb)')
         else:
-            ax.set_ylabel(f'{label} (ppm)')
+            ax.set_ylabel('CO$_{2}$ (ppm)')
         ax.grid(True)
         ax.legend(loc='upper left', bbox_to_anchor=(1, 1), fontsize='small')
         ax.set_xticks(range(24))
@@ -506,9 +506,9 @@ def plot_24h_anual_subplot(df, CO2=None, CH4=None, CO=None, start_month=1, end_m
         ax.set_title(f'{month_name}', size=10)
         #ax.set_xlabel('Hora del Día')
         if label == 'CH4':
-            ax.set_ylabel(f'{label} (ppb)')
+            ax.set_ylabel('CH$_{4}$ (ppb)')
         else:
-            ax.set_ylabel(f'{label} (ppm)')
+            ax.set_ylabel(f'CO$_{2}$ (ppm)')
         ax.grid(True)
         ax.legend(loc='upper right', fontsize='xx-small')
         #ax.set_xticks(range(24))
@@ -523,8 +523,21 @@ def plot_24h_anual_subplot(df, CO2=None, CH4=None, CO=None, start_month=1, end_m
         for gas, label in gases:
             plot_gas(axs[row, col], df_monthly_avg, df_avg, gas, label, month)
 
+    for ax in axs.flat:
+        ax.label_outer()
+        ax.xaxis.set_major_locator(MaxNLocator(nbins=4))
+
+
+
     plt.tight_layout(rect=[0, 0, 1, 0.95])
-    fig.suptitle(f'Ciclo Diario de {label}, Estación Calakmul ({year})', fontsize=16)
+    
+    if label == 'CH4':
+        fig.suptitle('Valores promedio de CH$_{4}$ 2024', fontsize=16)
+    else:
+        fig.suptitle('Valores promedio de CO$_{2}$ (ppb)', fontsize=16)
+    
+    ax.grid(True)    
+
     plt.show()
 
 
