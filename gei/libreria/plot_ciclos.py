@@ -24,9 +24,6 @@ geib=copy_and_rename_columns(geib)
 gei= copy_and_rename_columns(gei)
 
 '''
-gei = gei.set_index('Time')
-gei = gei.between_time('19:00', '23:59').reset_index()
-'''
 
 gei_nocturno=intervalo_horas(gei,'19:00','23:59')
 gei_dia=intervalo_horas(gei,'09:00','16:00')
@@ -34,10 +31,6 @@ gei_dia=intervalo_horas(gei,'09:00','16:00')
 gei_0_5am=intervalo_horas(gei,'00:00','05:00')
 
 gei_9_16_b=intervalo_horas(geib,'09:00','16:00')
-
-
-print(gei_0_5am)
-
 
 
 gei24h=ciclo_1d_avg(gei)
@@ -53,7 +46,7 @@ gei_dia=ciclo_1d_avg(gei_dia)
 gei_0_5am=ciclo_1d_avg(gei_0_5am)
 
 
-
+'''
 
 #plot_comparacion(('9 16h',gei_dia),('9 16 b',gei_9_16_b), column='CO2_Avg')
 

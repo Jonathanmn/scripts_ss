@@ -186,7 +186,7 @@ def plot_comparacion(*dfs, column='CO2_Avg'):
 def plot_intervalos_subplot_4x1(df1, df2, column='CO2_Avg', intervalos=[('19:00', '23:59'), ('00:00', '05:00'), ('09:00', '16:00')]):
     """
     Esta función toma dos DataFrames y una lista de intervalos de tiempo, filtra los datos según los intervalos,
-    aplica ciclo_1d_avg y plotea los resultados en un subplot de 3x1.
+    aplica ciclo_1d_avg y plotea los resultados en un subplot de 4x1.
     """
     fig, axs = plt.subplots(4, 1, figsize=(6, 10), sharex=True)
 
@@ -207,7 +207,7 @@ def plot_intervalos_subplot_4x1(df1, df2, column='CO2_Avg', intervalos=[('19:00'
 
 
         axs[i].set_ylabel('CO$_{2}$ ppm')
-        axs[i].legend(loc='upper right')
+        axs[i].legend(loc='upper right',fontsize='x-small')
         axs[i].grid(True)
         axs[i].set_ylim(405, 580)
 
@@ -222,7 +222,7 @@ def plot_intervalos_subplot_4x1(df1, df2, column='CO2_Avg', intervalos=[('19:00'
     for ax in axs:
         ax.set_xticks(month_starts)
         ax.set_xticklabels(month_labels, rotation=45)
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
+        #ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
 
     plt.tight_layout(rect=[0, 0, 1, 0.98])
     plt.show()
