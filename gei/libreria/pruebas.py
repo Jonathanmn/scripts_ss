@@ -1,77 +1,47 @@
-from picarro import *
-from picarro_ciclos import *
-
-
-
-
+from windrose import WindroseAxes
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Sample data
-x = np.linspace(0, 10, 100)
-y1 = np.sin(x)
-y2 = np.cos(x)
-y3 = np.tan(x)
+ws1 = np.random.random(500) * 6
+wd1 = np.random.random(500) * 360
+ws2 = np.random.random(500) * 6
+wd2 = np.random.random(500) * 360
+ws3 = np.random.random(500) * 6
+wd3 = np.random.random(500) * 360
+ws4 = np.random.random(500) * 6
+wd4 = np.random.random(500) * 360
 
-# Create a 3x2 grid of subplots
-fig, axs = plt.subplots(3, 2, sharex='col', sharey='row')
+fig=plt.figure(figsize=(15,15),dpi=150)
+# rect = [lowerleft_x,lowerleft_y,width,height]
 
-# Plotting data
-axs[0, 0].plot(x, y1)
-axs[1, 0].plot(x, y2)
-axs[2, 0].plot(x, y3)
+opening=0.99
 
-# Set y-labels only on the left side
-axs[0, 0].set_ylabel('Sine')
-axs[1, 0].set_ylabel('Cosine')
-axs[2, 0].set_ylabel('Tangent')
 
-# Set x-labels only on the bottom row
-axs[2, 0].set_xlabel('X-axis')
-axs[2, 1].set_xlabel('X-axis')
+rect1=[0.1, 0.5, 0.4, 0.4] 
+wa1=WindroseAxes(fig, rect1)
+fig.add_axes(wa1)
+wa1.set_title('00:00 - 06:00')
+wa1.bar(wd1, ws1, normed=True, opening=opening, edgecolor='white')
 
-# Hide inner x-labels
-for ax in axs[:-1, :].flatten():
-    ax.label_outer()
+rect2=[0.6, 0.5, 0.4, 0.4]
+wa2=WindroseAxes(fig, rect2)
+fig.add_axes(wa2)
+wa2.set_title('06:00 - 12:00')
+wa2.bar(wd2, ws2, normed=True, opening=opening, edgecolor='white')
 
-plt.tight_layout()
+rect3=[0.1,0,0.4,0.4] 
+wa3=WindroseAxes(fig, rect3)
+fig.add_axes(wa3)
+wa3.set_title('12:00 - 18:00')
+wa3.bar(wd3, ws3, normed=True, opening=opening, edgecolor='white')
+
+rect4=[0.6,0,0.4,0.4] 
+wa4=WindroseAxes(fig, rect4)
+fig.add_axes(wa4)
+wa4.set_title('18:00 - 00:00')
+wa4.bar(wd4, ws4, normed=True, opening=opening, edgecolor='white')
+wa4.set_legend()
+
 plt.show()
-
-
-
-
-
-'''
-
-folder_path = '/home/jmn/L1b/hora/2024'
-
-gei = read_L0_or_L1(folder_path, 'yyyy-mm-dd HH:MM:SS', header=7)
-gei = reverse_rename_columns(gei)
-gei['Time'] = pd.to_datetime(gei['Time'])
-
-
-
-
-
-
-
-#gei=umbrales_sd(gei, CO2_umbral=0.2,CH4_umbral=0.002)
-#gei=umbrales_sd(gei)
-
-
-
-
-plot_1min_avg_sd(gei)
-
-output_folder='/home/jmn/L1_2'
-
-
-save_gei_l1_minuto(gei,output_folder)
-
-save_gei_l1_hora(gei,output_folder)'
-''
-''
-''
-'''
 
 

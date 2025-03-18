@@ -534,7 +534,7 @@ def plot_24h_anual_subplot(df, CO2=None, CH4=None, CO=None, start_month=1, end_m
     if label == 'CH4':
         fig.suptitle('Valores promedio de CH$_{4}$ 2024', fontsize=16)
     else:
-        fig.suptitle('Valores promedio de CO$_{2}$ (ppb)', fontsize=16)
+        fig.suptitle('Valor Anuale promedio de CO$_{2}$ (ppb)', fontsize=16)
     
     ax.grid(True)    
 
