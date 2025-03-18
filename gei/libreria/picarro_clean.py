@@ -534,14 +534,14 @@ def plot_24h_anual_subplot(df, CO2=None, CH4=None, CO=None, start_month=1, end_m
     if label == 'CH4':
         fig.suptitle('Valores promedio de CH$_{4}$ 2024', fontsize=16)
     else:
-        fig.suptitle('Valor Anuale promedio de CO$_{2}$ (ppb)', fontsize=16)
+        fig.suptitle('Valor Anual promedio de CO$_{2}$ (ppb)', fontsize=16)
     
     ax.grid(True)    
 
     plt.show()
 
 
-def plot_24h_anual_subplot_comparacion(df, df2, CO2=None, CH4=None, CO=None, start_month=1, end_month=12):
+def plot_24h_anual_subplot_comp(df, df2, CO2=None, CH4=None, CO=None, start_month=1, end_month=12):
     """
     Esta función resamplea dos DataFrames a intervalos de 1 hora, agrupa los datos por mes y hora,
     y plotea los valores promedio de CO2, CH4 y CO en subplots para un período de 24 horas utilizando matplotlib.
@@ -580,7 +580,7 @@ def plot_24h_anual_subplot_comparacion(df, df2, CO2=None, CH4=None, CO=None, sta
     gases = [(gas, label) for gas, label in gases if gas is not None]
 
     # Crear subplots 3x4
-    fig, axs = plt.subplots(3, 4, figsize=(15, 9), sharex=True)
+    fig, axs = plt.subplots(4, 3, figsize=(5, 10), sharey=True, sharex=True)
 
     # Función para crear el plot de cada gas
     def plot_gas(ax, df_monthly_avg, df2_monthly_avg, df_avg, df2_avg, gas, label, month):
@@ -590,36 +590,61 @@ def plot_24h_anual_subplot_comparacion(df, df2, CO2=None, CH4=None, CO=None, sta
         color2 = 'green'
         month_name = month_names[month]  # Obtener el nombre del mes
         ax.plot(group['Hora'], group[gas], '-', linewidth=2, color=color1, label=f'L1')
-        ax.plot(group2['Hora'], group2[gas], '-', linewidth=2, color=color2,alpha=0.8, label=f'L1b')
+        ax.plot(group2['Hora'], group2[gas], '-', linewidth=2, color=color2, alpha=0.8, label=f'L1b')
 
         # Plotear el promedio de todo el DataFrame
-        ax.plot(df_avg['Hora'], df_avg[gas], 'r--', linewidth=1, label='L1 Avg')
+        #ax.plot(df_avg['Hora'], df_avg[gas], 'r--', linewidth=1, label='k')
         ax.plot(df2_avg['Hora'], df2_avg[gas], 'm--', linewidth=1, label='L1b Avg')
 
-        ylim_min = min(df_monthly_avg[gas].min(), df2_monthly_avg[gas].min()) - 5
-        ylim_max = max(df_monthly_avg[gas].max(), df2_monthly_avg[gas].max()) + 5
+        ylim_min=df_monthly_avg[gas].min() - 5
+        ylim_max=df_monthly_avg[gas].max() + 5
 
         # Configurar el plot
         ax.set_title(f'{month_name}', size=10)
+        #ax.set_xlabel('2024')
         if label == 'CH4':
             ax.set_ylabel('CH$_{4}$ (ppb)')
         else:
             ax.set_ylabel('CO$_{2}$ (ppm)')
         ax.grid(True)
-        ax.legend(loc='upper right', fontsize='x-small')
-        ax.set_xticks(range(24))
-        ax.set_xticklabels([f'{hour:02d}' for hour in range(24)], rotation=90)
+        #ax.legend(loc='upper right', fontsize='x-small')
+
+        ax.set_xticks(range(0, 30, 6))
+        ax.set_xticklabels([f'{hour:02d}' for hour in range(0, 30, 6)], rotation=90)
         ax.set_ylim([ylim_min, ylim_max])
 
     # Plotear cada gas individualmente en cada subplot
     for month in range(start_month, end_month + 1):
-        row = (month - 1) // 4
-        col = (month - 1) % 4
+        row = (month - 1) // 3
+        col = (month - 1) % 3
         for gas, label in gases:
             plot_gas(axs[row, col], df_monthly_avg, df2_monthly_avg, df_avg, df2_avg, gas, label, month)
 
+
+    for ax in axs.flat:
+        ax.label_outer()
+
+    # Crear una leyenda única para todos los subplots
+    handles, labels = axs[0, 0].get_legend_handles_labels()
+    #fig.legend(handles, labels, loc='upper center', ncol=4, fontsize='small')
+    fig.text(0.5, 0.04, '2024', ha='center', fontsize=12)
     plt.tight_layout(rect=[0, 0, 1, 0.95])
-    fig.suptitle(f'Ciclo Diario de {label}, Estación Calakmul ({year})', fontsize=16)
+    fig.suptitle('Valores mensuales de CO$_{2}$', fontsize=16)
+    fig.subplots_adjust(top=0.88, bottom=0.1)  # Ajustar espacio para la leyenda
+    fig.legend(handles, labels, loc='upper center', ncol=4, fontsize='small', bbox_to_anchor=(0.5, 0.95))
     plt.show()
+   
+
+
+
+
+
+
+
+
+
+
+
+
 
 
