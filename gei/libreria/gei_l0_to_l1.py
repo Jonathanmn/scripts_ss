@@ -14,8 +14,11 @@ folder_path = '/home/jmn/l0-1/minuto'
 gei = read_raw_lite(folder_path, 'Time')
 gei['Time'] = pd.to_datetime(gei['Time'])
 
+
+
+
 print('estamos guardando')
-#save_gei_l1_minuto(gei,output_folder)
+save_gei_l1_minuto(gei,output_folder)
 save_gei_l1_hora(gei,output_folder)
 
 

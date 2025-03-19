@@ -299,7 +299,7 @@ def umbrales_gei(df, CO2_umbral=None, CH4_umbral=None):
     df['CO2_dry'] = np.where(df['CO2_dry'] <= CO2_umbral, np.nan, df['CO2_dry'])
   if CH4_umbral is not None:
     df['CH4_dry'] = np.where(df['CH4_dry'] <= CH4_umbral, np.nan, df['CH4_dry'])
-  df['CO'] = np.where((df['CO'] > 0) & (df['CO'] <= 200), df['CO'], np.nan)
+  df['CO'] = np.where((df['CO'] > 0) & (df['CO'] <= 0.8), df['CO'], np.nan)
 
   return df
 
@@ -314,9 +314,8 @@ def umbrales_sd(df, CO2_umbral=None, CH4_umbral=None):
   if CH4_umbral is not None:
     df['CH4_Avg'] = np.where(df['CH4_SD'] > CH4_umbral, np.nan, df['CH4_Avg'])
   
-  df['CO_Avg'] = np.where((df['CO_Avg'] > 0) & (df['CO_Avg'] <= 1), df['CO_Avg'], np.nan)
- 
-
+  df['CO_Avg'] = np.where((df['CO_Avg'] > 0) & (df['CO_Avg'] <= 0.8), df['CO_Avg'], np.nan)
+  df['CO_SD'] = np.where((df['CO_Avg'] > 0) & (df['CO_Avg'] <= 0.8), df['CO_SD'], np.nan)
   return df
 
 
@@ -465,62 +464,111 @@ def flags_species_1min(df):
 ''' Ploteos    '''
 
 
-def plot_comparacion(df1, df2, columns1, columns2, time_column1='Time', time_column2='Time'):
 
-    num_plots = len(columns1)
-    fig, axes = plt.subplots(num_plots, 1, figsize=(10, 5 * num_plots), sharex=True)
+
+def plot_1min_avg(df, CO2=True, CH4=True, CO=True):
+    """
+    Ploteo de los valores promedio para CO2, CH4 y CO según los argumentos proporcionados.
+    """
+    # Determinar el número de subplots necesarios
+    num_plots = sum([CO2, CH4, CO])
+    fig, axes = plt.subplots(num_plots, 1, figsize=(10, 4 * num_plots), sharex=True)
 
     if num_plots == 1:
         axes = [axes]
 
-    for i, (col1, col2) in enumerate(zip(columns1, columns2)):
-        ax = axes[i]
-        ax.plot(df1[time_column1], df1[col1], color='black', alpha=0.5, label=f'{col1} (df1)')
-        ax.plot(df2[time_column2], df2[col2], color='red', alpha=0.8, label=f'{col2} (df2)')
-        ax.set_ylabel(col1)
-        ax.legend()
+    color_avg = '#0569cc'
+    plot_index = 0
 
-    plt.xlabel("Time") 
-    plt.title('Comparacion series de versiones gei')
+    # CO2
+    if CO2:
+        ax = axes[plot_index]
+        ax.plot(df['Time'], df['CO2_Avg'], label='CO2_Avg', color=color_avg)
+        ax.set_ylabel('CO2_Avg')
+        ax.legend(loc='upper left')
+        ax.set_title('CO2 Concentration')
+        plot_index += 1
+
+    # CH4
+    if CH4:
+        ax = axes[plot_index]
+        ax.plot(df['Time'], df['CH4_Avg'], label='CH4_Avg', color=color_avg)
+        ax.set_ylabel('CH4_Avg')
+        ax.legend(loc='upper left')
+        ax.set_title('CH4 Concentration')
+        plot_index += 1
+
+    # CO
+    if CO:
+        ax = axes[plot_index]
+        ax.plot(df['Time'], df['CO_Avg'], label='CO_Avg', color=color_avg)
+        ax.set_ylabel('CO_Avg')
+        ax.legend(loc='upper left')
+        ax.set_title('CO Concentration')
+
+    plt.xlabel('Time')
+    plt.tight_layout()
     plt.show()
 
 
-def plot_comparacion_monthly(df1, df2, columns1, columns2, time_column1='Time', time_column2='Time'):
+def plot_1min_avg_month(df, CO2=True, CH4=True, CO=True, start_month=None, end_month=None, year=None):
+    """
+    Ploteo de los valores promedio para CO2, CH4 y CO según los argumentos proporcionados.
+    Permite seleccionar un rango de meses y un año para plotear.
+    """
+    # Filtrar por año si se especifica
+    if year is not None:
+        df = df[df['Time'].dt.year == year]
 
-    # Ensure timestamp columns are in datetime format
-    df1[time_column1] = pd.to_datetime(df1[time_column1])
-    df2[time_column2] = pd.to_datetime(df2[time_column2])
+    # Filtrar por rango de meses si se especifica
+    if start_month is not None and end_month is not None:
+        df = df[(df['Time'].dt.month >= start_month) & (df['Time'].dt.month <= end_month)]
 
-    # Get unique years and months
-    years = df1[time_column1].dt.year.unique()
-    months = df1[time_column1].dt.month.unique()
+    # Determinar el número de subplots necesarios
+    num_plots = sum([CO2, CH4, CO])
+    fig, axes = plt.subplots(num_plots, 1, figsize=(10, 4 * num_plots), sharex=True)
 
-    # Iterate through years and months
-    for year in years:
-        for month in months:
-            # Filter data for the current month
-            df1_month = df1[(df1[time_column1].dt.year == year) & (df1[time_column1].dt.month == month)]
-            df2_month = df2[(df2[time_column2].dt.year == year) & (df2[time_column2].dt.month == month)]
+    if num_plots == 1:
+        axes = [axes]
 
-            # Check if data exists for the current month
-            if not df1_month.empty and not df2_month.empty:
-                # Create subplots for the current month
-                num_plots = len(columns1)
-                fig, axes = plt.subplots(num_plots, 1, figsize=(10, 5 * num_plots), sharex=True)
-                if num_plots == 1:
-                    axes = [axes]
+    color_avg = '#0569cc'
+    plot_index = 0
 
-                # Iterate through columns and plot data for the current month
-                for i, (col1, col2) in enumerate(zip(columns1, columns2)):
-                    ax = axes[i]
-                    ax.plot(df1_month[time_column1], df1_month[col1], color='black', alpha=0.5, label=f'{col1} (df1)')
-                    ax.plot(df2_month[time_column2], df2_month[col2], color='red', alpha=0.8, label=f'{col2} (df2)')
-                    ax.set_ylabel(col1)
-                    ax.legend()
+    # CO2
+    if CO2:
+        ax = axes[plot_index]
+        ax.plot(df['Time'], df['CO2_Avg'], label='CO2_Avg', color=color_avg)
+        ax.set_ylabel('CO2_Avg')
+        ax.legend(loc='upper left')
+        ax.set_title('CO2 Concentration')
+        plot_index += 1
 
-                plt.xlabel("Time")
-                plt.title(f'Comparacion series de tiempo - {year}-{month}')
-                plt.show()
+    # CH4
+    if CH4:
+        ax = axes[plot_index]
+        ax.plot(df['Time'], df['CH4_Avg'], label='CH4_Avg', color=color_avg)
+        ax.set_ylabel('CH4_Avg')
+        ax.legend(loc='upper left')
+        ax.set_title('CH4 Concentration')
+        plot_index += 1
+
+    # CO
+    if CO:
+        ax = axes[plot_index]
+        ax.plot(df['Time'], df['CO_Avg'], label='CO_Avg', color=color_avg)
+        ax.set_ylabel('CO_Avg')
+        ax.legend(loc='upper left')
+        ax.set_title('CO Concentration')
+
+    plt.xlabel('Time')
+    plt.tight_layout()
+    plt.show()
+
+
+
+
+
+
 
 
 def plot_1min_avg_sd(df):
@@ -530,55 +578,13 @@ def plot_1min_avg_sd(df):
 
     fig, axes = plt.subplots(3, 1, figsize=(10, 12), sharex=True)
 
-    # CO2
-    ax1 = axes[0]
-    ax1.plot(df['Time'], df['CO2_Avg'], label='CO2_Avg', color='#123456')
-    ax1_twin = ax1.twinx()
-    ax1_twin.plot(df['Time'], df['CO2_SD'], label='CO2_SD', color='#F7883F', alpha=0.9,linestyle='solid',linewidth=0.5)
-    ax1.set_ylabel('CO2_Avg')
-    ax1_twin.set_ylabel('CO2_SD')
-    ax1.legend(loc='upper left')
-    ax1_twin.legend(loc='upper right')
-    ax1.set_title('CO2 Concentration')
-
-    # CH4
-    ax2 = axes[1]
-    ax2.plot(df['Time'], df['CH4_Avg'], label='CH4_Avg', color='#123456')
-    ax2_twin = ax2.twinx()
-    ax2_twin.plot(df['Time'], df['CH4_SD'], label='CH4_SD', color='#F7883F',alpha=0.9,linestyle='solid',linewidth=0.5)
-    ax2.set_ylabel('CH4_Avg')
-    ax2_twin.set_ylabel('CH4_SD')
-    ax2.legend(loc='upper left')
-    ax2_twin.legend(loc='upper right')
-    ax2.set_title('CH4 Concentration')
-
-    # CO
-    ax3 = axes[2]
-    ax3.plot(df['Time'], df['CO_Avg'], label='CO_Avg', color='#123456')
-    ax3_twin = ax3.twinx()
-    ax3_twin.plot(df['Time'], df['CO_SD'], label='CO_SD', color='#F7883F', alpha=0.9,linestyle='solid',linewidth=0.5)
-    ax3.set_ylabel('CO_Avg')
-    ax3_twin.set_ylabel('CO_SD')
-    ax3.legend(loc='upper left')
-    ax3_twin.legend(loc='upper right')
-    ax3.set_title('CO Concentration')
-
-    plt.xlabel('Time')
-    plt.tight_layout()
-    plt.show()
-
-def plot_1min_avg_sd1(df):
-    """
-    Ploteo de los valores promedio y desviacion estandar para gei.
-    """
-
-    fig, axes = plt.subplots(3, 1, figsize=(10, 12), sharex=True)
-
+    color_co2='#0569cc'
+    color_sd='#f9631f'
     # CO2
     ax1 = axes[0]
     ax1_twin = ax1.twinx()
-    ax1_twin.plot(df['Time'], df['CO2_SD'], label='CO2_SD', color='#F7883F', alpha=0.5)
-    ax1.plot(df['Time'], df['CO2_Avg'], label='CO2_Avg', color='#123456')
+    ax1_twin.plot(df['Time'], df['CO2_SD'], label='CO2_SD', color=color_sd)
+    ax1.plot(df['Time'], df['CO2_Avg'], label='CO2_Avg', color=color_co2)
     ax1.set_ylabel('CO2_Avg')
     ax1_twin.set_ylabel('CO2_SD')
     ax1.legend(loc='upper left')
@@ -588,8 +594,8 @@ def plot_1min_avg_sd1(df):
     # CH4
     ax2 = axes[1]
     ax2_twin = ax2.twinx()
-    ax2_twin.plot(df['Time'], df['CH4_SD'], label='CH4_SD', color='#F7883F', alpha=0.5)
-    ax2.plot(df['Time'], df['CH4_Avg'], label='CH4_Avg', color='#123456')
+    ax2_twin.plot(df['Time'], df['CH4_SD'], label='CH4_SD', color=color_sd)
+    ax2.plot(df['Time'], df['CH4_Avg'], label='CH4_Avg', color=color_co2)
     ax2.set_ylabel('CH4_Avg')
     ax2_twin.set_ylabel('CH4_SD')
     ax2.legend(loc='upper left')
@@ -599,8 +605,8 @@ def plot_1min_avg_sd1(df):
     # CO
     ax3 = axes[2]
     ax3_twin = ax3.twinx()
-    ax3_twin.plot(df['Time'], df['CO_SD'], label='CO_SD', color='#F7883F', alpha=0.5)
-    ax3.plot(df['Time'], df['CO_Avg'], label='CO_Avg', color='#123456')
+    ax3_twin.plot(df['Time'], df['CO_SD'], label='CO_SD', color=color_sd)
+    ax3.plot(df['Time'], df['CO_Avg'], label='CO_Avg', color=color_co2)
     ax3.set_ylabel('CO_Avg')
     ax3_twin.set_ylabel('CO_SD')
     ax3.legend(loc='upper left')
@@ -740,36 +746,6 @@ def plot_raw(df, timestamp_column):
   plt.show()
 
 
-def plot_raw_per_month(df, timestamp_column):
-  """
-grafica por mes los datos de co2, ch4 y co en toda la serie de tiempo, cada mes se grafica al cerrar el anterior
-  """
-
-  grouped_data = df.groupby([df[timestamp_column].dt.year, df[timestamp_column].dt.month])
-
-
-  for (year, month), group_df in grouped_data:
-    fig, axes = plt.subplots(3, 1, figsize=(10, 12), sharex=True)
-
-    #  CO2_dry
-    axes[0].plot(group_df[timestamp_column], group_df['CO2_dry'], label='CO2_dry')
-    axes[0].set_ylabel('CO2_dry')
-    axes[0].legend()
-
-    # CH4_dry
-    axes[1].plot(group_df[timestamp_column], group_df['CH4_dry'], label='CH4_dry')
-    axes[1].set_ylabel('CH4_dry')
-    axes[1].legend()
-
-    #  CO
-    axes[2].plot(group_df[timestamp_column], group_df['CO'], label='CO')
-    axes[2].set_ylabel('CO')
-    axes[2].legend()
-
-    plt.xlabel(timestamp_column)
-    plt.suptitle(f'Raw Data Plot - Year: {year}, Month: {month}')
-    plt.tight_layout()
-    plt.show()
 
 
 

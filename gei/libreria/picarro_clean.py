@@ -586,15 +586,15 @@ def plot_24h_anual_subplot_comp(df, df2, CO2=None, CH4=None, CO=None, start_mont
     def plot_gas(ax, df_monthly_avg, df2_monthly_avg, df_avg, df2_avg, gas, label, month):
         group = df_monthly_avg[df_monthly_avg['Mes'] == month]
         group2 = df2_monthly_avg[df2_monthly_avg['Mes'] == month]
-        color1 = 'blue'
-        color2 = 'green'
+        color1 = 'orange'
+        color2 = '#1062b4'
         month_name = month_names[month]  # Obtener el nombre del mes
         ax.plot(group['Hora'], group[gas], '-', linewidth=2, color=color1, label=f'L1')
         ax.plot(group2['Hora'], group2[gas], '-', linewidth=2, color=color2, alpha=0.8, label=f'L1b')
 
         # Plotear el promedio de todo el DataFrame
         #ax.plot(df_avg['Hora'], df_avg[gas], 'r--', linewidth=1, label='k')
-        ax.plot(df2_avg['Hora'], df2_avg[gas], 'm--', linewidth=1, label='L1b Avg')
+        ax.plot(df2_avg['Hora'], df2_avg[gas], 'r--', linewidth=1, label='L1b Avg')
 
         ylim_min=df_monthly_avg[gas].min() - 5
         ylim_max=df_monthly_avg[gas].max() + 5

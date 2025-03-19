@@ -203,8 +203,8 @@ def plot_intervalos_subplot_4x1(df1, df2, column='CO2_Avg', intervalos=[('19:00'
         df1_avg = ciclo_1d_avg(df1_interval)
         df2_avg = ciclo_1d_avg(df2_interval)
 
-        axs[i].plot(df1_avg['Time'], df1_avg[column], label='L1', color='orange')
-        axs[i].plot(df2_avg['Time'], df2_avg[column], label='L1b', color='blue')
+        axs[i].plot(df1_avg['Time'], df1_avg[column], label='L1', color='orange', alpha=1)
+        axs[i].plot(df2_avg['Time'], df2_avg[column], label='L1b', color='#1062b4',alpha=1)
 
         '''df2_monthly_avg = df2_avg.set_index('Time').resample('ME').mean().reset_index()
         df2_monthly_avg['Time'] = df2_monthly_avg['Time'] + pd.offsets.MonthBegin(1) - pd.offsets.Day(15)
