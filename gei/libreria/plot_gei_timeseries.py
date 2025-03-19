@@ -26,4 +26,4 @@ print(gei.head())
 gei = umbrales_sd(gei)
 
 # Llamada a la función plot_1min_avg con argumentos dinámicos, rango de meses y año
-plot_1min_avg_month(gei, CO2=True, CH4=True, CO=True, start_month=1, end_month=12, year=2024)
+plot_1min_avg_month(gei, CO2=True, CH4=True, CO=False, start_month=1, end_month=12, year=2024)

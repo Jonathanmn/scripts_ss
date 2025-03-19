@@ -516,6 +516,16 @@ def plot_1min_avg_month(df, CO2=True, CH4=True, CO=True, start_month=None, end_m
     Ploteo de los valores promedio para CO2, CH4 y CO según los argumentos proporcionados.
     Permite seleccionar un rango de meses y un año para plotear.
     """
+
+    Meses = {
+    1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril',
+    5: 'Mayo', 6: 'Junio', 7: 'Julio', 8: 'Agosto',
+    9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'
+}
+
+
+
+
     # Filtrar por año si se especifica
     if year is not None:
         df = df[df['Time'].dt.year == year]
@@ -537,33 +547,46 @@ def plot_1min_avg_month(df, CO2=True, CH4=True, CO=True, start_month=None, end_m
     # CO2
     if CO2:
         ax = axes[plot_index]
-        ax.plot(df['Time'], df['CO2_Avg'], label='CO2_Avg', color=color_avg)
-        ax.set_ylabel('CO2_Avg')
+        ax.plot(df['Time'], df['CO2_Avg'], label='CO$_{2}$ Avg', color=color_avg)
+        ax.set_ylabel('CO$_{2}$ (ppm)')
         ax.legend(loc='upper left')
-        ax.set_title('CO2 Concentration')
+        ax.set_title('Concentración CO$_{2}$')
         plot_index += 1
 
     # CH4
     if CH4:
         ax = axes[plot_index]
-        ax.plot(df['Time'], df['CH4_Avg'], label='CH4_Avg', color=color_avg)
-        ax.set_ylabel('CH4_Avg')
+        ax.plot(df['Time'], df['CH4_Avg'], label='CH$_{4}$  Avg', color=color_avg)
+        ax.set_ylabel('CH$_{4}$ (ppb)')
         ax.legend(loc='upper left')
-        ax.set_title('CH4 Concentration')
+        ax.set_title('Concentración CH$_{4}$')
         plot_index += 1
 
     # CO
     if CO:
         ax = axes[plot_index]
-        ax.plot(df['Time'], df['CO_Avg'], label='CO_Avg', color=color_avg)
-        ax.set_ylabel('CO_Avg')
+        ax.plot(df['Time'], df['CO_Avg'], label='CO Avg', color=color_avg)
+        ax.set_ylabel('CO (ppm)')
         ax.legend(loc='upper left')
-        ax.set_title('CO Concentration')
+        ax.set_title('Concentración CO')
 
-    plt.xlabel('Time')
-    plt.tight_layout()
+
+
+
+#cambios en el titulo 
+
+    if start_month is not None and end_month is not None:
+        if start_month == end_month:
+            month_str = Meses.get(start_month, f'{start_month}')
+        else:
+            month_str = f'{Meses.get(start_month, f"{start_month}")}-{Meses.get(end_month, f"{end_month}")}'
+    else:
+        month_str = ''
+
+    plt.suptitle(f'Concentración de GEI, Estación Calakmul {month_str} {year}' if year is not None else f'Concentración de GEI, Estación Calakmul')
+
+    plt.tight_layout(rect=[0, 0, 1, 0.98])
     plt.show()
-
 
 
 
