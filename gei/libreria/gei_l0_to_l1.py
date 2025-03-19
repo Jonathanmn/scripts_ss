@@ -7,15 +7,17 @@ from picarro import *
 #output_folder = '/home/gei/scripts_j/l0'
 
 
-output_folder = '/home/jmn/'
+output_folder = '/home/jmn/L1_umbrales'
 
 
 folder_path = '/home/jmn/l0-1/minuto'
+
+
 gei = read_raw_lite(folder_path, 'Time')
 gei['Time'] = pd.to_datetime(gei['Time'])
 
 
-
+gei = umbrales_sd(gei)
 
 print('estamos guardando')
 save_gei_l1_minuto(gei,output_folder)
