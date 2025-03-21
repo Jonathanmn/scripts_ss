@@ -17,3 +17,8 @@ print(gei.head())
 
 # Llamada a la función plot_1min_avg con argumentos dinámicos, rango de meses y año
 plot_1min_avg_month_scatter(gei, CO2=True, CH4=True, CO=True, start_month=1, end_month=12, year=2024)
+
+
+
+
+plot_1min_sd(gei, CO2=True, CH4=True, CO=True, SD=True,start_month=1, end_month=12, year=2024)

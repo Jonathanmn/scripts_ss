@@ -67,6 +67,8 @@ def read_L0_or_L1(folder_path,time, header=None):
 
 
 
+
+
 def reverse_rename_columns(df):
     """
     Renombra las columnas del DataFrame basado en su posición para evitar conflictos.
@@ -104,6 +106,56 @@ def save_gei_l0(df, output_folder):
 
         
         group.to_csv(filepath, sep=',', index=False)
+
+
+
+
+
+''' headers y variables de sitio'''
+
+
+def header(file_path, sheet_name='station', header=0, encoding='utf-8'):
+    """
+    Lee un archivo Excel y retorna un DataFrame.
+    
+    Argumentos:
+    file_path -- La ruta del archivo Excel a leer.
+    sheet_name -- El nombre o índice de la hoja a leer (por defecto es la primera hoja).
+    header -- La fila que se usará como encabezado (por defecto es la primera fila).
+    encoding -- La codificación del archivo Excel (por defecto es 'utf-8').
+    
+    Retorna:
+    Un DataFrame con los datos del archivo Excel.
+    """
+    df = pd.read_excel(file_path, sheet_name=sheet_name, header=header)
+    return df
+
+
+
+def extract_variables(file_path, sheet_name='station', header=0, site_value=None):
+    df = pd.read_excel(file_path, sheet_name=sheet_name, header=header)
+    row = df[df['Site'] == site_value]
+    if not row.empty:
+        name = row['Name'].values[0]
+        state = row['State'].values[0]
+        north = row['North'].values[0]
+        west = row['West'].values[0]
+        masl = row['MASL'].values[0]
+        ut = row['UT'].values[0]
+        return name, state, north, west, masl, ut
+    else:
+        return None
+
+
+
+
+
+
+
+
+
+''' guardado de archivos  '''
+
 
 
 def save_gei_l1_minuto(df, output_folder):
@@ -663,6 +715,101 @@ def plot_1min_avg_month_scatter(df, CO2=True, CH4=True, CO=True, start_month=Non
 
     plt.tight_layout(rect=[0, 0, 1, 0.98])
     plt.show()
+
+def plot_1min_sd(df, CO2=True, CH4=True, CO=True, SD=True, start_month=None, end_month=None, year=None):
+    """
+    Ploteo de los valores promedio para CO2, CH4 y CO según los argumentos proporcionados.
+    Permite seleccionar un rango de meses y un año para plotear.
+    """
+
+    Meses = {
+        1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril',
+        5: 'Mayo', 6: 'Junio', 7: 'Julio', 8: 'Agosto',
+        9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'
+    }
+
+    # Filtrar por año si se especifica
+    if year is not None:
+        df = df[df['Time'].dt.year == year]
+
+    # Filtrar por rango de meses si se especifica
+    if start_month is not None and end_month is not None:
+        df = df[(df['Time'].dt.month >= start_month) & (df['Time'].dt.month <= end_month)]
+
+    # Determinar el número de subplots necesarios
+    num_plots = sum([CO2, CH4, CO])
+    fig, axes = plt.subplots(num_plots, 1, figsize=(10, 4 * num_plots), sharex=True)
+
+    if num_plots == 1:
+        axes = [axes]
+
+    color_avg = '#0569cc'
+    color_sd = '#f9631f'
+    size_scatter = 2
+    plot_index = 0
+
+    # CO2
+    if CO2:
+        ax = axes[plot_index]
+        ax.plot(df['Time'], df['CO2_Avg'], label='CO$_{2}$ Avg', color=color_avg, alpha=0.2)
+        ax.scatter(df['Time'], df['CO2_Avg'], color=color_avg, s=size_scatter)
+        ax.set_ylabel('CO$_{2}$ (ppm)')
+        ax.legend(loc='upper left')
+        ax.set_title('Concentración CO$_{2}$')
+        if SD:
+            ax_twin = ax.twinx()
+            ax_twin.plot(df['Time'], df['CO2_SD'], label='CO$_{2}$ SD', color=color_sd, alpha=0.2)
+            ax_twin.scatter(df['Time'], df['CO2_SD'], color=color_sd, s=size_scatter)
+            ax_twin.set_ylabel('CO$_{2}$ SD')
+            ax_twin.legend(loc='upper right')
+        plot_index += 1
+
+    # CH4
+    if CH4:
+        ax = axes[plot_index]
+        ax.plot(df['Time'], df['CH4_Avg'], label='CH$_{4}$ Avg', color=color_avg, alpha=0.2)
+        ax.scatter(df['Time'], df['CH4_Avg'], color=color_avg, s=size_scatter)
+        ax.set_ylabel('CH$_{4}$ (ppb)')
+        ax.legend(loc='upper left')
+        ax.set_title('Concentración CH$_{4}$')
+        if SD:
+            ax_twin = ax.twinx()
+            ax_twin.plot(df['Time'], df['CH4_SD'], label='CH$_{4}$ SD', color=color_sd, alpha=0.2)
+            ax_twin.scatter(df['Time'], df['CH4_SD'], color=color_sd, s=size_scatter)
+            ax_twin.set_ylabel('CH$_{4}$ SD')
+            ax_twin.legend(loc='upper right')
+        plot_index += 1
+
+    # CO
+    if CO:
+        ax = axes[plot_index]
+        ax.plot(df['Time'], df['CO_Avg'], label='CO Avg', color=color_avg, alpha=0.2)
+        ax.scatter(df['Time'], df['CO_Avg'], color=color_avg, s=size_scatter)
+        ax.set_ylabel('CO (ppm)')
+        ax.legend(loc='upper left')
+        ax.set_title('Concentración CO')
+        if SD:
+            ax_twin = ax.twinx()
+            ax_twin.plot(df['Time'], df['CO_SD'], label='CO SD', color=color_sd, alpha=0.2)
+            ax_twin.scatter(df['Time'], df['CO_SD'], color=color_sd, s=size_scatter)
+            ax_twin.set_ylabel('CO SD')
+            ax_twin.legend(loc='upper right')
+
+    # Cambios en el título
+    if start_month is not None and end_month is not None:
+        if start_month == end_month:
+            month_str = Meses.get(start_month, f'{start_month}')
+        else:
+            month_str = f'{Meses.get(start_month, f"{start_month}")}-{Meses.get(end_month, f"{end_month}")}'
+    else:
+        month_str = ''
+
+    plt.suptitle(f'Concentración de GEI, Estación Calakmul {month_str} {year}' if year is not None else f'Concentración de GEI, Estación Calakmul')
+
+    plt.tight_layout(rect=[0, 0, 1, 0.98])
+    plt.show()
+
+
 
 
 

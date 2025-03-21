@@ -5,8 +5,8 @@ from stat import S_ISDIR
 hostname = "132.248.8.32"
 username = "gei"
 password = "ru04g31"
-#remote_path = "/home/gei/scripts_j/l0"
-#local_path = "/home/jonathan_mn/server_gei"
+remote_path = "/home/gei/scripts_sandra"
+local_path = "/home/jmn/server_gei/low/sandra"
 
 
 
@@ -104,10 +104,12 @@ def upload_file_or_folder_to_server(hostname, username, password, local_path, re
 
 
 # Descargar carpeta
-#download_roua_process(hostname, username, password, remote_path, local_path)
+download_roua_process(hostname, username, password, remote_path, local_path)
+
+
+
 
 # Argumentos para la subida
-
 
 #local_file_path = "/home/jmn/ss/scripts/git/scripts_ss/gei/libreria/gei_raw_to_l0.py"
 #remote_file_path = "/home/gei/scripts_j/gei_raw_to_l0.py"
@@ -121,8 +123,8 @@ def upload_file_or_folder_to_server(hostname, username, password, local_path, re
 #remote_file_path = "/home/gei/scripts_j/picarro_l0_server.py"
 
 #upload_file_to_server(hostname, username, password, local_file_path, remote_file_path)
-local_folder_path='/home/jmn/l0-1'
-remote_folder_path = "/home/gei/scripts_j/L0"
+#local_folder_path='/home/jmn/l0-1'
+#remote_folder_path = "/home/gei/scripts_j/L0"
 
 
-upload_file_or_folder_to_server(hostname, username, password, local_folder_path, remote_folder_path)
+#upload_file_or_folder_to_server(hostname, username, password, local_folder_path, remote_folder_path)
