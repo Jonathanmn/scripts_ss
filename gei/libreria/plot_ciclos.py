@@ -25,30 +25,9 @@ gei= copy_and_rename_columns(gei)
 
 '''
 
-gei_nocturno=intervalo_horas(gei,'19:00','23:59')
-gei_dia=intervalo_horas(gei,'09:00','16:00')
-
-gei_0_5am=intervalo_horas(gei,'00:00','05:00')
-
-gei_9_16_b=intervalo_horas(geib,'09:00','16:00')
-
-
-gei24h=ciclo_1d_avg(gei)
-gei24hb=ciclo_1d_avg(geib)
-
-gei_9_16_b=ciclo_1d_avg(gei_9_16_b)
-
-gei_nocturno=ciclo_1d_avg(gei_nocturno)
-gei_dia=ciclo_1d_avg(gei_dia)
-
-
-
-gei_0_5am=ciclo_1d_avg(gei_0_5am)
-
-
 '''
 
 #plot_comparacion(('9 16h',gei_dia),('9 16 b',gei_9_16_b), column='CO2_Avg')
 
-plot_intervalos_subplot_4x1(gei,geib, column='CO2_Avg', intervalos=[('00:00','23:59'),('00:00','05:00'),('09:00', '16:00'),('19:00', '23:59') ])
+plot_intervalos_subplot_4x1(gei,geib, column='CO2_Avg', intervalos=[('00:00','23:59'),('19:00', '23:59'),('00:00','05:00'),('09:00', '16:00')])
 #plot_comparacion(('19-23h', gei_nocturno),('00-05h',gei_0_5am), ('09-16h', gei_dia),('24h',gei24h), column='CO2_Avg')

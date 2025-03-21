@@ -580,7 +580,7 @@ def plot_24h_anual_subplot_comp(df, df2, CO2=None, CH4=None, CO=None, start_mont
     gases = [(gas, label) for gas, label in gases if gas is not None]
 
     # Crear subplots 3x4
-    fig, axs = plt.subplots(4, 3, figsize=(5, 10), sharey=True, sharex=True)
+    fig, axs = plt.subplots(4, 3, figsize=(7, 10), sharey=True, sharex=True)
 
     # Función para crear el plot de cada gas
     def plot_gas(ax, df_monthly_avg, df2_monthly_avg, df_avg, df2_avg, gas, label, month):
@@ -594,7 +594,7 @@ def plot_24h_anual_subplot_comp(df, df2, CO2=None, CH4=None, CO=None, start_mont
 
         # Plotear el promedio de todo el DataFrame
         #ax.plot(df_avg['Hora'], df_avg[gas], 'r--', linewidth=1, label='k')
-        ax.plot(df2_avg['Hora'], df2_avg[gas], 'r--', linewidth=1, label='L1b Avg')
+        ax.plot(df2_avg['Hora'], df2_avg[gas], 'r--', linewidth=1, label='Promedio Anual L1b')
 
         ylim_min=df_monthly_avg[gas].min() - 5
         ylim_max=df_monthly_avg[gas].max() + 5

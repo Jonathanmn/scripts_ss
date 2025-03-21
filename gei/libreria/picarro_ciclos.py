@@ -190,11 +190,12 @@ def plot_intervalos_subplot_4x1(df1, df2, column='CO2_Avg', intervalos=[('19:00'
     """
     fig, axs = plt.subplots(4, 1, figsize=(6, 10), sharex=True)
 
+    '''
     df2_interval_full = intervalo_horas(df2, intervalos[0][0], intervalos[0][1])
     df2_avg_full = ciclo_1d_avg(df2_interval_full)
     df2_monthly_avg = df2_avg_full.set_index('Time').resample('ME').mean().reset_index()
     df2_monthly_avg['Time'] = df2_monthly_avg['Time'] + pd.offsets.MonthBegin(1) - pd.offsets.Day(15)
-
+'''
 
     for i, (h0, hf) in enumerate(intervalos):
         df1_interval = intervalo_horas(df1, h0, hf)
@@ -206,9 +207,9 @@ def plot_intervalos_subplot_4x1(df1, df2, column='CO2_Avg', intervalos=[('19:00'
         axs[i].plot(df1_avg['Time'], df1_avg[column], label='L1', color='orange', alpha=1)
         axs[i].plot(df2_avg['Time'], df2_avg[column], label='L1b', color='#1062b4',alpha=1)
 
-        '''df2_monthly_avg = df2_avg.set_index('Time').resample('ME').mean().reset_index()
+        df2_monthly_avg = df2_avg.set_index('Time').resample('ME').mean().reset_index()
         df2_monthly_avg['Time'] = df2_monthly_avg['Time'] + pd.offsets.MonthBegin(1) - pd.offsets.Day(15)
-        '''
+        
         axs[i].scatter(df2_monthly_avg['Time'], df2_monthly_avg[column], color='red', label='Promedio Mensual', s=30, zorder=5)
         axs[i].plot(df2_monthly_avg['Time'], df2_monthly_avg[column], color='red', linestyle='--', linewidth=1, zorder=4)
         axs[i].set_title(f'Horario:{h0}-{hf}', fontsize=10)
