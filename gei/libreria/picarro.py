@@ -844,64 +844,66 @@ def plot_1min_sd_comparison(df, df2=None, CO2=True, CH4=True, CO=True, SD=True, 
     if num_plots == 1:
         axes = [axes]
 
-    color_avg = '#0569cc'
-    color_sd = '#f91fb8'
-    color_avg2 = '#1062b4'
-    color_sd2 = '#1ff963'
+    color_avg = 'orange'
+    color_avg2 = '#0677d4'
+    color_sd = 'green'
+    color_sd2 = '#b5250e'
     size_scatter = 1
     plot_index = 0
 
     # CO2
     if CO2:
         ax = axes[plot_index]
-        ax.plot(df['Time'], df['CO2_Avg'], label='CO$_{2}$ Avg', color=color_avg, alpha=0.2)
+        ax.plot(df['Time'], df['CO2_Avg'], label='L1', color=color_avg, alpha=0.8,linewidth=0.5)
         ax.scatter(df['Time'], df['CO2_Avg'], color=color_avg, s=size_scatter)
         if df2 is not None:
-            ax.plot(df2['Time'], df2['CO2_Avg'], label='CO$_{2}$ Avg (df2)', color=color_avg2, alpha=0.2)
+            ax.plot(df2['Time'], df2['CO2_Avg'], label='L1b', color=color_avg2, alpha=0.8,linewidth=0.5)
             ax.scatter(df2['Time'], df2['CO2_Avg'], color=color_avg2, s=size_scatter)
         ax.set_ylabel('CO$_{2}$ (ppm)')
         ax.legend(loc='upper left')
         ax.set_title('Concentración CO$_{2}$')
         if SD:
             ax_twin = ax.twinx()
-            ax_twin.plot(df['Time'], df['CO2_SD'], label='CO$_{2}$ SD', color=color_sd, alpha=0.2)
+            ax_twin.plot(df['Time'], df['CO2_SD'], label='SD', color=color_sd, alpha=0.2)
             ax_twin.scatter(df['Time'], df['CO2_SD'], color=color_sd, s=size_scatter)
-            if df2 is not None:
+            ax_twin.legend(loc='upper right')
+            '''if df2 is not None:
                 ax_twin.plot(df2['Time'], df2['CO2_SD'], label='CO$_{2}$ SD (df2)', color=color_sd2, alpha=0.2)
                 ax_twin.scatter(df2['Time'], df2['CO2_SD'], color=color_sd2, s=size_scatter)
             ax_twin.set_ylabel('CO$_{2}$ SD')
-            ax_twin.legend(loc='upper right')
+            ax_twin.legend(loc='upper right')'''
         plot_index += 1
 
     # CH4
     if CH4:
         ax = axes[plot_index]
-        ax.plot(df['Time'], df['CH4_Avg'], label='CH$_{4}$ Avg', color=color_avg, alpha=0.2)
+        ax.plot(df['Time'], df['CH4_Avg'], label='L1', color=color_avg, alpha=0.2)
         ax.scatter(df['Time'], df['CH4_Avg'], color=color_avg, s=size_scatter)
         if df2 is not None:
-            ax.plot(df2['Time'], df2['CH4_Avg'], label='CH$_{4}$ Avg (df2)', color=color_avg2, alpha=0.2)
-            ax.scatter(df2['Time'], df2['CH4_Avg'], color=color_avg2, s=size_scatter)
+            ax.plot(df2['Time'], df2['CH4_Avg'], label='L1b', color=color_avg2, alpha=0.1)
+            ax.scatter(df2['Time'], df2['CH4_Avg'], color=color_avg2, s=size_scatter*0.5)
         ax.set_ylabel('CH$_{4}$ (ppb)')
         ax.legend(loc='upper left')
         ax.set_title('Concentración CH$_{4}$')
         if SD:
             ax_twin = ax.twinx()
-            ax_twin.plot(df['Time'], df['CH4_SD'], label='CH$_{4}$ SD', color=color_sd, alpha=0.2)
-            ax_twin.scatter(df['Time'], df['CH4_SD'], color=color_sd, s=size_scatter)
+            ax_twin.plot(df['Time'], df['CH4_SD'], label='SD', color=color_sd, alpha=0.1)
+            ax_twin.scatter(df['Time'], df['CH4_SD'], color=color_sd, s=size_scatter*0.5)
             '''if df2 is not None:
                 ax_twin.plot(df2['Time'], df2['CH4_SD'], label='CH$_{4}$ SD (df2)', color=color_sd2, alpha=0.2)
                 ax_twin.scatter(df2['Time'], df2['CH4_SD'], color=color_sd2, s=size_scatter)
             ax_twin.set_ylabel('CH$_{4}$ SD')
             ax_twin.legend(loc='upper right')'''
+            ax_twin.legend(loc='upper right')
         plot_index += 1
 
     # CO
     if CO:
         ax = axes[plot_index]
-        ax.plot(df['Time'], df['CO_Avg'], label='CO Avg', color=color_avg, alpha=0.2)
+        ax.plot(df['Time'], df['CO_Avg'], label='L1', color=color_avg, alpha=0.2,linewidth=2)
         ax.scatter(df['Time'], df['CO_Avg'], color=color_avg, s=size_scatter)
         if df2 is not None:
-            ax.plot(df2['Time'], df2['CO_Avg'], label='CO Avg (df2)', color=color_avg2, alpha=0.2)
+            ax.plot(df2['Time'], df2['CO_Avg'], label='L1b', color=color_avg2, alpha=0.2)
             ax.scatter(df2['Time'], df2['CO_Avg'], color=color_avg2, s=size_scatter)
         ax.set_ylabel('CO (ppm)')
         ax.legend(loc='upper left')
@@ -916,6 +918,11 @@ def plot_1min_sd_comparison(df, df2=None, CO2=True, CH4=True, CO=True, SD=True, 
             ax_twin.set_ylabel('CO SD')
             ax_twin.legend(loc='upper right')'''
 
+
+
+
+
+
     # Cambios en el título
     if start_month is not None and end_month is not None:
         if start_month == end_month:
@@ -925,9 +932,9 @@ def plot_1min_sd_comparison(df, df2=None, CO2=True, CH4=True, CO=True, SD=True, 
     else:
         month_str = ''
 
-    plt.suptitle(f'Concentración de GEI, Estación Calakmul {month_str} {year}' if year is not None else f'Concentración de GEI, Estación Calakmul')
+    plt.suptitle(f'Concentración de GEI, Estación Calakmul {month_str} {year}' if year is not None else f'Concentración de GEI, Estación Calakmul 2024')
 
-    plt.tight_layout(rect=[0, 0, 1, 0.98])
+    plt.tight_layout(rect=[0, 0, 1, 0.99])
     plt.show()
 
 
