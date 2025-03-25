@@ -7,6 +7,53 @@ import numpy as np
 import glob
 from windrose import WindroseAxes
 from datetime import datetime
+from pathlib import Path
+
+
+
+#datos de GEI
+
+def read_L0_or_L1(folder_path,time, header=None):
+    """
+    Lee los archivos .dat del folder donde se encuentran los archivos raw con subcarpetas
+    retorna un solo data frame con los datos de toda la carpeta .
+    """
+    dataframes = []
+
+    for file_path in Path(folder_path).rglob('*.dat'):
+        df = pd.read_csv(file_path, delimiter=r',', header=header)
+        dataframes.append(df)
+
+    gei = pd.concat(dataframes, ignore_index=True)
+    gei[time] = pd.to_datetime(gei[time])
+    gei = gei.sort_values(by=time).reset_index(drop=True)
+
+
+    return gei
+
+
+
+def reverse_rename_columns(df):
+    """
+    Renombra las columnas del DataFrame basado en su posición para evitar conflictos.
+    """
+    column_names = [
+        'Time', 'MPVPosition', 'Height', 'CO2_Avg', 'CO2_SD', 
+        'CH4_Avg', 'CH4_SD', 'CO_Avg', 'CO_SD', 
+        'CO2_MPVPosition', 'CH4_MPVPosition', 'CO_MPVPosition'
+    ]
+    
+    # Asegurarse de que el DataFrame tenga al menos tantas columnas como nombres en column_names
+    if len(df.columns) >= len(column_names):
+        df.columns = column_names + list(df.columns[len(column_names):])
+    else:
+        raise ValueError("El DataFrame no tiene suficientes columnas para renombrar.")
+    
+    return df
+
+
+
+
 
 
 
@@ -19,7 +66,7 @@ def met_cmul(folder_path):
         if filename.endswith(".csv"):
             file_path = os.path.join(folder_path, filename)
             
-            df = pd.read_csv(file_path, encoding='ISO-8859-1', header=6) 
+            df = pd.read_csv(file_path, encoding='ISO-8859-1', header=6,low_memory=False) 
             all_dfs.append(df)
 
     cmul = pd.concat(all_dfs, ignore_index=True) 
