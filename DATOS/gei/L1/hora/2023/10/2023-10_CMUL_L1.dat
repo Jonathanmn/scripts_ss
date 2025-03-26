@@ -1,0 +1,16 @@
+Red Universitaria de Observatorios Atmosfericos (RUOA)
+Atmospheric Observatory Calakmul (cmul), Campeche
+Lat 18.5956 N, Lon 89.4137 W, Alt 275 masl
+Time UTC-6h + 170 S correction for height position 
+Greenhouse Gas data
+Concentrations correspond to dry molar fractions
+
+Time,MPVPosition,Height,CO2_Avg,CO2_SD,CH4_Avg,CH4_SD,CO_Avg,CO_SD,CO2_MPVPosition,CH4_MPVPosition,CO_MPVPosition
+yyyy-mm-dd HH:MM:SS,1-5,m agl,ppm,ppm,ppb,ppb,ppb,ppm,1-5,1-5,1-5
+2023-10-31 17:00:00,,16.0,,,,,,,,,
+2023-10-31 18:00:00,,16.0,,,,,,,,,
+2023-10-31 19:00:00,,16.0,,,,,,,,,
+2023-10-31 20:00:00,,16.0,,,,,,,,,
+2023-10-31 21:00:00,,16.0,,,,,,,,,
+2023-10-31 22:00:00,,16.0,,,,,,,,,
+2023-10-31 23:00:00,,16.0,,,,,,,,,
