@@ -53,11 +53,6 @@ def reverse_rename_columns(df):
 
 
 
-
-
-
-
-
 def met_cmul(folder_path):
 
     all_dfs = []  
@@ -100,6 +95,33 @@ def t64_cmul(patht64):
   t64.rename(columns={'  PM10 Conc': 'PM10 Conc','  PM2.5 Conc':'PM2.5 Conc'}, inplace=True)
   
   return t64
+
+
+
+
+#linea del tiempo merge
+
+
+
+def merge_df(dfs, timestamp_columns):
+    """
+   Une dos o más dataframe coindiciendo con la fecha 
+   se une hasta donde tenga la fecha con datos en ese momento 
+   """
+    for i, df in enumerate(dfs):
+        df.rename(columns={timestamp_columns[i]: 'Timestamp'}, inplace=True)
+    
+    
+    merged_df = dfs[0]
+    for df in dfs[1:]:
+        merged_df = pd.merge(merged_df, df, on='Timestamp', how='inner' )  #inner
+    
+    return merged_df
+
+
+
+
+
 
 
 

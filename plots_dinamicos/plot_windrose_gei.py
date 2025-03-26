@@ -4,11 +4,6 @@ from windrose_lib import *
 
 ''' Aqui se van a plotear los ciclos horarios y nocturnos'''
 
-''' folders laptop 
-folder_cmul = '/home/jmn/DATA/met/L2/hora' 
-folder_gei = '/home/jmn/L1/minuto/2024'
-'''
-#folders lab pc
 folder_met = './DATOS/met/L2/minuto'
 folder_gei = './DATOS/gei/L1/minuto/2024' 
 

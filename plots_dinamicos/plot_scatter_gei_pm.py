@@ -12,7 +12,6 @@ folder_gei = './DATOS/gei/L1/minuto/2024'
 
 
 
-
 gei = read_L0_or_L1(folder_gei, 'yyyy-mm-dd HH:MM:SS', header=7)
 gei = reverse_rename_columns(gei)
 
@@ -23,6 +22,7 @@ gei = reverse_rename_columns(gei)
 
 t64 = t64_cmul(folder_t64)
 
+
 met = met_cmul(folder_met)   
 t64=t64[['Date & Time (Local)','PM10 Conc', 'PM2.5 Conc']]
 met= met[['yyyy-mm-dd HH:MM:SS', 'WDir_Avg', 'WSpeed_Avg']]
@@ -30,65 +30,20 @@ gei = gei[['Time', 'CO2_Avg', 'CH4_Avg','CO_Avg']]
 
 
 
-print(t64.columns)
-
-#gei_met=pd.concat([gei_winddata, met_winddata], axis=1, join='inner')
 
 
-
-
-
-import pandas as pd
-
-def merge_on_timestamp(dfs, timestamp_columns):
-    """
-    Merges multiple DataFrames on a common timestamp column, even if the column names differ.
-
-    Args:
-        dfs (list of pd.DataFrame): List of DataFrames to merge.
-        timestamp_columns (list of str): List of timestamp column names corresponding to each DataFrame.
-
-    Returns:
-        pd.DataFrame: Merged DataFrame.
-    """
-    # Rename timestamp columns to a common name
-    for i, df in enumerate(dfs):
-        df.rename(columns={timestamp_columns[i]: 'Timestamp'}, inplace=True)
-    
-    # Merge DataFrames on the common 'Timestamp' column
-    merged_df = dfs[0]
-    for df in dfs[1:]:
-        merged_df = pd.merge(merged_df, df, on='Timestamp', how='inner' )  #inner
-    
-    return merged_df
-
-
-# Merge the DataFrames
-merged_data = merge_on_timestamp(
+merged_data = merge_df(
     [met,gei,t64],
     ['yyyy-mm-dd HH:MM:SS', 'Time', 'Date & Time (Local)'])
 
-print(merged_data)
 
 
 
 
-
-
-import matplotlib.pyplot as plt
 
 def analisis_variables(df, column1, column2, timestamp_column='Timestamp'):
     """
-    Creates a scatter plot with two variables from a DataFrame, using a secondary y-axis (twinx).
-
-    Args:
-        df (pd.DataFrame): The DataFrame containing the data.
-        column1 (str): The name of the first column to plot on the primary y-axis.
-        column2 (str): The name of the second column to plot on the secondary y-axis.
-        timestamp_column (str): The name of the column to use as the x-axis (timestamps).
-
-    Returns:
-        None
+hace un scatter plot entre variables 
     """
     fig, ax1 = plt.subplots()
     marker_size=1
@@ -115,5 +70,151 @@ def analisis_variables(df, column1, column2, timestamp_column='Timestamp'):
     plt.tight_layout()
     plt.show()
 
-# Example usage
-analisis_variables(merged_data, 'CO2_Avg', 'PM2.5 Conc', timestamp_column='Timestamp')
+
+#analisis_variables(merged_data, 'CO2_Avg', 'PM2.5 Conc', timestamp_column='Timestamp')
+
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy.stats import pearsonr
+
+def correlacion(df, column1, column2):
+    """
+    Realiza un scatter plot para mostrar la correlación entre dos columnas
+    y añade el valor de la correlación de Pearson en el gráfico.
+    """
+    # Eliminar filas con valores NaN en cualquiera de las dos columnas
+    filtered_df = df[[column1, column2]].dropna()
+
+    # Calcular la correlación de Pearson
+    correlation, _ = pearsonr(filtered_df[column1], filtered_df[column2])
+
+    # Crear el scatter plot
+    plt.figure(figsize=(8, 6))
+    plt.scatter(x=filtered_df[column1], y=filtered_df[column2], alpha=0.7, color='red', s=1)
+
+    # Añadir el valor de la correlación en el gráfico
+    plt.title(f'Scatter Plot: {column1} vs {column2}\nPearson Correlation: {correlation:.2f}', fontsize=14)
+    plt.xlabel(column1, fontsize=12)
+    plt.ylabel(column2, fontsize=12)
+    plt.grid(True, linestyle='--', alpha=0.6)
+
+    # Mostrar el gráfico
+    plt.tight_layout()
+    plt.show()
+
+
+
+
+
+
+
+
+
+def correlacion(df, column1, column2):
+    """
+    Realiza un scatter plot para mostrar la correlación entre dos columnas
+    y añade el valor de la correlación de Pearson y R² en el gráfico.
+    """
+    # Eliminar filas con valores NaN en cualquiera de las dos columnas
+    filtered_df = df[[column1, column2]].dropna()
+
+    # Calcular la correlación de Pearson
+    correlation, _ = pearsonr(filtered_df[column1], filtered_df[column2])
+
+    # Calcular el valor de R²
+    r_squared = correlation ** 2
+
+    # Crear el scatter plot
+    plt.figure(figsize=(8, 6))
+    plt.scatter(x=filtered_df[column1], y=filtered_df[column2], alpha=0.7, color='red', s=1)
+
+    # Añadir el valor de la correlación y R² en el gráfico
+    plt.title(
+        f'Scatter Plot: {column1} vs {column2}\n'
+        f'Pearson Correlation: {correlation:.2f}\n'
+        f'R²: {r_squared:.2f}',
+        fontsize=14
+    )
+    plt.xlabel(column1, fontsize=12)
+    plt.ylabel(column2, fontsize=12)
+    plt.grid(True, linestyle='--', alpha=0.6)
+
+    # Mostrar el gráfico
+    plt.tight_layout()
+    plt.show()
+
+
+
+import numpy as np
+
+def correlacion1(df, column1, column2):
+    """
+    Realiza un scatter plot para mostrar la correlación entre dos columnas,
+    añade el valor de la correlación de Pearson, R² y una línea de regresión.
+    """
+    # Eliminar filas con valores NaN en cualquiera de las dos columnas
+    filtered_df = df[[column1, column2]].dropna()
+
+    # Calcular la correlación de Pearson
+    correlation, _ = pearsonr(filtered_df[column1], filtered_df[column2])
+
+    # Calcular el valor de R²
+    r_squared = correlation ** 2
+
+    # Calcular la línea de regresión
+    slope, intercept = np.polyfit(filtered_df[column1], filtered_df[column2], 1)
+    regression_line = slope * filtered_df[column1] + intercept
+
+    # Crear el scatter plot
+    plt.figure(figsize=(8, 6))
+    plt.scatter(x=filtered_df[column1], y=filtered_df[column2], alpha=1, color='red', s=1, label='Datos')
+    
+    # Añadir la línea de regresión
+    plt.plot(filtered_df[column1], regression_line, color='black', linewidth=1, label='Línea de regresión')
+
+    # Añadir el valor de la correlación y R² en el gráfico
+    plt.title(
+        f'Scatter Plot: {column1} vs {column2}\n'
+        f'Pearson Correlation: {correlation:.2f}\n'
+        f'R²: {r_squared:.2f}',
+        fontsize=14
+    )
+    plt.xlabel(column1, fontsize=12)
+    plt.ylabel(column2, fontsize=12)
+    plt.grid(True, linestyle='--', alpha=0.6)
+    plt.legend()
+
+    # Mostrar el gráfico
+    plt.tight_layout()
+    plt.show()
+
+
+
+
+
+
+correlacion1(merged_data, 'CH4_Avg', 'CO2_Avg')
+
+
+
+
+
+
+
+
+
+
+
+
+'''
+
+# Excluir la columna 'timestamp' del DataFrame para el heatmap
+columns_to_exclude = ['Timestamp']  # Ajusta el nombre exacto si es diferente
+filtered_data = merged_data.drop(columns=columns_to_exclude, errors='ignore')
+
+sns.heatmap(filtered_data.corr(), vmin=-1, vmax=1, annot=True, cmap="rocket_r")
+plt.show()'
+''
+''
+'''
