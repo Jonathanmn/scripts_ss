@@ -47,4 +47,11 @@ intervals = {'CO2_Avg': (500, 550),'CH4_Avg': (2.2, 2.4)}
 
 
 
-plot_wr_timeseries(gei_met, column='CO2_Avg')
+# Para una sola columna
+#plot_wr_timeseries_dynamic(gei_met, columns=['CO2_Avg'])
+
+# Para múltiples columnas
+#plot_wr_timeseries_dynamic(gei_met, columns=['CO2_Avg', 'CH4_Avg', 'CO_Avg'])
+
+
+plot_wr_timeseries_date(gei_met, columns=['CO2_Avg', 'CH4_Avg', 'CO_Avg'], inicio='2024-03-01 00:00:00', fin='2024-03-31 00:00:00')

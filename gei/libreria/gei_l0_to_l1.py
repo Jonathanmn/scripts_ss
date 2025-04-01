@@ -7,7 +7,7 @@ from picarro import *
 #output_folder = '/home/gei/scripts_j/l0'
 
 
-output_folder = '/home/jmn/L1_umbrales'
+output_folder = '/home/jonathan_mn/L1'
 
 
 
@@ -19,7 +19,7 @@ gei['Time'] = pd.to_datetime(gei['Time'])
 
 '''
 
-folder_path = '/home/jmn/L1/minuto/2024'
+folder_path = './DATOS/gei/L1/minuto' 
 
 #gei = read_raw_lite(folder_path, 'Time')
 gei = read_L0_or_L1(folder_path, 'yyyy-mm-dd HH:MM:SS', header=7)
