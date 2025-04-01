@@ -579,6 +579,10 @@ def plot_wr_timeseries_date(df, columns, inicio=None, fin=None):
     n = len(columns)
     fig = plt.figure(figsize=(13, 3 * n))  # Adjust figure height dynamically
 
+
+    fig.suptitle('Serie de tiempo y dirección de viento Calakmul', fontsize=16, y=0.95)  # Adjust 'y' to position the suptitle
+
+
     for i, column in enumerate(columns):
         # Calculate the starting position for the current row
         row_start = i * 3 + 1
@@ -599,6 +603,110 @@ def plot_wr_timeseries_date(df, columns, inicio=None, fin=None):
         ax2.legend(title=f"CO$_{{2}}$ (ppm)" if column == 'CO2_Avg' else f"CH$_{{4}}$ (ppm)" if column == 'CH4_Avg' else column, title_fontsize=8, loc="lower right", bbox_to_anchor=(0.5, 0.1), prop={'size': 7})
         ax2.set_title("Dirección del viento")
 
-    plt.tight_layout()
+    plt.tight_layout(rect=[0, 0, 1, 0.93])  # Adjust 'rect' to leave space for the suptitle
     plt.show()
 
+
+
+
+def plot_wr_timeseries_date1(df, columns, inicio=None, fin=None):
+  
+    # Filter the DataFrame based on the 'inicio' and 'fin' arguments
+    if inicio is not None:
+        inicio = pd.to_datetime(inicio)
+        df = df[df['Time'] >= inicio]
+    if fin is not None:
+        fin = pd.to_datetime(fin)
+        df = df[df['Time'] <= fin]
+
+    if df.empty:
+        raise ValueError("The filtered DataFrame is empty. Check your 'inicio' and 'fin' values.")
+
+    # Determine the number of rows based on the number of columns
+    n = len(columns)
+    fig = plt.figure(figsize=( 5* n, 5))  # Adjust figure height dynamically
+
+    # Add a fixed suptitle
+    fig.suptitle('Serie de tiempo y dirección de viento Calakmul', fontsize=16, y=0.95)  # Adjust 'y' to position the suptitle
+
+    # Initialize the first axis for sharing x-axis
+    shared_ax = None
+
+    for i, column in enumerate(columns):
+        # Calculate the starting position for the current row
+        row_start = i * 3 + 1
+
+        # Subplot 1: Time series plot for the current column (spanning positions 1 and 2 in the row)
+        ax1 = plt.subplot(n, 3, (row_start, row_start + 1), sharex=shared_ax)
+        if shared_ax is None:
+            shared_ax = ax1  # Set the first axis as the shared x-axis
+        ax1.plot(df['Time'], df[column], label=f"CO$_{{2}}$ (ppm)" if column == 'CO2_Avg' else f"CH$_{{4}}$ (ppm)" if column == 'CH4_Avg' else column, color='blue')
+        ax1.set_xlabel("Time")
+        ax1.set_ylabel(f"CO$_{{2}}$ (ppm)" if column == 'CO2_Avg' else f"CH$_{{4}}$ (ppm)" if column == 'CH4_Avg' else column)
+        ax1.grid(True)
+        ax1.legend()
+
+        # Subplot 2: Windrose plot for the current column (position 3 in the row)
+        ax2 = plt.subplot(n, 3, row_start + 2, projection="windrose")
+        windrose_data = df[['WDir_Avg', column]].dropna()
+        ax2.bar(windrose_data['WDir_Avg'], windrose_data[column], normed=True, opening=0.8, edgecolor='white', bins=4)
+        ax2.legend(title=f"CO$_{{2}}$ (ppm)" if column == 'CO2_Avg' else f"CH$_{{4}}$ (ppm)" if column == 'CH4_Avg' else column, title_fontsize=8, loc="lower right", bbox_to_anchor=(0.5, 0.1), prop={'size': 7})
+
+    # Adjust layout to fit the plots below the suptitle
+    plt.tight_layout(rect=[0, 0, 1, 0.93])  # Adjust 'rect' to leave space for the suptitle
+    plt.show()
+
+
+    
+def plot_wr_timeseries_date2(df, columns, inicio=None, fin=None, rmax=None):
+    if 'Time' not in df.columns:
+        raise ValueError("The DataFrame must contain a 'Time' column for the x-axis of the time series.")
+    if 'WDir_Avg' not in df.columns:
+        raise ValueError("The DataFrame must contain a 'WDir_Avg' column for wind direction.")
+    for column in columns:
+        if column not in df.columns:
+            raise ValueError(f"The specified column '{column}' is not in the DataFrame.")
+
+    if inicio is not None:
+        inicio = pd.to_datetime(inicio)
+        df = df[df['Time'] >= inicio]
+    if fin is not None:
+        fin = pd.to_datetime(fin)
+        df = df[df['Time'] <= fin]
+
+    if df.empty:
+        raise ValueError("The filtered DataFrame is empty. Check your 'inicio' and 'fin' values.")
+
+    n = len(columns)
+    fig = plt.figure(figsize=(15, 5 * n))
+    fig.suptitle('Serie de tiempo y dirección de viento Calakmul', fontsize=16, y=0.95)
+
+    shared_ax = None
+
+    for i, column in enumerate(columns):
+        row_start = i * 3 + 1
+
+        ax1 = plt.subplot(n, 3, (row_start, row_start + 1), sharex=shared_ax)
+        if shared_ax is None:
+            shared_ax = ax1
+        ax1.plot(df['Time'], df[column], label=f"CO$_{{2}}$ (ppm)" if column == 'CO2_Avg' else f"CH$_{{4}}$ (ppm)" if column == 'CH4_Avg' else column, color='blue')
+        ax1.set_xlabel("Time")
+        ax1.set_ylabel(f"CO$_{{2}}$ (ppm)" if column == 'CO2_Avg' else f"CH$_{{4}}$ (ppm)" if column == 'CH4_Avg' else column)
+        ax1.grid(True)
+        ax1.legend()
+
+        ax2 = plt.subplot(n, 3, row_start + 2, projection="windrose")
+        windrose_data = df[['WDir_Avg', column]].dropna()
+        ax2.bar(windrose_data['WDir_Avg'], windrose_data[column], normed=True, opening=0.8, edgecolor='white', bins=4)
+        ax2.legend(title=f"CO$_{{2}}$ (ppm)" if column == 'CO2_Avg' else f"CH$_{{4}}$ (ppm)" if column == 'CH4_Avg' else column, title_fontsize=6, loc="center left", bbox_to_anchor=(1, 0.5), prop={'size': 5})
+        if rmax is not None:
+            ax2.set_rmax(rmax)
+
+        # Customize windrose tick labels and parameters
+        ax2.xaxis.set_ticklabels(['E', 'NE', 'N', 'NW', 'W', 'SW', 'S', 'SE'])
+        ax2.xaxis.set_tick_params(labelsize=8)  # Adjust font size of xticklabels
+        ax2.yaxis.set_tick_params(labelsize=8)
+        ax2.tick_params(axis='both', which='major', pad=-20)  # Adjust tick label padding
+
+    plt.tight_layout(rect=[0, 0, 1, 0.93])
+    plt.show()
