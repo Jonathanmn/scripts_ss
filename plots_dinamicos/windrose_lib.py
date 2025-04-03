@@ -678,7 +678,7 @@ def plot_wr_timeseries_date2(df, columns, inicio=None, fin=None, rmax=None):
         raise ValueError("The filtered DataFrame is empty. Check your 'inicio' and 'fin' values.")
 
     n = len(columns)
-    fig = plt.figure(figsize=(15, 5 * n))
+    fig = plt.figure(figsize=(10, 3 * n))
     fig.suptitle('Serie de tiempo y dirección de viento Calakmul', fontsize=16, y=0.95)
 
     shared_ax = None
@@ -698,15 +698,13 @@ def plot_wr_timeseries_date2(df, columns, inicio=None, fin=None, rmax=None):
         ax2 = plt.subplot(n, 3, row_start + 2, projection="windrose")
         windrose_data = df[['WDir_Avg', column]].dropna()
         ax2.bar(windrose_data['WDir_Avg'], windrose_data[column], normed=True, opening=0.8, edgecolor='white', bins=4)
-        ax2.legend(title=f"CO$_{{2}}$ (ppm)" if column == 'CO2_Avg' else f"CH$_{{4}}$ (ppm)" if column == 'CH4_Avg' else column, title_fontsize=6, loc="center left", bbox_to_anchor=(1, 0.5), prop={'size': 5})
-        if rmax is not None:
-            ax2.set_rmax(rmax)
+        ax2.legend(title=f"CO$_{{2}}$ (ppm)" if column == 'CO2_Avg' else f"CH$_{{4}}$ (ppm)" if column == 'CH4_Avg' else column, title_fontsize=6, loc="center left", bbox_to_anchor=(1, 0.5), prop={'size': 7})
 
-        # Customize windrose tick labels and parameters
+        # labels windrose
         ax2.xaxis.set_ticklabels(['E', 'NE', 'N', 'NW', 'W', 'SW', 'S', 'SE'])
-        ax2.xaxis.set_tick_params(labelsize=8)  # Adjust font size of xticklabels
+        ax2.xaxis.set_tick_params(labelsize=8)  
         ax2.yaxis.set_tick_params(labelsize=8)
-        ax2.tick_params(axis='both', which='major', pad=-20)  # Adjust tick label padding
+        ax2.tick_params(axis='both', which='major', pad=-20)  
 
     plt.tight_layout(rect=[0, 0, 1, 0.93])
     plt.show()

@@ -10,8 +10,6 @@ folder_t64= './DATOS/pm/L0/minuto'
 
 
 
-
-
 gei = read_L0_or_L1(folder_gei, 'yyyy-mm-dd HH:MM:SS', header=7)
 gei = reverse_rename_columns(gei)
 
@@ -57,5 +55,5 @@ intervals = {'CO2_Avg': (500, 550),'CH4_Avg': (2.2, 2.4)}
 #plot_wr_timeseries_dynamic(gei_met, columns=['CO2_Avg', 'CH4_Avg', 'CO_Avg'])
 
 
-plot_wr_timeseries_date2(cmul, columns=['CO2_Avg', 'CH4_Avg'], inicio='2024-01-06 18:00:00', fin='2024-01-07 00:00:00')# Para una sola columna con intervalo de fechas
+plot_wr_timeseries_date2(cmul, columns=['CO2_Avg', 'CH4_Avg','PM10 Conc','PM2.5 Conc'], inicio='2024-01-06 18:00:00', fin='2024-01-07 00:00:00')# Para una sola columna con intervalo de fechas
 
