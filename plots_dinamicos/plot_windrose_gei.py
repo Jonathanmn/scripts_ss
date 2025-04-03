@@ -6,41 +6,44 @@ from windrose_lib import *
 
 folder_met = './DATOS/met/L2/minuto'
 folder_gei = './DATOS/gei/L1/minuto/2024' 
+folder_t64= './DATOS/pm/L0/minuto'
+
 
 
 
 
 gei = read_L0_or_L1(folder_gei, 'yyyy-mm-dd HH:MM:SS', header=7)
 gei = reverse_rename_columns(gei)
-gei['Time'] = pd.to_datetime(gei['Time'])
 
-
+t64 = t64_cmul(folder_t64)
 met = met_cmul(folder_met)   
 
-met_winddata = met[['yyyy-mm-dd HH:MM:SS', 'WDir_Avg', 'WSpeed_Avg']]
-gei_winddata = gei[['Time', 'CO2_Avg', 'CH4_Avg','CO_Avg']]
 
-
-
-gei_met=pd.concat([gei_winddata, met_winddata], axis=1, join='inner')
-
-print (gei_met.columns)
+t64=t64[['Date & Time (Local)','PM10 Conc', 'PM2.5 Conc']]
+met= met[['yyyy-mm-dd HH:MM:SS', 'WDir_Avg', 'WSpeed_Avg']]
+gei = gei[['Time', 'CO2_Avg', 'CH4_Avg','CO_Avg']]
 
 
 
 
+cmul = merge_df(
+    [met,gei,t64],
+    ['yyyy-mm-dd HH:MM:SS', 'Time', 'Date & Time (Local)'])
+
+
+print(cmul.columns)
 
 
 
 
-#plot_windrose_subplots(gei_met, columns=['CO2_Avg', 'CH4_Avg'])
 
 
-# Assuming `gei_met` is your DataFrame
+
+
+# por intervalos
 intervals = {'CO2_Avg': (500, 550),'CH4_Avg': (2.2, 2.4)}
     
     
-
 #plot_windrose_subplots_intervalos(gei_met, columns=['CO2_Avg', 'CH4_Avg'], intervals=intervals)
 
 
@@ -54,5 +57,5 @@ intervals = {'CO2_Avg': (500, 550),'CH4_Avg': (2.2, 2.4)}
 #plot_wr_timeseries_dynamic(gei_met, columns=['CO2_Avg', 'CH4_Avg', 'CO_Avg'])
 
 
-plot_wr_timeseries_date2(gei_met, columns=['CO2_Avg', 'CH4_Avg'], inicio='2024-01-06 18:00:00', fin='2024-01-07 00:00:00')# Para una sola columna con intervalo de fechas
+plot_wr_timeseries_date2(cmul, columns=['CO2_Avg', 'CH4_Avg'], inicio='2024-01-06 18:00:00', fin='2024-01-07 00:00:00')# Para una sola columna con intervalo de fechas
 

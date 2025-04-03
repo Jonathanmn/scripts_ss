@@ -109,12 +109,12 @@ def merge_df(dfs, timestamp_columns):
    se une hasta donde tenga la fecha con datos en ese momento 
    """
     for i, df in enumerate(dfs):
-        df.rename(columns={timestamp_columns[i]: 'Timestamp'}, inplace=True)
+        df.rename(columns={timestamp_columns[i]: 'Time'}, inplace=True)
     
     
     merged_df = dfs[0]
     for df in dfs[1:]:
-        merged_df = pd.merge(merged_df, df, on='Timestamp', how='inner' )  #inner
+        merged_df = pd.merge(merged_df, df, on='Time', how='inner' )  #inner
     
     return merged_df
 
