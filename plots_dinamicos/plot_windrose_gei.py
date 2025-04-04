@@ -55,5 +55,5 @@ intervals = {'CO2_Avg': (500, 550),'CH4_Avg': (2.2, 2.4)}
 #plot_wr_timeseries_dynamic(gei_met, columns=['CO2_Avg', 'CH4_Avg', 'CO_Avg'])
 
 
-plot_wr_timeseries_date2(cmul, columns=['CO2_Avg', 'CH4_Avg','PM10 Conc','PM2.5 Conc'], inicio='2024-01-06 18:00:00', fin='2024-01-07 00:00:00')# Para una sola columna con intervalo de fechas
+plot_wr_timeseries_date2(cmul, columns=['CO2_Avg', 'CH4_Avg','PM10 Conc','PM2.5 Conc'], inicio='2024-01-06 23:00:00', fin='2024-01-07 00:00:00')# Para una sola columna con intervalo de fechas
 

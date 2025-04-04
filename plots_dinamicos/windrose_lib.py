@@ -679,7 +679,7 @@ def plot_wr_timeseries_date2(df, columns, inicio=None, fin=None, rmax=None):
 
     n = len(columns)
     fig = plt.figure(figsize=(10, 3 * n))
-    fig.suptitle('Serie de tiempo y dirección de viento Calakmul', fontsize=16, y=0.95)
+    fig.suptitle('Serie de tiempo y dirección de viento, Calakmul', fontsize=16, y=0.95)
 
     shared_ax = None
 
@@ -690,7 +690,7 @@ def plot_wr_timeseries_date2(df, columns, inicio=None, fin=None, rmax=None):
         if shared_ax is None:
             shared_ax = ax1
         ax1.plot(df['Time'], df[column], label=f"CO$_{{2}}$ (ppm)" if column == 'CO2_Avg' else f"CH$_{{4}}$ (ppm)" if column == 'CH4_Avg' else column, color='blue')
-        ax1.set_xlabel("Time")
+        
         ax1.set_ylabel(f"CO$_{{2}}$ (ppm)" if column == 'CO2_Avg' else f"CH$_{{4}}$ (ppm)" if column == 'CH4_Avg' else column)
         ax1.grid(True)
         ax1.legend()
