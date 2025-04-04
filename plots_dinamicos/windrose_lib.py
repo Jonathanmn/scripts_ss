@@ -212,133 +212,65 @@ def rosa_pm(wr_cmul):
 
 
 
-def met_windrose(wr_cmul):
+
+
+
+def met_windrose(wr_cmul, timestamp='yyyy-mm-dd HH:MM:SS', column='WSpeed_Avg'):
     """
     Esta función toma un DataFrame y plotea rosas de viento en un subplot de 4x3 para cada mes de 2024.
+    
+    Parameters:
+        wr_cmul (pd.DataFrame): DataFrame con datos de viento
+        timestamp (str): Nombre de la columna que contiene los datos de fecha y hora (por defecto: 'yyyy-mm-dd HH:MM:SS')
+        column (str): Nombre de la columna a plotear en las rosas de viento (por defecto: 'WSpeed_Avg')
     """
+
     # Filtrar datos para el año 2024
-    wr_cmul_2024 = wr_cmul[wr_cmul['yyyy-mm-dd HH:MM:SS'].dt.year == 2024]
+    wr_cmul_2024 = wr_cmul[wr_cmul[timestamp].dt.year == 2024]
 
     # Crear una figura con subplots 4x3
     fig, axs = plt.subplots(4, 3, figsize=(9, 15), subplot_kw={'projection': 'windrose'})
-    fig.suptitle('Rosas de Viento Mensuales para 2024', fontsize=16)
+    
+    # Título dinámico basado en la columna elegida
+    if column == 'WSpeed_Avg':
+        fig.suptitle('Rosas de Viento Mensuales para 2024', fontsize=16)
+    else:
+        fig.suptitle(f'Rosas de Viento Mensuales para {column} - 2024', fontsize=16)
 
     # Nombres de los meses
     month_names = {1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 6: 'Junio', 7: 'Julio', 8: 'Agosto', 9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'}
-
+    legend_title = "Velocidad (m/s)" if column == 'WSpeed_Avg' else f"{column}"
     # Iterar sobre cada mes y crear una rosa de viento
     for month in range(1, 13):
         ax = axs[(month-1)//3, (month-1)%3]
-        monthly_data = wr_cmul_2024[wr_cmul_2024['yyyy-mm-dd HH:MM:SS'].dt.month == month]
-        wind_data = monthly_data[['WSpeed_Avg', 'WDir_Avg']].dropna()
+        monthly_data = wr_cmul_2024[wr_cmul_2024[timestamp].dt.month == month]
+        wind_data = monthly_data[['WDir_Avg', column]].dropna()
 
         if not wind_data.empty:
-            ax.bar(wind_data['WDir_Avg'], wind_data['WSpeed_Avg'], normed=True, opening=0.8, edgecolor='white', bins=4)
-            ax.set_title(month_names[month], fontsize=10, pad=10)  # Ajustar la posición del título
-            #ax.set_rlabel_position(-50)  # Ajustar la posición de las etiquetas de los ticks r
-            ax.yaxis.set_tick_params(direction='in')
-            ax.xaxis.set_tick_params(direction='in')
+            ax.bar(wind_data['WDir_Avg'], wind_data[column], normed=True, opening=0.8, edgecolor='white', bins=4)
+            ax.set_title(f'\n{month_names[month]}', fontsize=10, pad=10)  # Ajustar la posición del título
+            # Configurar las etiquetas cardinales
+            ax.xaxis.set_ticklabels(['E', 'NE', 'N', 'NW', 'W', 'SW', 'S', 'SE'])
+            ax.xaxis.set_tick_params(labelsize=5)  
+            ax.yaxis.set_tick_params(labelsize=5)
+            ax.tick_params(axis='both', which='major', pad=-5)
+            ax.legend(title=legend_title, title_fontsize=8, loc="lower right", 
+                     bbox_to_anchor=(0.5, -0.1), prop={'size': 5})
         else:
             ax.set_title(month_names[month], fontsize=10, pad=10)  # Ajustar la posición del título
             ax.text(0.5, 0.5, 'No Data', horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
+            # Configurar las etiquetas cardinales también para gráficos vacíos
+            ax.xaxis.set_ticklabels(['E', 'NE', 'N', 'NW', 'W', 'SW', 'S', 'SE'])
+            ax.xaxis.set_tick_params(labelsize=4)  
+            ax.yaxis.set_tick_params(labelsize=4)
+            ax.tick_params(axis='both', which='major', pad=-5)
 
-    # Crear una leyenda global
-    handles, labels = ax.get_legend_handles_labels()
-    fig.legend(handles, labels, title="Velocidad (m/s)", title_fontsize=10, loc="lower center", bbox_to_anchor=(0.5, -0.05), ncol=4, prop={'size': 10})
 
     # Ajustar el espaciado entre los subplots
     plt.subplots_adjust(hspace=0.9, wspace=0.2)
 
     plt.tight_layout(rect=[0, 0, 1, 0.96])
     plt.show()
-
-
-
-
-
-import seaborn as sns
-
-
-def met_windrose_sns(wr_cmul):
-    """
-    Esta función toma un DataFrame y plotea rosas de viento en un subplot de 4x3 para cada mes de 2024 utilizando Seaborn para la configuración de estilo.
-    """
-    # Configurar el estilo de Seaborn
-    sns.set(style="whitegrid")
-
-    # Filtrar datos para el año 2024
-    wr_cmul_2024 = wr_cmul[wr_cmul['yyyy-mm-dd HH:MM:SS'].dt.year == 2024]
-
-    # Crear una figura con subplots 4x3
-    fig, axs = plt.subplots(4, 3, figsize=(18, 24), subplot_kw={'projection': 'windrose'})
-    fig.suptitle('Rosas de Viento Mensuales para 2024', fontsize=16)
-
-    # Nombres de los meses
-    month_names = {1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 6: 'Junio', 7: 'Julio', 8: 'Agosto', 9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'}
-
-    # Iterar sobre cada mes y crear una rosa de viento
-    for month in range(1, 13):
-        ax = axs[(month-1)//3, (month-1)%3]
-        monthly_data = wr_cmul_2024[wr_cmul_2024['yyyy-mm-dd HH:MM:SS'].dt.month == month]
-        wind_data = monthly_data[['WSpeed_Avg', 'WDir_Avg']].dropna()
-
-        if not wind_data.empty:
-            ax.bar(wind_data['WDir_Avg'], wind_data['WSpeed_Avg'], normed=True, opening=0.8, edgecolor='white', bins=4)
-            ax.set_title(month_names[month], fontsize=10, pad=10)  # Ajustar la posición del título
-            ax.set_rlabel_position(-22.5)  # Ajustar la posición de las etiquetas de los ticks r
-            ax.tick_params(axis='y', direction='in', pad=-15)  # Colocar las etiquetas de los ticks r dentro
-        else:
-            ax.set_title(month_names[month], fontsize=10, pad=10)  # Ajustar la posición del título
-            ax.text(0.5, 0.5, 'No Data', horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
-
-    # Crear una leyenda global
-    #handles, labels = ax.get_legend_handles_labels()
-    #fig.legend(handles, labels, title="Velocidad (m/s)", title_fontsize=10, loc="center", bbox_to_anchor=(0.5, -0.05), ncol=4, prop={'size': 10})
-
-    # Ajustar el espaciado entre los subplots
-    plt.subplots_adjust(hspace=0.9, wspace=0.2)
-
-    plt.tight_layout(rect=[0, 0, 1, 0.96])
-    plt.show()
-
-
-
-def met_windrose1(wr_cmul):
-    """
-    Esta función toma un DataFrame y plotea rosas de viento en un subplot de 4x3 para cada mes de 2024.
-    """
-    # Filtrar datos para el año 2024
-    wr_cmul_2024 = wr_cmul[wr_cmul['yyyy-mm-dd HH:MM:SS'].dt.year == 2024]
-
-    # Crear una figura con subplots 4x3
-    fig, axs = plt.subplots(4, 3, figsize=(18, 12), subplot_kw={'projection': 'windrose'})
-    fig.suptitle('Rosas de Viento Mensuales para 2024', fontsize=16)
-
-    # Nombres de los meses
-    month_names = {1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 6: 'Junio', 7: 'Julio', 8: 'Agosto', 9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'}
-
-    # Iterar sobre cada mes y crear una rosa de viento
-    for month in range(1, 13):
-        ax = axs[(month-1)//3, (month-1)%3]
-        monthly_data = wr_cmul_2024[wr_cmul_2024['yyyy-mm-dd HH:MM:SS'].dt.month == month]
-        wind_data = monthly_data[['WSpeed_Avg', 'WDir_Avg']].dropna()
-
-        if not wind_data.empty:
-            ax.bar(wind_data['WDir_Avg'], wind_data['WSpeed_Avg'], normed=True, opening=0.8, edgecolor='white', bins=4)
-            ax.set_title(month_names[month], fontsize=12)
-            ax.legend(title="Velocidad (m/s)", title_fontsize=8, loc="lower right", bbox_to_anchor=(0.5, 0.1), prop={'size': 7})
-            ax.yaxis.set_ticks_position('inside')
-            ax.yaxis.set_tick_params(direction='in', length=6)
-
-        else:
-            ax.set_title(month_names[month], fontsize=12)
-            ax.text(0.5, 0.5, 'No Data', horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
-
-    plt.tight_layout(rect=[0, 0, 1, 0.96])
-    plt.show()
-
-
-
 
 
 
@@ -348,13 +280,7 @@ def met_windrose1(wr_cmul):
 
 def plot_windrose(df, column):
     """
-    Prepares and plots a windrose using the specified column.
-
-    Parameters:
-        df (pd.DataFrame): The input DataFrame containing wind data.
-        column (str): The column to plot (e.g., wind speed or pollutant concentration).
-
-    Returns:
+  
         None
     """
     if 'WDir_Avg' not in df.columns:
@@ -699,6 +625,76 @@ def plot_wr_timeseries_date2(df, columns, inicio=None, fin=None, rmax=None):
         windrose_data = df[['WDir_Avg', column]].dropna()
         ax2.bar(windrose_data['WDir_Avg'], windrose_data[column], normed=True, opening=0.8, edgecolor='white', bins=4)
         ax2.legend(title=f"CO$_{{2}}$ (ppm)" if column == 'CO2_Avg' else f"CH$_{{4}}$ (ppm)" if column == 'CH4_Avg' else column, title_fontsize=6, loc="center left", bbox_to_anchor=(1, 0.5), prop={'size': 7})
+
+        # labels windrose
+        ax2.xaxis.set_ticklabels(['E', 'NE', 'N', 'NW', 'W', 'SW', 'S', 'SE'])
+        ax2.xaxis.set_tick_params(labelsize=8)  
+        ax2.yaxis.set_tick_params(labelsize=8)
+        ax2.tick_params(axis='both', which='major', pad=-20)  
+
+    plt.tight_layout(rect=[0, 0, 1, 0.93])
+    plt.show()
+
+
+
+
+
+
+def plot_wr_timeseries_date3(df, columns, inicio=None, fin=None, rmax=None, cuartil=None):
+    if 'Time' not in df.columns:
+        raise ValueError("The DataFrame must contain a 'Time' column for the x-axis of the time series.")
+    if 'WDir_Avg' not in df.columns:
+        raise ValueError("The DataFrame must contain a 'WDir_Avg' column for wind direction.")
+    for column in columns:
+        if column not in df.columns:
+            raise ValueError(f"The specified column '{column}' is not in the DataFrame.")
+
+    if inicio is not None:
+        inicio = pd.to_datetime(inicio)
+        df = df[df['Time'] >= inicio]
+    if fin is not None:
+        fin = pd.to_datetime(fin)
+        df = df[df['Time'] <= fin]
+
+    if df.empty:
+        raise ValueError("The filtered DataFrame is empty. Check your 'inicio' and 'fin' values.")
+
+    n = len(columns)
+    fig = plt.figure(figsize=(10, 3 * n))
+    fig.suptitle('Serie de tiempo y dirección de viento, Calakmul', fontsize=16, y=0.95)
+
+    shared_ax = None
+
+    for i, column in enumerate(columns):
+        row_start = i * 3 + 1
+
+        ax1 = plt.subplot(n, 3, (row_start, row_start + 1), sharex=shared_ax)
+        if shared_ax is None:
+            shared_ax = ax1
+        ax1.plot(df['Time'], df[column], label=f"CO$_{{2}}$ (ppm)" if column == 'CO2_Avg' else f"CH$_{{4}}$ (ppm)" if column == 'CH4_Avg' else column, color='blue')
+        
+        ax1.set_ylabel(f"CO$_{{2}}$ (ppm)" if column == 'CO2_Avg' else f"CH$_{{4}}$ (ppm)" if column == 'CH4_Avg' else column)
+        ax1.grid(True)
+        ax1.legend()
+
+        ax2 = plt.subplot(n, 3, row_start + 2, projection="windrose")
+        windrose_data = df[['WDir_Avg', column]].dropna()
+        
+        # Filter data based on quartile if provided
+        if cuartil is not None:
+            if cuartil <= 0 or cuartil >= 100:
+                raise ValueError("Cuartil must be a value between 0 and 100")
+            
+            threshold = np.percentile(windrose_data[column], cuartil)
+            windrose_data = windrose_data[windrose_data[column] >= threshold]
+            quartile_title = f" (>{cuartil}%)"
+        else:
+            quartile_title = ""
+            
+        ax2.bar(windrose_data['WDir_Avg'], windrose_data[column], normed=True, opening=0.8, edgecolor='white', bins=4)
+        
+        title_text = f"CO$_{{2}}$ (ppm){quartile_title}" if column == 'CO2_Avg' else f"CH$_{{4}}$ (ppm){quartile_title}" if column == 'CH4_Avg' else f"{column}{quartile_title}"
+        ax2.legend(title=title_text, title_fontsize=6, loc="center left", bbox_to_anchor=(1, 0.5), prop={'size': 7})
 
         # labels windrose
         ax2.xaxis.set_ticklabels(['E', 'NE', 'N', 'NW', 'W', 'SW', 'S', 'SE'])

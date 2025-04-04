@@ -34,26 +34,23 @@ print(cmul.columns)
 
 
 
+#print(cmul.describe())
 
+max_co2 = cmul['CO2_Avg'].max()
+max_ch4 = cmul['CH4_Avg'].max()
+max_co = cmul['CO_Avg'].max()
+max_pm10 = cmul['PM10 Conc'].max()
+max_pm25 = cmul['PM2.5 Conc'].max()
 
 
 
 # por intervalos
-intervals = {'CO2_Avg': (500, 550),'CH4_Avg': (2.2, 2.4)}
+intervals = {'CO2_Avg': (600, max_co2),'CH4_Avg': (2.2, max_ch4)}
     
     
-#plot_windrose_subplots_intervalos(gei_met, columns=['CO2_Avg', 'CH4_Avg'], intervals=intervals)
+plot_windrose_subplots_intervalos(cmul, columns=['CO2_Avg', 'CH4_Avg'], intervals=intervals)
 
 
-
-
-
-# Para una sola columna
-#plot_wr_timeseries_dynamic(gei_met, columns=['CO2_Avg'])
-
-# Para múltiples columnas
-#plot_wr_timeseries_dynamic(gei_met, columns=['CO2_Avg', 'CH4_Avg', 'CO_Avg'])
-
-
-plot_wr_timeseries_date2(cmul, columns=['CO2_Avg', 'CH4_Avg','PM10 Conc','PM2.5 Conc'], inicio='2024-01-06 23:00:00', fin='2024-01-07 00:00:00')# Para una sola columna con intervalo de fechas
-
+#met_windrose(cmul, timestamp='Time',column='CO2_Avg')
+#plot_wr_timeseries_date2(cmul, columns=['CO2_Avg', 'CH4_Avg','PM10 Conc','PM2.5 Conc'], inicio='2024-08-25 23:00:00', fin='2024-08-26 00:00:00')# Para una sola columna con intervalo de fechas
+#plot_wr_timeseries_date3(cmul, ['CO2_Avg', 'CH4_Avg'], cuartil=90)

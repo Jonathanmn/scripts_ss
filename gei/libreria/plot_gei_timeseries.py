@@ -9,7 +9,7 @@ from picarro import *
 
 #folder_path = '/home/jmn/L1/minuto/2024'
 
-folder_path = '/home/jmn/L1_umbrales/L1/minuto/2024'
+folder_path = './DATOS/gei/L1/minuto/2024' 
 
 #gei = read_raw_lite(folder_path, 'Time')
 gei = read_L0_or_L1(folder_path, 'yyyy-mm-dd HH:MM:SS', header=7)
@@ -19,7 +19,7 @@ print(gei.head())
 #gei=umbrales_sd(gei)
 
 
-folder_pathb='/home/jmn/L1b/minuto/2024'
+folder_pathb='./DATOS/gei/L1b/minuto/2024'
 
 geib = read_L0_or_L1(folder_pathb, 'yyyy-mm-dd HH:MM:SS', header=7)
 geib = reverse_rename_columns(geib)
@@ -34,7 +34,7 @@ geib['Time'] = pd.to_datetime(geib['Time'])
 
 
 
-#plot_1min_sd(gei, CO2=True, CH4=True, CO=False, SD=True,start_month=1, end_month=12, year=2024)
+plot_1min_sd(gei, CO2=True, CH4=True, CO=False, SD=True,start_month=1, end_month=12, year=2024)
 
 #plot_1min_sd_comparison(gei, df2=geib, CO2=True, CH4=False, CO=False, SD=True, start_month=None, end_month=None, year=2024)
 
