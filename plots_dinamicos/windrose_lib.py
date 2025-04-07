@@ -219,7 +219,7 @@ def rosa_pm(wr_cmul):
 
 
 
-def met_windrose(wr_cmul, timestamp='yyyy-mm-dd HH:MM:SS', column='WSpeed_Avg'):
+def met_windrose(wr_cmul, timestamp='yyyy-mm-dd HH:MM:SS', column='WSpeed_Avg', interval=None):
     """
     Esta función toma un DataFrame y plotea rosas de viento en un subplot de 4x3 para cada mes de 2024.
     
@@ -231,6 +231,12 @@ def met_windrose(wr_cmul, timestamp='yyyy-mm-dd HH:MM:SS', column='WSpeed_Avg'):
 
     # Filtrar datos para el año 2024
     wr_cmul_2024 = wr_cmul[wr_cmul[timestamp].dt.year == 2024]
+
+    if interval:
+        min_val, max_val = interval
+        wr_cmul_2024 = wr_cmul_2024[(wr_cmul_2024[column] >= min_val) & (wr_cmul_2024[column] <= max_val)]
+
+
 
     # Crear una figura con subplots 4x3
     fig, axs = plt.subplots(4, 3, figsize=(9, 15), subplot_kw={'projection': 'windrose'})
@@ -306,16 +312,8 @@ def plot_windrose(df, column):
 
 def plot_windrose_subplots_intervalos(df, columns, intervals=None):
     """
-    Prepares and plots windrose subplots for the specified columns, with optional filtering by value intervals.
-
-    Parameters:
-        df (pd.DataFrame): The input DataFrame containing wind data.
-        columns (list of str): List of columns to plot (e.g., wind speed or pollutant concentrations).
-        intervals (dict, optional): A dictionary where keys are column names and values are tuples specifying
-                                     the (min, max) range to filter the data for that column.
-
-    Returns:
-        None
+    plotea rosas de viento para cada mes de 2024, donde se filtra por intervalo
+    los palametros de la rosa de viento son:
     """
     if 'WDir_Avg' not in df.columns:
         raise ValueError("The DataFrame must contain a 'WDir_Avg' column for wind direction.")
