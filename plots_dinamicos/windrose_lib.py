@@ -9,6 +9,7 @@ from windrose import WindroseAxes
 from datetime import datetime
 from pathlib import Path
 
+from matplotlib import cm
 
 
 #datos de GEI
@@ -281,6 +282,79 @@ def met_windrose(wr_cmul, timestamp='yyyy-mm-dd HH:MM:SS', column='WSpeed_Avg', 
 
     plt.tight_layout(rect=[0, 0, 1, 0.96])
     plt.show()
+
+
+
+
+def met_windrose2(wr_cmul, timestamp='yyyy-mm-dd HH:MM:SS', column='WSpeed_Avg', interval=None):
+    """
+    Esta función toma un DataFrame y plotea rosas de viento en un subplot de 4x3 para cada mes de 2024.
+    Usa el método contourf para crear rosas de viento con contornos rellenos.
+    
+    Parameters:
+        wr_cmul (pd.DataFrame): DataFrame con datos de viento
+        timestamp (str): Nombre de la columna que contiene los datos de fecha y hora (por defecto: 'yyyy-mm-dd HH:MM:SS')
+        column (str): Nombre de la columna a plotear en las rosas de viento (por defecto: 'WSpeed_Avg')
+        interval (tuple, optional): Intervalo (min_val, max_val) para filtrar los datos
+    """
+
+    # Filtrar datos para el año 2024
+    wr_cmul_2024 = wr_cmul[wr_cmul[timestamp].dt.year == 2024]
+
+    # Aplicar filtro por intervalo si se especifica
+    if interval:
+        min_val, max_val = interval
+        wr_cmul_2024 = wr_cmul_2024[(wr_cmul_2024[column] >= min_val) & (wr_cmul_2024[column] <= max_val)]
+
+    # Crear una figura con subplots 4x3
+    fig, axs = plt.subplots(4, 3, figsize=(9, 15), subplot_kw={'projection': 'windrose'})
+    
+    # Título dinámico basado en la columna elegida
+    if column == 'WSpeed_Avg':
+        fig.suptitle('Rosas de Viento Mensuales para 2024', fontsize=16)
+    else:
+        fig.suptitle(f'Rosas de Viento Mensuales para {column} - 2024', fontsize=16)
+
+    # Nombres de los meses
+    month_names = {1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 6: 'Junio', 7: 'Julio', 8: 'Agosto', 9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'}
+    legend_title = "Velocidad (m/s)" if column == 'WSpeed_Avg' else f"{column}"
+    
+    # Iterar sobre cada mes y crear una rosa de viento
+    for month in range(1, 13):
+        ax = axs[(month-1)//3, (month-1)%3]
+        monthly_data = wr_cmul_2024[wr_cmul_2024[timestamp].dt.month == month]
+        wind_data = monthly_data[['WDir_Avg', column]].dropna()
+
+        if not wind_data.empty:
+            # Cambio de bar a contourf
+            ax.contourf(wind_data['WDir_Avg'], wind_data[column], bins=4, cmap=cm.hot, normed=True)
+            ax.set_title(f'\n{month_names[month]}', fontsize=10, pad=10)  # Ajustar la posición del título
+            
+            
+            
+            # Configurar las etiquetas cardinales
+            ax.xaxis.set_ticklabels(['E', 'NE', 'N', 'NW', 'W', 'SW', 'S', 'SE'])
+            ax.xaxis.set_tick_params(labelsize=5)  
+            ax.yaxis.set_tick_params(labelsize=5)
+            ax.tick_params(axis='both', which='major', pad=-5)
+            ax.legend(title=legend_title, title_fontsize=8, loc="lower right", 
+                     bbox_to_anchor=(0.5, -0.1), prop={'size': 5})
+        else:
+            ax.set_title(month_names[month], fontsize=10, pad=10)  # Ajustar la posición del título
+            ax.text(0.5, 0.5, 'No Data', horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
+            # Configurar las etiquetas cardinales también para gráficos vacíos
+            ax.xaxis.set_ticklabels(['E', 'NE', 'N', 'NW', 'W', 'SW', 'S', 'SE'])
+            ax.xaxis.set_tick_params(labelsize=4)  
+            ax.yaxis.set_tick_params(labelsize=4)
+            ax.tick_params(axis='both', which='major', pad=-5)
+
+    # Ajustar el espaciado entre los subplots
+    plt.subplots_adjust(hspace=0.9, wspace=0.2)
+
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
+    plt.show()
+
+
 
 
 # rosas de viento de gei pm
