@@ -639,8 +639,7 @@ def plot_wr_timeseries_date2(df, columns, inicio=None, fin=None, rmax=None):
 
 
 
-
-def plot_wr_timeseries_date3(df, columns, inicio=None, fin=None, rmax=None, cuartil=None):
+def plot_wr_timeseries_date3(df, columns, inicio=None, fin=None, rmax=None):
     if 'Time' not in df.columns:
         raise ValueError("The DataFrame must contain a 'Time' column for the x-axis of the time series.")
     if 'WDir_Avg' not in df.columns:
@@ -676,25 +675,27 @@ def plot_wr_timeseries_date3(df, columns, inicio=None, fin=None, rmax=None, cuar
         ax1.set_ylabel(f"CO$_{{2}}$ (ppm)" if column == 'CO2_Avg' else f"CH$_{{4}}$ (ppm)" if column == 'CH4_Avg' else column)
         ax1.grid(True)
         ax1.legend()
+        ax1.legend()
+
+    # borrar ticks 
+        if i < n - 1:  
+            ax1.tick_params(labelbottom=False)  
+
+        
+        max_value = df[column].max()
+        avg_value = df[column].mean()
+        ax1.text(0.1, 1.05, f"Max: {max_value:.2f}, Avg: {avg_value:.2f}", 
+             ha='center', va='center', fontsize=6, color='black', transform=ax1.transAxes,
+             bbox=dict(facecolor='white', alpha=1, boxstyle='round'))
+        
+        #windorose
+
+
 
         ax2 = plt.subplot(n, 3, row_start + 2, projection="windrose")
         windrose_data = df[['WDir_Avg', column]].dropna()
-        
-        # Filter data based on quartile if provided
-        if cuartil is not None:
-            if cuartil <= 0 or cuartil >= 100:
-                raise ValueError("Cuartil must be a value between 0 and 100")
-            
-            threshold = np.percentile(windrose_data[column], cuartil)
-            windrose_data = windrose_data[windrose_data[column] >= threshold]
-            quartile_title = f" (>{cuartil}%)"
-        else:
-            quartile_title = ""
-            
         ax2.bar(windrose_data['WDir_Avg'], windrose_data[column], normed=True, opening=0.8, edgecolor='white', bins=4)
-        
-        title_text = f"CO$_{{2}}$ (ppm){quartile_title}" if column == 'CO2_Avg' else f"CH$_{{4}}$ (ppm){quartile_title}" if column == 'CH4_Avg' else f"{column}{quartile_title}"
-        ax2.legend(title=title_text, title_fontsize=6, loc="center left", bbox_to_anchor=(1, 0.5), prop={'size': 7})
+        ax2.legend(title=f"CO$_{{2}}$ (ppm)" if column == 'CO2_Avg' else f"CH$_{{4}}$ (ppm)" if column == 'CH4_Avg' else column, title_fontsize=6, loc="center left", bbox_to_anchor=(1, 0.5), prop={'size': 7})
 
         # labels windrose
         ax2.xaxis.set_ticklabels(['E', 'NE', 'N', 'NW', 'W', 'SW', 'S', 'SE'])

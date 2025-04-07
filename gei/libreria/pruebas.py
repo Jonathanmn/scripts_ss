@@ -117,3 +117,15 @@ plt.tight_layout()
 plt.show()
 
 
+import matplotlib.pyplot as plt
+
+# Sample data
+x = [1, 2, 3, 4, 5]
+y = [2, 3, 5, 7, 11]
+
+plt.plot(x, y)
+
+# Move x-axis labels to the top and hide bottom labels
+plt.tick_params(axis='x', labeltop=True, labelbottom=False)
+
+plt.show()
