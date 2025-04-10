@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+<html>
+<head>
+<title>Spectroscopy and Remote Sensing - CCA - UNAM</title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+  <meta name="description" content="CCA - UNAM">
+  <meta name="keywords"
+ content="Centro de Ciencias de la Atmosfera, UNAM, Mexico City, Spectroscopy, Remote Sensing">
+ <script type="text/javascript">
+	function getAllUrlParams(url) {
+
+		// obtener la cadena de consulta de la url
+		var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
+
+		// se almacenarán los parámetros aquí:
+		var obj = {};
+
+		// si la cadena existe
+		if (queryString) {
+
+			// si los caracteres o strings después de # no son parte de la cadena de consulta, hay que deshacernos de eso!
+			queryString = queryString.split('#')[0];
+
+			// dividir nuestra cadena de consulta en sus componentes 
+			var arr = queryString.split('&');
+
+			for (var i = 0; i < arr.length; i++) {
+				// separar las claves y los valores (par/valor)
+				var a = arr[i].split('=');
+
+				// establecer el parámetro nombre y valor (usar 'true' si está vacío)
+				var paramName = a[0];
+				var paramValue = typeof (a[1]) === 'undefined' ? true : a[1];
+
+				//convertir a minúsculasBue
+				//paramName = paramName.toLowerCase();
+				//if (typeof paramValue === 'string') paramValue = paramValue.toLowerCase();
+
+				// si el nombre del parámetro termina con [], 
+				if (paramName.match(/\[(\d+)?\]$/)) {
+
+					// crear la llave si no existe
+					var key = paramName.replace(/\[(\d+)?\]/, '');
+					if (!obj[key]) obj[key] = [];
+
+					if (paramName.match(/\[\d+\]$/)) {
+						var index = /\[(\d+)\]/.exec(paramName)[1];
+						obj[key][index] = paramValue;
+					} else 
+						{
+							obj[key].push(paramValue);
+						}
+				} else {
+							// cuando nos toque manejar un string
+							if (!obj[paramName]) {
+									// sino existe, crear la propiedad
+									obj[paramName] = paramValue;
+							} else if (obj[paramName] && typeof obj[paramName] === 'string'){
+										// si la propiedad existe y es un string, convertirlo a un arreglo
+										obj[paramName] = [obj[paramName]];
+										obj[paramName].push(paramValue);
+									} else {
+												// sino, agregarle la propiedad
+												obj[paramName].push(paramValue);
+											}
+						}
+			}
+		}
+
+		return obj;
+	}
+
+	
+	//Función que llama a la función anterior "getAllUrlParams() obtiene el nombre de la página que se requiere (dada en la url) 
+	//y la manda a llamar en el frame principal"
+	function LoadPage(resultado){
+		
+		// el resultado para este caso será: pandora
+		var resultado= getAllUrlParams().pagina;  
+		//alert(resultado);
+		
+		if(resultado==='pandora'){
+			//si el resultado es igual al nombre de la página que solicitamos, entonces;
+			//mandarla al frame principal			
+			document.getElementById('main').src = resultado;
+		}
+		if(resultado==='doas'){
+			//si el resultado es igual al nombre de la página que solicitamos, entonces;
+			//mandarla al frame principal			
+			document.getElementById('main').src = resultado;
+		}
+		if(resultado==='volcanoes'){
+			//si el resultado es igual al nombre de la página que solicitamos, entonces;
+			//mandarla al frame principal			
+			document.getElementById('main').src = resultado;
+		}
+		if(resultado==='miembros.html'){
+			//si el resultado es igual al nombre de la página que solicitamos, entonces;
+			//mandarla al frame principal			
+			document.getElementById('main').src = resultado;
+		}
+                if(resultado==='UNAM'){
+                        //si el resultado es igual al nombre de la p?gina que solicitamos, entonces;
+                        //mandarla al frame principal                   
+                        document.getElementById('main').src = resultado;
+                }
+		else{
+			
+			//sino dejarla como estaba (inicio.htm)
+			document.getElementById('main').src = inicio.htm;
+			}
+		
+	}
+
+ </script>
+</head>
+
+<frameset cols="150,*" border="0" frameborder="0">
+	<frame src="directorio.htm" id="menu" noresize="noresize" vscrolling="yes">
+		<frameset rows="170,*" border="0" frameborder="0" onload="LoadPage();">
+			<frame src="titulo.htm" noresize="noresize" scrolling="no">
+			<frame src="inicio.htm" id="main" name="main" noresize="noresize" vscrolling="yes">
+		</frameset>
+</frameset>
+<script>
+
+</script>
+</html>
