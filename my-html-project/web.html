@@ -25,9 +25,10 @@
         aside {
             width: 250px;
             padding: 20px;
-            background-color: #e8f4ff;
+            background-color: #b2d1ee;
             border-right: 1px solid #ccc;
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            transition: width 0.3s ease; /* Add smooth transition */
         }
         
         aside ul {
@@ -105,51 +106,70 @@
         
         /* Media queries mejorados para diferentes tamaños de pantalla */
         @media (max-width: 992px) {
-            .header-main h1 {
-                font-size: 20px; /* Reduce el tamaño de la fuente */
-                width: 50%; /* Reduce el ancho para dar más espacio */
-            }
-            
-            .logo-left, .logo-right {
-                max-height: 50px; /* Reduce el tamaño de los logos */
+            aside {
+                width: 200px; /* Reduce sidebar width on medium screens */
+                padding: 15px;
             }
         }
         
         @media (max-width: 768px) {
-            .header-main {
-                flex-direction: row; /* Mantiene la dirección en fila */
-                justify-content: space-between;
-                padding: 10px 0;
-                flex-wrap: wrap; /* Permite que los elementos se envuelvan si es necesario */
+            .container {
+                flex-direction: column;
             }
             
-            .header-main h1 {
-                position: relative; /* Cambia a posicionamiento normal */
-                left: auto;
-                transform: none;
-                order: 3; /* Coloca el título después de los logos */
-                width: 100%; /* Usa todo el ancho */
-                margin: 15px 0 5px; /* Agrega margen arriba y abajo */
-                font-size: 18px; /* Reduce aún más el tamaño en móviles */
+            aside {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #ccc;
             }
             
-            .logo-left {
-                order: 1; /* El logo izquierdo aparece primero */
-                max-height: 40px;
+            /* Create horizontal menu for tablets */
+            aside ul {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
             }
             
-            .logo-right {
-                order: 2; /* El logo derecho aparece segundo */
-                max-height: 40px;
-                margin-left: 0; /* Elimina el margen automático */
+            aside li {
+                margin: 0 10px 10px 0;
+            }
+            
+            aside a {
+                padding: 5px 10px;
+                background-color: #e6f0fa;
+                border-radius: 4px;
             }
         }
         
         @media (max-width: 576px) {
+            /* Further adjustments for very small screens */
+            aside {
+                padding: 10px;
+            }
+            
+            aside h3 {
+                font-size: 16px;
+                margin-bottom: 10px;
+            }
+            
+            aside ul {
+                justify-content: flex-start;
+            }
+            
+            aside li {
+                margin: 0 8px 8px 0;
+                width: calc(50% - 8px); /* Make links take approximately half width */
+            }
+            
+            aside a {
+                text-align: center;
+                font-size: 14px;
+            }
+            
             .station-grid {
                 display: block; /* Cambia el diseño de grid a bloque */
             }
-              
+            
             .station-card {
                 margin-bottom: 20px; /* Espacio entre tarjetas */
             }
@@ -182,17 +202,58 @@
             font-size: 14px;
             color: #666;
         }
+
+        /* Estilos para submenús */
+        .submenu {
+            margin-left: 15px;
+            margin-top: 5px;
+            list-style-type: none;
+            padding: 0;
+            display: none; /* Hidden by default */
+        }
         
-        /* Estilos para hacerlo responsive */
+        .menu-item-with-submenu > a {
+            position: relative;
+        }
+        
+        .menu-item-with-submenu > a:after {
+            content: "▼";
+            font-size: 10px;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+        
+        .menu-item-with-submenu.active .submenu {
+            display: block;
+        }
+        
+        .submenu li {
+            margin-bottom: 8px;
+        }
+        
+        .submenu a {
+            padding: 4px 0;
+            font-size: 0.95em;
+        }
+        
+        /* For mobile views */
         @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
+            .submenu {
+                margin-left: 0;
+                margin-top: 10px;
+                width: 100%;
             }
             
-            aside {
+            .menu-item-with-submenu.active {
                 width: 100%;
-                border-right: none;
-                border-bottom: 1px solid #ccc;
+            }
+            
+            .submenu li {
+                margin: 0 10px 10px 0;
+            }
+            
+            .submenu a {
+                background-color: #d9eafa;
             }
         }
     </style>
@@ -201,7 +262,7 @@
 	<header>
 	    <div class="header-main">
 	        <img src="img/icacc.png" alt="ICAyCC Logo" class="logo-left">
-	        <h1>Spectroscopy and Remote Sensing - CCA - UNAM</h1>
+	        <h1>Spectroscopy and Remote Sensing</h1>
 	        <img src="img/unam_vector.png" alt="UNAM Logo" class="logo-right">
 	    </div>
 	    <div class="header-spectrum">
@@ -210,12 +271,18 @@
 	</header>
 	
     <div class="container">
-        <!-- Aside mejorado -->
+        <!-- Aside mejorado con opciones anidadas -->
         <aside>
             <h3>Temas</h3>
             <ul>
                 <li><a href="#" class="page-link" data-page="home-section">Inicio</a></li>
-                <li><a href="#" class="page-link" data-page="estaciones">Estaciones</a></li>
+                <li class="menu-item-with-submenu">
+                    <a href="#" class="page-link" data-page="estaciones">Estaciones</a>
+                    <ul class="submenu">
+                        <li><a href="#" class="page-link" data-page="estacion-cca">Estación CCA</a></li>
+                        <li><a href="#" class="page-link" data-page="estacion-popo">Estación Popocatépetl</a></li>
+                    </ul>
+                </li>
                 <li><a href="#" class="page-link" data-page="instrumental">Instrumental</a></li>
                 <li><a href="#" class="page-link" data-page="miembros">Miembros</a></li>
                 <li><a href="https://www.google.com" target="_blank">Buscar</a></li>
@@ -281,6 +348,51 @@
                         </div>
                     </div>
                 </section>
+                
+                <!-- Nueva sección para Estación CCA -->
+                <section id="estacion-cca" class="page-section">
+                    <h2>Estación CCA</h2>
+                    <p>Detalles de la estación ubicada en Ciudad Universitaria.</p>
+                    <div class="station-detail">
+                        <h3>Ubicación</h3>
+                        <p>Ciudad Universitaria, Ciudad de México</p>
+                        <p>Coordenadas: 19.32° N, 99.17° W</p>
+                        
+                        <h3>Instrumentación</h3>
+                        <ul>
+                            <li><strong>DOAS:</strong> Monitoreo continuo de gases traza</li>
+                            <li><strong>MAX-DOAS:</strong> Mediciones de perfiles verticales</li>
+                            <li><strong>Pandora:</strong> Columnas totales de O3 y NO2</li>
+                        </ul>
+                        
+                        <figure>
+                            <img src="img/laboratory.jpg" alt="Estación CCA" width="500">
+                            <figcaption>Instrumentación en la estación CCA</figcaption>
+                        </figure>
+                    </div>
+                </section>
+                
+                <!-- Nueva sección para Estación Popocatépetl -->
+                <section id="estacion-popo" class="page-section">
+                    <h2>Estación Popocatépetl</h2>
+                    <p>Detalles de la estación de monitoreo volcánico.</p>
+                    <div class="station-detail">
+                        <h3>Ubicación</h3>
+                        <p>Paso de Cortés, Estado de México</p>
+                        <p>Elevación: 3,700 msnm</p>
+                        
+                        <h3>Instrumentación</h3>
+                        <ul>
+                            <li><strong>Mini-DOAS:</strong> Medición de emisiones de SO2</li>
+                            <li><strong>Sensores de gas:</strong> Monitoreo de gases volcánicos</li>
+                        </ul>
+                        
+                        <figure>
+                            <img src="img/laboratory.jpg" alt="Estación Popocatépetl" width="500">
+                            <figcaption>Instrumentación en la estación del Popocatépetl</figcaption>
+                        </figure>
+                    </div>
+                </section>
             </main>
         </div>
     </div>
@@ -296,6 +408,22 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Obtener todos los enlaces de navegación
             const pageLinks = document.querySelectorAll('.page-link');
+            const menuItemsWithSubmenu = document.querySelectorAll('.menu-item-with-submenu > a');
+            
+            // Toggle para submenús
+            menuItemsWithSubmenu.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const parent = this.parentElement;
+                    parent.classList.toggle('active');
+                    
+                    // Si el menú principal ya tiene un data-page, cárgalo
+                    const pageId = this.getAttribute('data-page');
+                    if (pageId) {
+                        updateContent(pageId);
+                    }
+                });
+            });
             
             // Función para actualizar URL con parámetros sin recargar la página
             function updateURL(pageId) {
@@ -304,47 +432,57 @@
                 window.history.pushState({}, '', url);
             }
             
-            // Verificar si hay un parámetro pagina en la URL al cargar
-            const urlParams = new URLSearchParams(window.location.search);
-            const pageParam = urlParams.get('pagina');
-            
-            if (pageParam) {
+            // Función para actualizar el contenido
+            function updateContent(pageId) {
+                // Actualizar URL con el parámetro
+                updateURL(pageId);
+                
                 // Ocultar todas las secciones
                 document.querySelectorAll('.page-section').forEach(section => {
                     section.classList.remove('active');
                 });
                 
+                // Mostrar la sección seleccionada
+                document.getElementById(pageId).classList.add('active');
+                
+                // Hacer scroll al inicio de la sección
+                window.scrollTo(0, 0);
+            }
+            
+            // Verificar si hay un parámetro pagina en la URL al cargar
+            const urlParams = new URLSearchParams(window.location.search);
+            const pageParam = urlParams.get('pagina');
+            
+            if (pageParam) {
                 // Mostrar la sección solicitada si existe
                 const targetSection = document.getElementById(pageParam);
                 if (targetSection) {
+                    document.querySelectorAll('.page-section').forEach(section => {
+                        section.classList.remove('active');
+                    });
                     targetSection.classList.add('active');
-                } else {
-                    // Si no existe, mostrar la sección home
-                    document.getElementById('home-section').classList.add('active');
+                    
+                    // Si es una subsección, mostrar el submenú
+                    if (pageParam.includes('estacion-')) {
+                        document.querySelector('.menu-item-with-submenu').classList.add('active');
+                    }
                 }
             }
             
             // Añadir evento click a cada enlace
             pageLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
+                    if (this.parentElement.classList.contains('submenu')) {
+                        e.stopPropagation(); // Evita que se propague al elemento padre
+                    }
+                    
                     e.preventDefault(); // Prevenir el comportamiento predeterminado del enlace
                     
                     // Obtener el ID de la página a mostrar
                     const pageId = this.getAttribute('data-page');
                     
-                    // Actualizar URL con el parámetro
-                    updateURL(pageId);
-                    
-                    // Ocultar todas las secciones
-                    document.querySelectorAll('.page-section').forEach(section => {
-                        section.classList.remove('active');
-                    });
-                    
-                    // Mostrar la sección seleccionada
-                    document.getElementById(pageId).classList.add('active');
-                    
-                    // Hacer scroll al inicio de la sección
-                    window.scrollTo(0, 0);
+                    // Actualizar contenido
+                    updateContent(pageId);
                 });
             });
         });
