@@ -648,3 +648,106 @@ def plot_24h_anual_subplot_comp(df, df2, CO2=None, CH4=None, CO=None, start_mont
 
 
 
+
+def plot_24h_anual_subplot_comp_delta(df, df2, CO2=None, CH4=None, CO=None, start_month=1, end_month=12):
+    """
+    Esta función resamplea dos DataFrames a intervalos de 1 hora, agrupa los datos por mes y hora,
+    y plotea los valores promedio de CO2, CH4 y CO en subplots para un período de 24 horas utilizando matplotlib.
+    Cada mes se plotea en un subplot separado en una cuadrícula de 3x4, comparando los dos DataFrames.
+    """
+    if start_month & end_month is not None:
+        df = df[df['Time'].dt.month.between(start_month, end_month)]
+        df2 = df2[df2['Time'].dt.month.between(start_month, end_month)]
+
+    df = df.set_index('Time')
+    df2 = df2.set_index('Time')
+    df_resampled = df.resample('1h').mean()
+    df2_resampled = df2.resample('1h').mean()
+    df_resampled['Hora'] = df_resampled.index.hour
+    df2_resampled['Hora'] = df2_resampled.index.hour
+    df_resampled['Mes'] = df_resampled.index.month
+    df2_resampled['Mes'] = df2_resampled.index.month
+
+    # Calcular el promedio mensual para cada hora del día
+    df_monthly_avg = df_resampled.groupby(['Mes', 'Hora']).mean().reset_index()
+    df2_monthly_avg = df2_resampled.groupby(['Mes', 'Hora']).mean().reset_index()
+    # Calcular el promedio para todo el DataFrame
+    df_avg = df_resampled.groupby('Hora').mean().reset_index()
+    df2_avg = df2_resampled.groupby('Hora').mean().reset_index()
+    # Obtener el año del DataFrame
+    year = df.index.year[0]
+
+    # Diccionario para mapear los números de los meses a sus nombres
+    month_names = {
+        1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 6: 'Junio',
+        7: 'Julio', 8: 'Agosto', 9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'
+    }
+
+    # Contar el número de argumentos no None
+    gases = [(CO2, 'CO2'), (CH4, 'CH4'), (CO, 'CO')]
+    gases = [(gas, label) for gas, label in gases if gas is not None]
+
+    # Crear subplots 3x4
+    fig, axs = plt.subplots(4, 3, figsize=(7, 10), sharey=True, sharex=True)
+
+    # Función para crear el plot de cada gas
+    def plot_gas(ax, df_monthly_avg, df2_monthly_avg, df_avg, df2_avg, gas, label, month):
+        group = df_monthly_avg[df_monthly_avg['Mes'] == month]
+        group2 = df2_monthly_avg[df2_monthly_avg['Mes'] == month]
+        color1 = 'orange'
+        color2 = '#1062b4'
+        month_name = month_names[month]  # Obtener el nombre del mes
+        ax.plot(group['Hora'], group[gas], '-', linewidth=2, color=color1, label=f'L1')
+        ax.plot(group2['Hora'], group2[gas], '-', linewidth=2, color=color2, alpha=0.8, label=f'L1b')
+
+        # Plotear el promedio de todo el DataFrame
+        #ax.plot(df_avg['Hora'], df_avg[gas], 'r--', linewidth=1, label='k')
+        ax.plot(df2_avg['Hora'], df2_avg[gas], 'r--', linewidth=1, label='Promedio Anual L1b')
+
+        ylim_min=df_monthly_avg[gas].min() - 5
+        ylim_max=df_monthly_avg[gas].max() + 5
+
+
+        gasmax=df_monthly_avg[gas].max()
+        gasmin=df_monthly_avg[gas].min()
+        gas_delta=gasmax-gasmin
+
+
+      
+        ax.text(0.05, 0.95, f'Δ CO$_{2}$ ppm = {gas_delta:.1f} ppm', transform=ax.transAxes, fontsize=8,verticalalignment='top')#, bbox=bbox_props)
+
+        # Configurar el plot
+        ax.set_title(f'{month_name}', size=10)
+        #ax.set_xlabel('2024')
+        if label == 'CH4':
+            ax.set_ylabel('CH$_{4}$ (ppb)')
+        else:
+            ax.set_ylabel('CO$_{2}$ (ppm)')
+        ax.grid(True)
+        #ax.legend(loc='upper right', fontsize='x-small')
+
+        ax.set_xticks(range(0, 30, 6))
+        ax.set_xticklabels([f'{hour:02d}' for hour in range(0, 30, 6)], rotation=90)
+        ax.set_ylim([ylim_min, ylim_max])
+
+    # Plotear cada gas individualmente en cada subplot
+    for month in range(start_month, end_month + 1):
+        row = (month - 1) // 3
+        col = (month - 1) % 3
+        for gas, label in gases:
+            plot_gas(axs[row, col], df_monthly_avg, df2_monthly_avg, df_avg, df2_avg, gas, label, month)
+
+
+    for ax in axs.flat:
+        ax.label_outer()
+
+    # Crear una leyenda única para todos los subplots
+    handles, labels = axs[0, 0].get_legend_handles_labels()
+    #fig.legend(handles, labels, loc='upper center', ncol=4, fontsize='small')
+    fig.text(0.5, 0.04, '2024', ha='center', fontsize=12)
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
+    fig.suptitle('Valores mensuales de CO$_{2}$', fontsize=16)
+    fig.subplots_adjust(top=0.88, bottom=0.1)  # Ajustar espacio para la leyenda
+    fig.legend(handles, labels, loc='upper center', ncol=4, fontsize='small', bbox_to_anchor=(0.5, 0.95))
+    plt.show()
+   
