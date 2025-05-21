@@ -24,10 +24,14 @@ gei_b['Time']=pd.to_datetime(gei_b['Time'])
 
 #plot_24h_anual_subplot(gei_b,CO2='CO2_Avg',start_month=1, end_month=12)
 
-plot_24h_anual_subplot_comp(gei, gei_b, CO2='CO2_Avg', start_month=1, end_month=12)
+#plot_24h_anual_subplot_comp(gei, gei_b, CO2='CO2_Avg', start_month=1, end_month=12)
 
 
 
 #ciclo_diurno_mensual_matplot(gei_b, CO2='CO2_Avg', CH4='CH4_Avg',start_month=1, end_month=12)
 
 #plot_24h_anual_subplot_comp_delta(gei, gei_b, CO2='CO2_Avg', start_month=1, end_month=12)
+
+timeseries_delta_per_day(gei_b, CO2='CO2_Avg', start_month=1, end_month=12)
+
+

@@ -649,31 +649,46 @@ def plot_24h_anual_subplot_comp(df, df2, CO2=None, CH4=None, CO=None, start_mont
 
 
 
-def plot_24h_anual_subplot_comp_delta(df, df2, CO2=None, CH4=None, CO=None, start_month=1, end_month=12):
+def plot_24h_anual_subplot_comp_delta(df, df2=None, CO2=None, CH4=None, CO=None, start_month=1, end_month=12):
     """
     Esta función resamplea dos DataFrames a intervalos de 1 hora, agrupa los datos por mes y hora,
     y plotea los valores promedio de CO2, CH4 y CO en subplots para un período de 24 horas utilizando matplotlib.
-    Cada mes se plotea en un subplot separado en una cuadrícula de 3x4, comparando los dos DataFrames.
+    Cada mes se plotea en un subplot separado en una cuadrícula de 3x4.
+    
+    Si df2 está presente, compara los dos DataFrames.
+    Si df2 es None, solo grafica el primero.
+    
+    También muestra el delta (diferencia máxima) de cada mes.
     """
     if start_month & end_month is not None:
         df = df[df['Time'].dt.month.between(start_month, end_month)]
-        df2 = df2[df2['Time'].dt.month.between(start_month, end_month)]
+        if df2 is not None:
+            df2 = df2[df2['Time'].dt.month.between(start_month, end_month)]
 
     df = df.set_index('Time')
-    df2 = df2.set_index('Time')
     df_resampled = df.resample('1h').mean()
-    df2_resampled = df2.resample('1h').mean()
     df_resampled['Hora'] = df_resampled.index.hour
-    df2_resampled['Hora'] = df2_resampled.index.hour
     df_resampled['Mes'] = df_resampled.index.month
-    df2_resampled['Mes'] = df2_resampled.index.month
+    
+    # Procesar el segundo DataFrame solo si está presente
+    if df2 is not None:
+        df2 = df2.set_index('Time')
+        df2_resampled = df2.resample('1h').mean()
+        df2_resampled['Hora'] = df2_resampled.index.hour
+        df2_resampled['Mes'] = df2_resampled.index.month
+        df2_monthly_avg = df2_resampled.groupby(['Mes', 'Hora']).mean().reset_index()
+        df2_avg = df2_resampled.groupby('Hora').mean().reset_index()
+    else:
+        # Crear dataframes vacíos para evitar errores cuando df2 es None
+        df2_monthly_avg = None
+        df2_avg = None
 
-    # Calcular el promedio mensual para cada hora del día
+    # Calcular el promedio mensual para cada hora del día para df
     df_monthly_avg = df_resampled.groupby(['Mes', 'Hora']).mean().reset_index()
-    df2_monthly_avg = df2_resampled.groupby(['Mes', 'Hora']).mean().reset_index()
-    # Calcular el promedio para todo el DataFrame
+    
+    # Calcular el promedio para todo el DataFrame para df
     df_avg = df_resampled.groupby('Hora').mean().reset_index()
-    df2_avg = df2_resampled.groupby('Hora').mean().reset_index()
+    
     # Obtener el año del DataFrame
     year = df.index.year[0]
 
@@ -693,38 +708,57 @@ def plot_24h_anual_subplot_comp_delta(df, df2, CO2=None, CH4=None, CO=None, star
     # Función para crear el plot de cada gas
     def plot_gas(ax, df_monthly_avg, df2_monthly_avg, df_avg, df2_avg, gas, label, month):
         group = df_monthly_avg[df_monthly_avg['Mes'] == month]
-        group2 = df2_monthly_avg[df2_monthly_avg['Mes'] == month]
-        color1 = 'orange'
-        color2 = '#1062b4'
+        
+        # Configurar colores
+        color1 = 'green' if df2 is None else 'orange'
         month_name = month_names[month]  # Obtener el nombre del mes
-        ax.plot(group['Hora'], group[gas], '-', linewidth=2, color=color1, label=f'L1')
-        ax.plot(group2['Hora'], group2[gas], '-', linewidth=2, color=color2, alpha=0.8, label=f'L1b')
+        
+        # Plotear el primer dataset
+        ax.plot(group['Hora'], group[gas], '-', linewidth=2, color=color1, label='Datos' if df2 is None else 'L1')
+        
+        # Calcular el delta (diferencia) entre los valores máximo y mínimo para df
+        delta_df = group[gas].max() - group[gas].min()
+        
+        # Si df2 existe, plotear la comparación
+        if df2_monthly_avg is not None:
+            group2 = df2_monthly_avg[df2_monthly_avg['Mes'] == month]
+            color2 = '#1062b4'
+            ax.plot(group2['Hora'], group2[gas], '-', linewidth=2, color=color2, alpha=0.8, label='L1b')
+            
+            # Plotear el promedio anual del segundo dataset
+            ax.plot(df2_avg['Hora'], df2_avg[gas], 'r--', linewidth=1, label='Promedio Anual L1b')
+            
+            # Calcular delta para df2
+            delta_df2 = group2[gas].max() - group2[gas].min()
+            
+            # Añadir texto con ambos deltas
+            bbox_props = dict(boxstyle="round,pad=0.3", edgecolor="none", facecolor="white", alpha=0.7)
+            ax.text(0.95, 0.05, f'ΔL1: {delta_df:.2f}\nΔL1b: {delta_df2:.2f}', 
+                    transform=ax.transAxes, fontsize=8, 
+                    verticalalignment='bottom', horizontalalignment='right',
+                    bbox=bbox_props)
+        else:
+            # Plotear el promedio anual del primer dataset
+            ax.plot(df_avg['Hora'], df_avg[gas], 'r--', linewidth=1, label='Promedio Anual')
+            
+            # Añadir texto solo con el delta del primer dataset
+            bbox_props = dict(boxstyle="round,pad=0.3", edgecolor="none", facecolor="white", alpha=0.7)
+            ax.text(0.95, 0.05, f'Δ: {delta_df:.2f}', 
+                    transform=ax.transAxes, fontsize=8, 
+                    verticalalignment='bottom', horizontalalignment='right',
+                    bbox=bbox_props)
 
-        # Plotear el promedio de todo el DataFrame
-        #ax.plot(df_avg['Hora'], df_avg[gas], 'r--', linewidth=1, label='k')
-        ax.plot(df2_avg['Hora'], df2_avg[gas], 'r--', linewidth=1, label='Promedio Anual L1b')
-
-        ylim_min=df_monthly_avg[gas].min() - 5
-        ylim_max=df_monthly_avg[gas].max() + 5
-
-
-        gasmax=df_monthly_avg[gas].max()
-        gasmin=df_monthly_avg[gas].min()
-        gas_delta=gasmax-gasmin
-
-
-      
-        ax.text(0.05, 0.95, f'Δ CO$_{2}$ ppm = {gas_delta:.1f} ppm', transform=ax.transAxes, fontsize=8,verticalalignment='top')#, bbox=bbox_props)
+        # Definir límites del eje Y
+        ylim_min = df_monthly_avg[gas].min() - 5
+        ylim_max = df_monthly_avg[gas].max() + 6
 
         # Configurar el plot
         ax.set_title(f'{month_name}', size=10)
-        #ax.set_xlabel('2024')
         if label == 'CH4':
             ax.set_ylabel('CH$_{4}$ (ppb)')
         else:
             ax.set_ylabel('CO$_{2}$ (ppm)')
         ax.grid(True)
-        #ax.legend(loc='upper right', fontsize='x-small')
 
         ax.set_xticks(range(0, 30, 6))
         ax.set_xticklabels([f'{hour:02d}' for hour in range(0, 30, 6)], rotation=90)
@@ -737,17 +771,176 @@ def plot_24h_anual_subplot_comp_delta(df, df2, CO2=None, CH4=None, CO=None, star
         for gas, label in gases:
             plot_gas(axs[row, col], df_monthly_avg, df2_monthly_avg, df_avg, df2_avg, gas, label, month)
 
-
     for ax in axs.flat:
         ax.label_outer()
 
     # Crear una leyenda única para todos los subplots
     handles, labels = axs[0, 0].get_legend_handles_labels()
-    #fig.legend(handles, labels, loc='upper center', ncol=4, fontsize='small')
-    fig.text(0.5, 0.04, '2024', ha='center', fontsize=12)
-    plt.tight_layout(rect=[0, 0, 1, 0.95])
-    fig.suptitle('Valores mensuales de CO$_{2}$', fontsize=16)
+    fig.text(0.5, 0.04, f'{year}', ha='center', fontsize=12)
+    
+    # Calcular el delta promedio anual para cada gas
+    for gas, label in gases:
+        annual_delta_df = df_monthly_avg.groupby('Mes')[gas].apply(lambda x: x.max() - x.min()).mean()
+        
+        if df2 is not None:
+            annual_delta_df2 = df2_monthly_avg.groupby('Mes')[gas].apply(lambda x: x.max() - x.min()).mean()
+            fig.text(0.5, 0.01, f'Delta promedio anual {label}: ΔL1: {annual_delta_df:.2f}, ΔL1b: {annual_delta_df2:.2f}', 
+                    ha='center', fontsize=10)
+        else:
+            fig.text(0.5, 0.01, f'Delta promedio anual {label}: Δ: {annual_delta_df:.2f}', 
+                    ha='center', fontsize=10)
+    
+    plt.tight_layout(rect=[0, 0.05, 1, 0.95])
+    
+    # Configurar el título según los gases utilizados
+    if any('CO2' in gas for gas, _ in gases):
+        title = 'Valores mensuales de CO$_{2}$'
+    elif any('CH4' in gas for gas, _ in gases):
+        title = 'Valores mensuales de CH$_{4}$'
+    else:
+        title = 'Valores mensuales'
+        
+    fig.suptitle(title, fontsize=16)
     fig.subplots_adjust(top=0.88, bottom=0.1)  # Ajustar espacio para la leyenda
     fig.legend(handles, labels, loc='upper center', ncol=4, fontsize='small', bbox_to_anchor=(0.5, 0.95))
     plt.show()
+
+
+
+
+
+
+
+
+def timeseries_delta_per_day(df, CO2=None, start_month=1, end_month=12):
+
+    if start_month and end_month is not None:
+        df = df[df['Time'].dt.month.between(start_month, end_month)]
+
+    df = df.set_index('Time')
+    df_resampled = df.resample('1h').mean()
+    df_resampled['Hora'] = df_resampled.index.hour
+    df_resampled['Mes'] = df_resampled.index.month
+    df_resampled['Dia'] = df_resampled.index.day
+
+    
+    df_monthly_avg = df_resampled.groupby(['Mes', 'Hora']).mean().reset_index()
+    
    
+    timeseries_delta = pd.DataFrame()
+    
+    if CO2 is not None:
+        
+        monthly_stats = df_monthly_avg.groupby('Mes').agg({
+            CO2: ['max', 'min', 'mean']
+        })
+        
+        
+        monthly_stats.columns = ['_'.join(col).strip() for col in monthly_stats.columns.values]
+        
+        # Calculate delta (max - min)
+        monthly_stats[f'{CO2}_delta'] = monthly_stats[f'{CO2}_max'] - monthly_stats[f'{CO2}_min']
+        
+       
+        timeseries_delta = monthly_stats.reset_index()
+
+        
+    # Plot
+
+
+
+        fig, ax1 = plt.subplots(figsize=(18, 9))
+        
+        
+        month_names = {
+            1: 'Ene', 2: 'Feb', 3: 'Mar', 4: 'Abr', 5: 'May', 6: 'Jun',
+            7: 'Jul', 8: 'Ago', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dic'
+        }
+        
+        
+        ax1.plot(timeseries_delta['Mes'], timeseries_delta[f'{CO2}_max'], 'o-', color='red', label='Máximo')
+        ax1.plot(timeseries_delta['Mes'], timeseries_delta[f'{CO2}_min'], 'o-', color='blue', label='Mínimo')
+        ax1.plot(timeseries_delta['Mes'], timeseries_delta[f'{CO2}_mean'], 'o-', color='green', label='Avg')
+        
+        # valor por mes
+        for i, row in timeseries_delta.iterrows():
+            # max
+            ax1.annotate(f"{row[f'{CO2}_max']:.1f}", 
+                        (row['Mes'], row[f'{CO2}_max']),
+                        textcoords="offset points", 
+                        xytext=(0,10), 
+                        ha='center',
+                        fontsize=8,
+                        bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="red", alpha=0.7))
+            
+            #min
+            ax1.annotate(f"{row[f'{CO2}_min']:.1f}", 
+                        (row['Mes'], row[f'{CO2}_min']),
+                        textcoords="offset points", 
+                        xytext=(0,-15), 
+                        ha='center',
+                        fontsize=8,
+                        bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="blue", alpha=0.7))
+            
+            # avg
+            ax1.annotate(f"{row[f'{CO2}_mean']:.1f}", 
+                        (row['Mes'], row[f'{CO2}_mean']),
+                        textcoords="data", 
+                        
+                        ha='right',
+                        fontsize=8,
+                        bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="green", alpha=0.7))
+        
+        
+        ax1.set_xticks(timeseries_delta['Mes'])
+        ax1.set_xticklabels([month_names[m] for m in timeseries_delta['Mes']])
+        ax1.set_ylabel('CO$_2$ (ppm)', fontsize=12)
+        
+       
+
+
+        ax1.set_xlabel('Mes', fontsize=12)
+        
+       
+        ax2 = ax1.twinx()
+        
+
+        line_delta = ax2.plot(timeseries_delta['Mes'], timeseries_delta[f'{CO2}_delta'], '^--', 
+                             color='purple', label='Δ (max-min)', markersize=8)
+        
+        ax2.set_ylabel(f'Δ {CO2} (max-min)', fontsize=12)
+        ax2.tick_params(axis='y', labelcolor='purple')
+        
+        # delta
+        for i, row in timeseries_delta.iterrows():
+            ax2.annotate(f"{row[f'{CO2}_delta']:.1f}", 
+                       (row['Mes'], row[f'{CO2}_delta']),
+                       textcoords="offset points", 
+                       xytext=(10,0), 
+                       ha='left',
+                       fontsize=8,
+                       color='black',
+                       bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="purple", alpha=0.7))
+        
+        ax1.grid(True, alpha=0.3)
+        
+   
+        lines1, labels1 = ax1.get_legend_handles_labels()
+        lines2, labels2 = ax2.get_legend_handles_labels()
+        ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper right', fontsize=10)
+        
+        
+        year = df.index.year[0] if len(df.index) > 0 else ''
+        plt.title(f'Estadísticas {CO2} para {year}', fontsize=14)
+        
+        plt.tight_layout()
+        plt.show()
+        
+        return timeseries_delta
+
+
+
+
+
+
+
