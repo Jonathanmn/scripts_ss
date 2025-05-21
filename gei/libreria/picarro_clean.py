@@ -660,6 +660,8 @@ def plot_24h_anual_subplot_comp_delta(df, df2=None, CO2=None, CH4=None, CO=None,
     
     También muestra el delta (diferencia máxima) de cada mes.
     """
+
+
     if start_month & end_month is not None:
         df = df[df['Time'].dt.month.between(start_month, end_month)]
         if df2 is not None:
@@ -831,6 +833,9 @@ def timeseries_delta_per_day(df, CO2=None, start_month=1, end_month=12):
     
     if CO2 is not None:
         
+
+        #df_resampled    or df_monthly_avg
+        #monthly_stats = df_resampled.groupby('Mes').agg({
         monthly_stats = df_monthly_avg.groupby('Mes').agg({
             CO2: ['max', 'min', 'mean']
         })
