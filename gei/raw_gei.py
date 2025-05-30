@@ -10,7 +10,7 @@ import sys
 from IPython.display import clear_output
 #pip install ipython
 
-folder_path = '/home/jonathan_mn/12'
+folder_path = 'DATOS Sensores/gei/l0-1/minuto/2024/01'
 file_paths = glob.glob(os.path.join(folder_path, '*.dat'))
 gei_list = []
 

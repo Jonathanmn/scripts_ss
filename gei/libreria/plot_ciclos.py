@@ -1,5 +1,5 @@
 from picarro import *
-from gei.libreria.plot_ciclo_horas import *
+from picarro_clean import *
 
 
 ''' Aqui se van a plotear los ciclos horarios y nocturnos'''
