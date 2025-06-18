@@ -26,7 +26,7 @@ gei_b['Time']=pd.to_datetime(gei_b['Time'])
 
 #plot_24h_anual_subplot(gei_b,CO2='CO2_Avg',start_month=1, end_month=12)
 
-#plot_24h_anual_subplot_comp(gei, gei_b, CO2='CO2_Avg', start_month=1, end_month=12)
+plot_24h_anual_subplot_comp(gei, gei_b, CO2='CO2_Avg', start_month=1, end_month=12)
 
 
 

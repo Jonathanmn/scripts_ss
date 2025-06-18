@@ -47,24 +47,3 @@ plot_1min_sd(gei, CO2=True, CH4=True, CO=False, SD=True,start_month=1, end_month
 #plot_1min_sd_comparison(gei, df2=geib, CO2=True, CH4=False, CO=False, SD=True, start_month=None, end_month=None, year=2024)
 
 '''
-
-def plot_describe_table(df):
-    """
-    Plots the descriptive statistics of the 'CO2_Avg' and 'CH4_Avg' columns of a DataFrame as a table.
-    """
-    # Filter the DataFrame to include only the 'CO2_Avg' and 'CH4_Avg' columns
-    df_filtered = df[['CO2_Avg', 'CH4_Avg']]
-    desc = df_filtered.describe(percentiles=[]).transpose().round(3)
-    
-    fig, ax = plt.subplots(figsize=(10, 2 + 0.5 * len(desc)))
-    ax.axis('tight')
-    ax.axis('off')
-    table = ax.table(cellText=desc.values, colLabels=desc.columns, rowLabels=desc.index, cellLoc='center', loc='center')
-    table.auto_set_font_size(False)
-    table.set_fontsize(10)
-    table.scale(1.2, 1.2)
-    
-    plt.title('Estadisticas para CO$_2$ y CH$_4$')
-    plt.show()
-#plot_describe_table(geib)
-
