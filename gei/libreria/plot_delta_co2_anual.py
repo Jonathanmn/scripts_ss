@@ -1,6 +1,6 @@
 from picarro import *
 from picarro_clean import *
-from picarro_l0_server import *
+
 
 '''se grafican datos delta de ciclos 24h '''
 
@@ -14,8 +14,16 @@ gei['Time'] = pd.to_datetime(gei['Time'])
 
 
 
+
+
 plot_24h_anual_subplot_comp_delta(gei, CO2='CO2_Avg', start_month=1, end_month=12)
 
+
+# grafica maxm min y avg de CO2 y el delta  de cada mes
+
 timeseries_delta_per_day(gei, CO2='CO2_Avg', start_month=1, end_month=12)
+
+
+
 
 
