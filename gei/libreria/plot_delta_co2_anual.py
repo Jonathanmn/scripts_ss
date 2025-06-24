@@ -16,14 +16,15 @@ gei['Time'] = pd.to_datetime(gei['Time'])
 
 
 
-plot_24h_anual_subplot_comp_delta(gei, CO2='CO2_Avg', start_month=1, end_month=12)
+#plot_24h_anual_subplot_comp_delta(gei, CO2='CO2_Avg', start_month=1, end_month=12)
 
 
 # grafica maxm min y avg de CO2 y el delta  de cada mes
 
-timeseries_delta_per_day(gei, CO2='CO2_Avg', start_month=1, end_month=12)
 
+co2_delta=timeseries_delta_per_day(gei, CO2='CO2_Avg', start_month=1, end_month=12)
 
+print(co2_delta)
 
 
 
