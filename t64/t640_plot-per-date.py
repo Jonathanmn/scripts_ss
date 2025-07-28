@@ -11,7 +11,7 @@ si quieres poner 2023-11-18 15:00:00 se escribe en datetime así '''
 start_date1 = datetime(2024, 1, 6, 12, 0, 0)
 end_date1 = datetime(2024, 6, 6, 20, 0, 0)
 
-folder_path = '/home/jonathan_mn/Descargas/data/t64/LO/minuto'
+folder_path = r'DATOS Sensores/pm/L0/minuto'
 
 
 

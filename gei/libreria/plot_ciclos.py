@@ -1,6 +1,6 @@
 from picarro import *
 from picarro_clean import *
-
+from picarro_horarios import *
 
 ''' Aqui se van a plotear los ciclos horarios y nocturnos'''
 
@@ -20,15 +20,46 @@ geib['Time'] = pd.to_datetime(geib['Time'])
 
 
 
-geib=reverse_rename_columns(geib)
-gei= reverse_rename_columns(gei)
+print(geib.columns)
 
 '''
 
 '''
 
-#plot_comparacion(('9 16h',gei_dia),('9 16 b',gei_9_16_b), column='CO2_Avg')
-plot_24h_anual_subplot_comp_delta(gei, geib, column='CO2_Avg', year=2024, delta=True)
 
-#plot_intervalos_subplot_4x1(gei,geib, column='CO2_Avg', intervalos=[('00:00','23:59'),('19:00', '23:59'),('00:00','05:00'),('09:00', '16:00')])
-#plot_comparacion(('19-23h', gei_nocturno),('00-05h',gei_0_5am), ('09-16h', gei_dia),('24h',gei24h), column='CO2_Avg')
+import matplotlib.pyplot as plt
+
+def intervalo_horas_gei(df, column, intervalos=[]):
+    """
+    Plots the average of `column` for each hour in the specified intervals.
+    Each interval is plotted in a separate subplot (n x 1).
+    The average is computed over all months (not separated by month).
+    """
+    n = len(intervalos)
+    fig, axes = plt.subplots(n, 1, figsize=(10, 4 * n), sharex=False)  # <-- sharex=False
+    if n == 1:
+        axes = [axes]
+
+    for idx, (start, end) in enumerate(intervalos):
+        # Filter by hour interval
+        mask = (
+            (df['Time'].dt.strftime('%H:%M') >= start) &
+            (df['Time'].dt.strftime('%H:%M') <= end)
+            if start <= end else
+            ((df['Time'].dt.strftime('%H:%M') >= start) | (df['Time'].dt.strftime('%H:%M') <= end))
+        )
+        df_interval = df[mask].copy()
+        df_interval['hour'] = df_interval['Time'].dt.hour
+
+        # Group by hour only, average over all months
+        grouped = df_interval.groupby('hour')[column].mean().reset_index()
+        axes[idx].plot(grouped['hour'], grouped[column], marker='o', label='Avg All Months')
+        axes[idx].set_title(f'{start} - {end}')
+        axes[idx].set_xlabel('Hour')
+        axes[idx].set_ylabel(column)
+        axes[idx].legend()
+        axes[idx].grid(True)
+
+    plt.tight_layout()
+    plt.show()
+intervalo_horas_gei(geib, column='CO2_Avg', intervalos=[('19:00', '23:59'), ('00:00', '05:00'), ('09:00', '16:00')])

@@ -5,9 +5,10 @@ import glob
 import matplotlib.pyplot as plt
 import numpy as np
 from windrose import WindroseAxes
-folder_met = '/home/jonathan_mn/Descargas/data/met/minuto'
-folder_t64 = '/home/jonathan_mn/Descargas/data/t64/LO/minuto'
 
+
+folder_met= r'DATOS Sensores\met\L2\hora'
+folder_t64 = r'DATOS Sensores\pm\L0\hora'
 
 all_files_met = glob.glob(os.path.join(folder_met, "*.csv"))
 
@@ -18,7 +19,7 @@ df_met = []
 df_t64=[]
 
 for file in all_files_met:
-    df = pd.read_csv(file,header=7, encoding='ISO-8859-1',low_memory=False)
+    df = pd.read_csv(file,header=6, encoding='ISO-8859-1',low_memory=False)
     df_met.append(df)
 
 for file in all_files_t64:

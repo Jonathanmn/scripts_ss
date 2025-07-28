@@ -178,6 +178,18 @@ def plot_comparacion(*dfs, column='CO2_Avg'):
 
 
 
+def ciclo_1d_avg(ciclo_filtrado):
+
+    #ciclo_filtrado['Time']=ciclo_filtrado['Time'] - timedelta(hours=5)
+    ciclo_filtrado = ciclo_filtrado.set_index('Time')
+    #resampleo por dia
+    ciclo_dia = ciclo_filtrado.resample('1D').agg(['mean', 'std'])
+    
+    # Rename columns
+    ciclo_dia.columns = ['_'.join(col).replace('_mean', '_Avg').replace('_std', '_SD') for col in ciclo_dia.columns]
+    ciclo_dia = ciclo_dia.reset_index()
+ 
+    return ciclo_dia
 
 
 
@@ -190,12 +202,11 @@ def plot_intervalos_subplot_4x1(df1, df2, column='CO2_Avg', intervalos=[('19:00'
     """
     fig, axs = plt.subplots(4, 1, figsize=(6, 10), sharex=True)
 
-    '''
+    
     df2_interval_full = intervalo_horas(df2, intervalos[0][0], intervalos[0][1])
     df2_avg_full = ciclo_1d_avg(df2_interval_full)
     df2_monthly_avg = df2_avg_full.set_index('Time').resample('ME').mean().reset_index()
     df2_monthly_avg['Time'] = df2_monthly_avg['Time'] + pd.offsets.MonthBegin(1) - pd.offsets.Day(15)
-'''
 
     for i, (h0, hf) in enumerate(intervalos):
         df1_interval = intervalo_horas(df1, h0, hf)
