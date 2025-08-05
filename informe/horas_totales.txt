@@ -22,14 +22,14 @@ Semana		Tabla		Fecha				Horas Semana	Horas Totales
 16		4		27-01-2025 al 31-01-2025		20h		244h
 17		5		03-02-2025 al 07-02-2025		16h		260h
 18		5		10-02-2025 al 14-02-2025		20h		280h
-19		5		17-02-2025 al 21-02-2025		20h		300h
+19		5		17-02-2025 al 21-02-2025		20h		300h  4
 20		5		24-02-2025 al 28-02-2025		20h		320h
 21		6		03-03-2025 al 07-03-2025		20h		340h
 22		6		10-03-2025 al 14-03-2025		20h		360h
 23		6		17-03-2025 al 21-03-2025		16h		376h 5
 24		6		24-03-2025 al 28-03-2025		20h		396h
 25		7		31-03-2025 al 04-04-2025		20h		416h
-26		7		07-04-2025 al 11-04-2025		20h		436h
+26		7		07-04-2025 al 11-04-2025		20h		436h    436 
 27		7		14-04-2025 al 18-04-2025		0h		436h
 28		7		21-04-2025 al 25-04-2025		20h		456h  salida de campo 
 29		8		28-04-2025 al 02-05-2025		20h		476h
@@ -47,24 +47,7 @@ DÍAS INHÁBILES:
 - 02-11-2024 (Sábado) - No incluida en el período
 - 18-11-2024 (Lunes) - Semana 6
 - 12-12-2024 (Jueves) - Semana 9
-- 16-12-2024 (Lunes) - Semana 10
-- 17-12-2024 (Martes) - Semana 10
-- 18-12-2024 (Miércoles) - Semana 10
-- 19-12-2024 (Jueves) - Semana 10
-- 20-12-2024 (Viernes) - Semana 10
-- 21-12-2024 (Sábado) - No incluida en el período
-- 22-12-2024 (Domingo) - No incluida en el período
-- 23-12-2024 (Lunes) - Semana 11
-- 24-12-2024 (Martes) - Semana 11
-- 25-12-2024 (Miércoles) - Semana 11
-- 26-12-2024 (Jueves) - Semana 11
-- 27-12-2024 (Viernes) - Semana 11
-- 28-12-2024 (Sábado) - No incluida en el período
-- 29-12-2024 (Domingo) - No incluida en el período
-- 30-12-2024 (Lunes) - Semana 12
-- 31-12-2024 (Martes) - Semana 12
-- 01-01-2025 (Miércoles) - Semana 12
-- 02-01-2025 (Jueves) - Semana 12
+
 - 03-01-2025 (Viernes) - Semana 12
 - 03-02-2025 (Lunes) - Semana 17
 - 17-03-2025 (Lunes) - Semana 23
