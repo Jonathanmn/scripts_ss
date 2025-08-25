@@ -3,16 +3,15 @@ from windrose_lib import *
 
 
 
-
-folder_met = './DATOS/met/L2/minuto'
-folder_t64 = './DATOS/pm/L0/minuto'
-folder_gei = './DATOS/gei/L1/minuto/2024' 
-
+folder_met = r'_files\met\L2\minuto'
+folder_t64 = r'_files\pm\L0\minuto'
+folder_gei = r'_files\gei\L1b\minuto\2024'
 
 
 
 
-gei = read_L0_or_L1(folder_gei, 'yyyy-mm-dd HH:MM:SS', header=7)
+
+gei = read_L0_or_L1(folder_gei, 'yyyy-mm-dd HH:MM:SS', header=8)
 gei = reverse_rename_columns(gei)
 
 

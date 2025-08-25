@@ -52,7 +52,7 @@ def read_L0_or_L1(folder_path,time, header=None):
     dataframes = []
 
     for file_path in Path(folder_path).rglob('*.dat'):
-        df = pd.read_csv(file_path, delimiter=r',', header=header)
+        df = pd.read_csv(file_path, delimiter=',', header=header)
         dataframes.append(df)
 
     gei = pd.concat(dataframes, ignore_index=True)

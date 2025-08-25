@@ -8,8 +8,8 @@ from windrose import WindroseAxes
 
 ''' Este script grafica la direccion del viento y concentrraciones mayores a 300 '''
 
-folder_met = r'DATOS Sensores\met\L2\minuto'
-folder_t64 = r'DATOS Sensores/pm/L0/minuto'
+folder_met = r'_files\met\L2\minuto'
+folder_t64 = r'_files\pm\L0\minuto'
 
 
 all_files_met = glob.glob(os.path.join(folder_met, "*.csv"))
