@@ -36,3 +36,22 @@ t64_.rename(columns={
 
 
 print(t64_.columns)
+
+t64_['datetime']=pd.to_datetime(t64_['datetime'], format='%Y-%m-%d %H:%M:%S')
+
+#plot
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(12, 6))
+
+
+plt.scatter(t64_['datetime'], t64_['pm25'], label='PM2.5 Concentration', color='blue')
+plt.scatter(t64_['datetime'], t64_['pm10'], label='PM10 Concentration', color='orange')
+plt.xlabel('Date and Time')
+plt.ylabel('Concentration (µg/m³)')
+plt.title('PM2.5 and PM10 Concentrations Over Time')
+plt.legend()
+plt.grid()
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
