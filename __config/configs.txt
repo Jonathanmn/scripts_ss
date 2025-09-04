@@ -1,0 +1,12 @@
+
+"workbench.colorCustomizations": {{--- IGNORE ---}}
+
+
+"sideBar.background": "#393742",
+"sideBar.foreground": "#ffffff",
+        "editor.background": "#cccccc",
+        "editor.foreground": "#0e0e0e",
+        "activityBarBadge.background": "#ff1b1b",
+        "activityBar.background": "#9a9a9a",
+        "activityBar.foreground": "#000000",
+        
