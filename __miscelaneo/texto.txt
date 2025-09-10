@@ -1,0 +1,14 @@
+Sus siglas provienen del Inglés Solar-Induced Flourescence. Este índice es una diminuta fracción de luz entre el 0.05% y 2% de radiancia  en la superficie de la vegetación. Está relacionada con la absorción de Radiación Fotosintética Activa (PAR, por sus siglas en Ingles), gracias a la excitación de las moléculas a clorofila a (ChlaF). Este índice comunica información sobre la tasa instantanea de fotosintesis, lo que se traduce a una ventana óptica que permite seguir el estado funcional y de salud de las plantas. Los mapas que se realizaron con este indice hicieron uso del producto GOSIF reportado en el trabajo de (Li, X. et Xiao, J.,2019)  en donde se trabajaron con observaciones de los satelites MODIS y GOSAT, con resolución espacial de 0.05° a distintas resoluciones temporales, como cada 8 días, cada 16 días y cada mes, en este trabajo se utilizo el de un mes pues tuvo fines de exploración de este producto. Además, el SIF esta relacionado con la Productividad Primaria Bruta (GPP, por sus siglas en Inglés).
+
+
+
+
+
+El SIF (Solar-Induced Fluorescence) es una pequeña fracción de luz emitida por la vegetación (0.05 - 2 % de radiancia), relacionada con la absorción de radiación fotosintética activa (PAR) y la excitación de la clorofila a (ChlaF). Indica la tasa instantánea de fotosíntesis y el estado funcional y de salud de las plantas. Los mapas de SIF realizados usan los indices de observaciones satelitales (MODIS, GOSAT) con resolución espacial de 0.05° y resolución temporal variable (8 días, 16 dias y mensual) reportados por Li, X. et Xiao, J.,2019. SIF está vinculado a la Productividad Primaria Bruta (GPP) y los resultados tuvieron fines de exploración de este producto.
+
+
+
+
+stas siglás provienen del Inglés Gross Primary Productivity; es un parametro de observación terrestre para la cuantificación y fijación del carbón en los ecosistemas terrestres, hace referencia: “la inhalación” de dióxido de carbono para posteriormente utilizarlo ,durante la fotosíntesis, en la cosntrucción de nuevas estructuras vegetales. El producto cartográfico generado para esta visualización se obtuvo con información proporcionada de MODIS, el algoritmo MOD17A2H , es un compuesto acumulativo de 8días y resolución espacial de 500 m, que se basa en el concepto de eficiencia en el uso de la radiación. El producto de este algoritmo tiene un nivel 4 de procesamiento.
+
+Gross Primary Productivity (GPP) es un parámetro de observación de cuantificación y fijación de carbono en los ecosistemas terrestres por medio de la inhalación de CO2 y el proceso de la fotosíntesis para nuevas estructuras vegetales. . El producto cartográfico se obtuvo con datos MODIS usando el algoritmo MOD17A2H, que genera compuestos acumulativos de 8 días con resolución espacial de 500 m, basado en la eficiencia del uso de la radiación con un nivel 4 de procesamiento.
