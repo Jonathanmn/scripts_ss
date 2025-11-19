@@ -16,7 +16,7 @@ conteo=0
 
 #se agregan todos los datos de raw
 for file_path in file_paths:
-    gei = pd.read_csv(file_path, delimiter="\s+")
+    gei = pd.read_csv(file_path, delimiter=r"\s+")
     gei['timestamp'] = pd.to_datetime(gei['DATE'] + ' ' + gei['TIME'])
     gei_list.append(gei)
     conteo+=1

@@ -8,6 +8,7 @@ import plotly.colors
 import matplotlib.cm as cm
 import matplotlib.dates as mdates
 from matplotlib.ticker import MaxNLocator
+from plot_ciclo_horas import intervalo_horas, ciclo_1d_avg
 '''herramienta para desplegar el plotly y eliminar datos de forma visual '''
 
 
@@ -949,3 +950,130 @@ def timeseries_delta_per_day(df, CO2=None, start_month=1, end_month=12):
 
 
 
+def plot_comparacion(*dfs, column='CO2_Avg'):
+    plt.figure(figsize=(10, 6))
+    
+    for i, df in enumerate(dfs):
+        if column in df.columns:
+            plt.plot(df['Time'], df[column], label=f' {df}')
+        else:
+            print(f"Column '{column}' not found in DataFrame {i+1}")
+    
+    plt.xlabel('Time')
+    plt.ylabel(column)
+    plt.title(f'Comparison of {column} across DataFrames')
+    plt.legend()
+    plt.show()
+
+
+
+def plot_comparacion(*dfs, column='CO2_Avg'):
+    month_names = {
+        1: 'Ene', 2: 'Feb', 3: 'Mar', 4: 'Abr', 5: 'May', 6: 'Jun',
+        7: 'Jul', 8: 'Ago', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dic'
+    }
+    
+    plt.figure(figsize=(10, 6))
+    
+    for df in dfs:
+        if isinstance(df, tuple) and len(df) == 2:
+            df_name, df_data = df
+            if column in df_data.columns:
+                plt.plot(df_data['Time'], df_data[column], label=df_name)
+            else:
+                print(f"Column '{column}' no se encontro en '{df_name}'")
+        else:
+            print("se deben meter valores en tupla ('df_name', df_data)")
+    
+ 
+    plt.ylabel('CO$_{2}$ ppm')
+    plt.title('Comparación de intervalos de tiempo de CO$_{2}$')
+    plt.legend()
+    
+    # Set month names as x-tick labels
+    months = dfs[0][1]['Time'].dt.month.unique()
+    month_starts = [dfs[0][1][dfs[0][1]['Time'].dt.month == month]['Time'].iloc[0] for month in months]
+    month_labels = [month_names[month] for month in months]
+
+    plt.xticks(month_starts, month_labels, rotation=45)
+    plt.grid()
+    plt.show()
+
+
+
+
+
+
+
+
+def plot_intervalos_subplot_4x1(df1, df2, column='CO2_Avg', intervalos=[('19:00', '23:59'), ('00:00', '05:00'), ('09:00', '16:00')]):
+    """
+    Esta función toma dos DataFrames y una lista de intervalos de tiempo, filtra los datos según los intervalos,
+    aplica ciclo_1d_avg y plotea los resultados en un subplot de 4x1.
+    
+    Parameters:
+    -----------
+    df1 : pandas.DataFrame
+        Primer DataFrame con datos de gases de efecto invernadero
+    df2 : pandas.DataFrame
+        Segundo DataFrame con datos de gases de efecto invernadero
+    column : str, default='CO2_Avg'
+        Nombre de la columna a graficar
+    intervalos : list of tuples, default=[('19:00', '23:59'), ('00:00', '05:00'), ('09:00', '16:00')]
+        Lista de tuplas con intervalos de tiempo en formato ('HH:MM', 'HH:MM')
+    
+    Returns:
+    --------
+    None
+        Muestra el gráfico con 4 subplots mostrando diferentes intervalos horarios
+    """
+    fig, axs = plt.subplots(4, 1, figsize=(6, 10), sharex=True)
+
+    '''
+    df2_interval_full = intervalo_horas(df2, intervalos[0][0], intervalos[0][1])
+    df2_avg_full = ciclo_1d_avg(df2_interval_full)
+    df2_monthly_avg = df2_avg_full.set_index('Time').resample('ME').mean().reset_index()
+    df2_monthly_avg['Time'] = df2_monthly_avg['Time'] + pd.offsets.MonthBegin(1) - pd.offsets.Day(15)
+'''
+    for i, (h0, hf) in enumerate(intervalos):
+        df1_interval = intervalo_horas(df1, h0, hf)
+        df2_interval = intervalo_horas(df2, h0, hf)
+
+        df1_avg = ciclo_1d_avg(df1_interval)
+        df2_avg = ciclo_1d_avg(df2_interval)
+
+        axs[i].plot(df1_avg['Time'], df1_avg[column], label='L1', color='orange', alpha=1)
+        axs[i].plot(df2_avg['Time'], df2_avg[column], label='L1b', color='#1062b4',alpha=1)
+
+        df2_monthly_avg = df2_avg.set_index('Time').resample('ME').mean().reset_index()
+        df2_monthly_avg['Time'] = df2_monthly_avg['Time'] + pd.offsets.MonthBegin(1) - pd.offsets.Day(15)
+        
+        axs[i].scatter(df2_monthly_avg['Time'], df2_monthly_avg[column], color='red', label='Promedio Mensual', s=30, zorder=5)
+        axs[i].plot(df2_monthly_avg['Time'], df2_monthly_avg[column], color='red', linestyle='--', linewidth=1, zorder=4)
+        axs[i].set_title(f'Horario:{h0}-{hf}', fontsize=10)
+        axs[i].set_ylabel('CO$_{2}$ ppm')
+        #axs[i].legend(loc='upper right',fontsize='x-small')
+        axs[i].grid(True)
+        #axs[i].set_ylim(405, 580)
+
+    axs[-1].set_xlabel('2024')
+    fig.suptitle('Promedios diarios de CO$_{2}$ para diferentes horarios', fontsize=14)
+    # Set month names as x-tick labels
+    months = df1['Time'].dt.month.unique()
+    month_starts = [df1[df1['Time'].dt.month == month]['Time'].iloc[0] for month in months]
+    month_names = {1: 'Ene', 2: 'Feb', 3: 'Mar', 4: 'Abr', 5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Ago', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dic'}
+    month_labels = [month_names[month] for month in months]
+
+    for ax in axs:
+        ax.set_xticks(month_starts)
+        ax.set_xticklabels(month_labels, rotation=45)
+        #ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
+
+    # Crear una leyenda única para todos los subplots
+    handles, labels = axs[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='upper center', ncol=4, fontsize='small', bbox_to_anchor=(0.5, 0.95))
+
+
+
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
+    plt.show()
