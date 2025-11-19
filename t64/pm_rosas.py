@@ -4,8 +4,8 @@ import glob
 import matplotlib.pyplot as plt
 import numpy as np
 from windrose import WindroseAxes
-folder_met = '/home/jonathan_mn/Descargas/data/met/minuto'
-folder_t64 = '/home/jonathan_mn/Descargas/data/t64/LO/minuto'
+folder_met = 'DATOS Sensores/met/L2/minuto'
+folder_t64 = 'DATOS Sensores/pm/L0/minuto'
 
 
 all_files_met = glob.glob(os.path.join(folder_met, "*.csv"))
@@ -88,7 +88,7 @@ plt.plot(cmul['date'], cmul['PM10 Conc'], label='PM10 Conc', color='#4C4B16')
 plt.plot(cmul['date'], cmul['PM2.5 Conc'], label='PM2.5 Conc', alpha=0.9, color='#E6C767')
 
 plt.title('\nObservatorio Atmosférico Calakmul Concentraciones de PM2.5 y PM10')
-plt.ylabel('Concentración ($\mathregular{μg/m^{-3}}$)')
+plt.ylabel(r'Concentración ($\mathregular{μg/m^{-3}}$)')
 
 plt.legend()
 plt.grid(True)
@@ -98,7 +98,7 @@ plt.subplot(2, 3,4)
 plt.hist(cmul['PM10 Conc'], bins=40, label='PM10', alpha=1, color='#4C4B16')
 plt.hist(cmul['PM2.5 Conc'], bins=40, label='PM2.5', alpha=0.85, color='#E6C767')
 
-plt.xlabel('Concentración PM ($\mathregular{μg/m^{-3}}$)')
+plt.xlabel(r'Concentración PM ($\mathregular{μg/m^{-3}}$)')
 plt.ylabel('Número de datos (Log)')
 plt.yscale('log')
 plt.title('\nHistograma PM2.5 y PM10')

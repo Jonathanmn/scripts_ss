@@ -855,7 +855,7 @@ def timeseries_delta_per_day(df, CO2=None, start_month=1, end_month=12):
 
 
 
-        fig, ax1 = plt.subplots(figsize=(18, 9))
+        fig, ax1 = plt.subplots(figsize=(12, 8))
         
         
         month_names = {
@@ -937,11 +937,12 @@ def timeseries_delta_per_day(df, CO2=None, start_month=1, end_month=12):
         
         
         year = df.index.year[0] if len(df.index) > 0 else ''
-        plt.title(f'Estadísticas {CO2} para {year}', fontsize=14)
+        plt.title(f'Observatorio Atmosférico Calakmul 2024\nEstadísticas de CO₂', fontsize=14)
         
         plt.tight_layout()
         plt.show()
         
+        timeseries_delta['CO2_Avg_delta'].round(3) # Redondear a 2 decimales
         return timeseries_delta
 
 

@@ -9,7 +9,7 @@ from picarro import *
 
 #folder_path = '/home/jmn/L1/minuto/2024'
 
-folder_path = 'DATOS Sensores/gei/L1b/minuto/2024' 
+folder_path = 'scripts_ss/_files/gei/L1b/minuto/2024' 
 
 #gei = read_raw_lite(folder_path, 'Time')
 gei = read_L0_or_L1(folder_path, 'yyyy-mm-dd HH:MM:SS', header=7)
@@ -23,7 +23,11 @@ folder_pathb='./DATOS/gei/L1b/minuto/2024'
 
 
 
-plot_1min_avg(gei, CO2=True, CH4=False, CO=False)
+plot_1min_avg(gei, CO2=True, CH4=True, CO=True)
+
+plot_1min_sd(gei, CO2=True, CH4=True, CO=True, SD=True,start_month=1, end_month=12, year=2024)
+
+
 
 
 '''

@@ -39,7 +39,7 @@ def met_cmul_L1_L2(folder_path):
     return cmul
 
 
-folder_path = './DATOS/met/L2/hora' 
+folder_path = r'DATOS Sensores\met\L2\hora' 
 
 
 

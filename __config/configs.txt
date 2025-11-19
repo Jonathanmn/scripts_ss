@@ -1,0 +1,52 @@
+
+"workbench.colorCustomizations": {{--- IGNORE ---}}
+
+
+"sideBar.background": "#393742",
+"sideBar.foreground": "#ffffff",
+        "editor.background": "#cccccc",
+        "editor.foreground": "#0e0e0e",
+        "activityBarBadge.background": "#ff1b1b",
+        "activityBar.background": "#9a9a9a",
+        "activityBar.foreground": "#000000",
+        
+
+
+
+
+
+
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#00112b",
+        "activityBar.foreground": "#ffffff",
+        "sideBar.background": "#040e35fa",
+        "sideBar.foreground": "#b0b0b0",
+        "editor.background": "#d1d1d1",
+        "statusBar.background": "#ffffff",
+         "activityBarBadge.background": "#ff1b1b",
+         "activityBar.activeBackground": "#0b2fb4",
+         
+        "tab.activeBackground": "#021a4f",
+        "tab.activeForeground": "#ffffff",
+        "tab.inactiveBackground": "#fffefe",
+        "tab.inactiveForeground": "#101010",
+        "terminal.background": "#030639",
+        "terminal.foreground": "#abd2ff",
+        "terminal.ansiBlack": "#000000",
+        "terminal.ansiBlue": "#2472c8",
+        "terminal.ansiBrightBlue": "#3b8eea",
+        "terminal.ansiBrightCyan": "#29b8db",
+        "terminal.ansiBrightGreen": "#f9ffa6",
+        "terminal.ansiBrightMagenta": "#d670d6",
+        "terminal.ansiBrightRed": "#f14c4c",
+        "terminal.ansiBrightWhite": "#e5e5e5",
+        "terminal.ansiBrightYellow": "#f5f543",
+        "terminal.ansiCyan": "#11a8cd",
+        "terminal.ansiGreen": "#0dbc79",
+        "terminal.ansiMagenta": "#bc3fbc",
+        "terminal.ansiRed": "#cd3131",
+        "terminal.ansiWhite": "#e5e5e5",
+        "terminal.ansiYellow": "#e5e510"
+
+
+    }

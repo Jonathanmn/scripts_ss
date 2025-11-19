@@ -1,0 +1,40 @@
+
+# Add basemap
+# ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.OpenStreetMap.Mapnik)
+# ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.OpenStreetMap.France)
+# ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.OpenStreetMap.HOT)
+
+# CartoDB basemaps
+ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.CartoDB.Positron)
+ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.CartoDB.PositronNoLabels)
+ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.CartoDB.DarkMatter)
+ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.CartoDB.DarkMatterNoLabels)
+ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.CartoDB.Voyager)
+
+# Stamen basemaps
+ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.Stamen.Terrain)
+ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.Stamen.TerrainBackground)
+ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.Stamen.Toner)
+ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.Stamen.TonerBackground)
+ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.Stamen.Watercolor)
+
+# ESRI basemaps
+ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.Esri.WorldImagery)
+ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.Esri.WorldStreetMap)
+ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.Esri.WorldTopographic)
+ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.Esri.WorldTerrain)
+ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.Esri.WorldShadedRelief)
+ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.Esri.WorldPhysical)
+ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.Esri.OceanBasemap)
+ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.Esri.NatGeoWorldMap)
+
+# NASA GIBS basemaps
+ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.NASAGIBS.ModisTerraTrueColorCR)
+ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.NASAGIBS.ModisAquaTrueColorCR)
+
+# Google basemaps (may require API key)
+ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.Google.Map)
+ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.Google.Satellite)
+ctx.add_basemap(ax, crs=polygon_gdf.crs, source=ctx.providers.Google.Terrain)
+
+# Custom tile server example

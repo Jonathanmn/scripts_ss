@@ -16,8 +16,8 @@ folder_t64 = '/home/jonathan_mn/Descargas/data/t64/L0/minuto'
 
 
 
-folder_cmul = '/home/jmn/DATA/met/L2/hora' 
-folder_t64 = '/home/jmn/DATA/t64/L0/hora'
+folder_cmul = r'DATOS Sensores\met\L2\hora'
+folder_t64 = r'DATOS Sensores\pm\L0\hora'
 
 start_date1 = datetime(2024, 5, 15, 6, 0, 0)
 end_date1 = datetime(2024, 5, 16, 0, 0, 0)
@@ -43,10 +43,10 @@ wr_per_date = wr_all_time[(wr_all_time['yyyy-mm-dd HH:MM:SS'] >= start_date1) & 
  el agumento per_date o all_time significa graficar por periodo de fecha o toda la serie de tiempo'''
 
 #rosa_pm(wr_per_date)
-#rosa_pm(wr_all_time)
+rosa_pm(wr_all_time)
 
 
 #met_windrose(wr_all_time)
 
-met_windrose(wr_all_time)
+#met_windrose(wr_all_time)
 
